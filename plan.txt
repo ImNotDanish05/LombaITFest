@@ -1,0 +1,9 @@
+1.	Database (https://dbdiagram.io/home) - Syauqi
+-	Buat kerangka
+-	Dianalisa (dicek ulang)
+-	Dibuat (dalam MongoDB)
+2.	Backend – Danish dan Adzi
+-	Buat program ngambil komentar dari video youtube yang dipilih ke program
+-	Ngedeteksi komentar judol (pakai github yang pernah dikirim + improvisasi)
+-	Ngebuat program yang APInya bisa menghapus komentar yang dipilh dari step sebelumnya
+-	Penggabungan Database sama Backend
