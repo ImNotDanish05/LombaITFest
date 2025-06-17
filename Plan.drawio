@@ -1,6 +1,6 @@
 <mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36" version="27.1.6">
   <diagram name="Page-1" id="75r0CHqdmpS8ziVCV765">
-    <mxGraphModel dx="2896" dy="1775" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+    <mxGraphModel dx="2511" dy="1558" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -318,6 +318,9 @@
         <mxCell id="xB-aLpheTIVvpIYeBYx6-39" value="Salah" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
           <mxGeometry x="810" y="580" width="60" height="30" as="geometry" />
         </mxCell>
+        <mxCell id="xB-aLpheTIVvpIYeBYx6-59" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="xB-aLpheTIVvpIYeBYx6-42" target="xB-aLpheTIVvpIYeBYx6-58">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
         <mxCell id="xB-aLpheTIVvpIYeBYx6-42" value="Data user dipakai buat ambil seluruh komentar di link youtube yang diberikan" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
           <mxGeometry x="660" y="980" width="182.5" height="130" as="geometry" />
         </mxCell>
@@ -331,8 +334,8 @@
             </Array>
           </mxGeometry>
         </mxCell>
-        <mxCell id="xB-aLpheTIVvpIYeBYx6-47" value="Memasukan Data Comment ke Database" style="shape=card;whiteSpace=wrap;html=1;" vertex="1" parent="1">
-          <mxGeometry x="688.75" y="1340" width="125" height="140" as="geometry" />
+        <mxCell id="xB-aLpheTIVvpIYeBYx6-47" value="Memasukan Data Filter Comment ke Database" style="shape=card;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="695" y="1690" width="125" height="140" as="geometry" />
         </mxCell>
         <mxCell id="xB-aLpheTIVvpIYeBYx6-52" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="xB-aLpheTIVvpIYeBYx6-49" target="xB-aLpheTIVvpIYeBYx6-51">
           <mxGeometry relative="1" as="geometry" />
@@ -354,6 +357,31 @@
         </mxCell>
         <mxCell id="xB-aLpheTIVvpIYeBYx6-57" value="&lt;h1 style=&quot;margin-top: 0px;&quot;&gt;Delete Comment Judol&lt;/h1&gt;&lt;div&gt;Akan memilih komentar yang dicurigai judol, lalu di delete&lt;/div&gt;" style="text;html=1;whiteSpace=wrap;overflow=hidden;rounded=0;" vertex="1" parent="1">
           <mxGeometry x="-700" y="1415" width="340" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="xB-aLpheTIVvpIYeBYx6-61" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="xB-aLpheTIVvpIYeBYx6-58" target="xB-aLpheTIVvpIYeBYx6-60">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="xB-aLpheTIVvpIYeBYx6-58" value="Data difilter, hanya diambil yang memiliki huruf unik, disimpan ke data1" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="691.25" y="1210" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="xB-aLpheTIVvpIYeBYx6-63" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="xB-aLpheTIVvpIYeBYx6-60" target="xB-aLpheTIVvpIYeBYx6-62">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="xB-aLpheTIVvpIYeBYx6-60" value="use_GeminiAI == True ?" style="rhombus;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="692.5" y="1340" width="118.75" height="135" as="geometry" />
+        </mxCell>
+        <mxCell id="xB-aLpheTIVvpIYeBYx6-62" value="Data yang BELUM DIFILTER diambil lagi, lalu diambil aja yang dianggap dicurigai, disimpan ke data2" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="870" y="1377.5" width="150" height="112.5" as="geometry" />
+        </mxCell>
+        <mxCell id="xB-aLpheTIVvpIYeBYx6-64" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="xB-aLpheTIVvpIYeBYx6-60" target="xB-aLpheTIVvpIYeBYx6-47">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="xB-aLpheTIVvpIYeBYx6-65" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.995;entryY=0.61;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="xB-aLpheTIVvpIYeBYx6-62" target="xB-aLpheTIVvpIYeBYx6-47">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="940" y="1775" />
+            </Array>
+          </mxGeometry>
         </mxCell>
       </root>
     </mxGraphModel>
