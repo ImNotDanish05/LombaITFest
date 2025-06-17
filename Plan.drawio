@@ -19,7 +19,7 @@
         <mxCell id="JXqW-oBA6LnlcBC6Squj-5" value="Choose Channel" style="ellipse;whiteSpace=wrap;html=1;" parent="1" vertex="1">
           <mxGeometry x="-270.5" y="240" width="120" height="80" as="geometry" />
         </mxCell>
-        <mxCell id="JXqW-oBA6LnlcBC6Squj-6" value="Get Comment Judol" style="ellipse;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+        <mxCell id="JXqW-oBA6LnlcBC6Squj-6" value="Get Comment" style="ellipse;whiteSpace=wrap;html=1;" parent="1" vertex="1">
           <mxGeometry x="-302.5" y="710" width="185" height="130" as="geometry" />
         </mxCell>
         <mxCell id="JXqW-oBA6LnlcBC6Squj-7" value="Input user &amp;amp; channel" style="shape=parallelogram;perimeter=parallelogramPerimeter;whiteSpace=wrap;html=1;fixedSize=1;" parent="1" vertex="1">
@@ -273,13 +273,13 @@
         <mxCell id="xB-aLpheTIVvpIYeBYx6-50" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="xB-aLpheTIVvpIYeBYx6-21" target="xB-aLpheTIVvpIYeBYx6-49">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="xB-aLpheTIVvpIYeBYx6-21" value="delete_comment_judol&lt;div&gt;(youtube link)&lt;/div&gt;" style="shape=card;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+        <mxCell id="xB-aLpheTIVvpIYeBYx6-21" value="get_comment&lt;div&gt;(youtube link)&lt;/div&gt;" style="shape=card;whiteSpace=wrap;html=1;" vertex="1" parent="1">
           <mxGeometry x="-305" y="1090" width="170" height="210" as="geometry" />
         </mxCell>
         <mxCell id="xB-aLpheTIVvpIYeBYx6-27" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="xB-aLpheTIVvpIYeBYx6-24" target="xB-aLpheTIVvpIYeBYx6-25">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="xB-aLpheTIVvpIYeBYx6-24" value="delete_comment_judol&lt;div&gt;(youtube link)&lt;/div&gt;" style="shape=card;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+        <mxCell id="xB-aLpheTIVvpIYeBYx6-24" value="get_comment&lt;div&gt;(youtube link)&lt;/div&gt;" style="shape=card;whiteSpace=wrap;html=1;" vertex="1" parent="1">
           <mxGeometry x="430" y="-165" width="170" height="210" as="geometry" />
         </mxCell>
         <mxCell id="xB-aLpheTIVvpIYeBYx6-25" value="Memasukan Data video &amp;amp; Mengambil Data video" style="shape=card;whiteSpace=wrap;html=1;" vertex="1" parent="1">
