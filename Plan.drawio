@@ -13,6 +13,9 @@
         <mxCell id="JXqW-oBA6LnlcBC6Squj-3" value="login_user()" style="shape=card;whiteSpace=wrap;html=1;" vertex="1" parent="1">
           <mxGeometry x="-95" y="-80" width="80" height="100" as="geometry" />
         </mxCell>
+        <mxCell id="JXqW-oBA6LnlcBC6Squj-15" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="JXqW-oBA6LnlcBC6Squj-5" target="JXqW-oBA6LnlcBC6Squj-14">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
         <mxCell id="JXqW-oBA6LnlcBC6Squj-5" value="Choose Channel" style="ellipse;whiteSpace=wrap;html=1;" vertex="1" parent="1">
           <mxGeometry x="365" y="370" width="120" height="80" as="geometry" />
         </mxCell>
@@ -35,6 +38,9 @@
           <mxGeometry x="385" y="180" width="80" height="100" as="geometry" />
         </mxCell>
         <mxCell id="JXqW-oBA6LnlcBC6Squj-12" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="JXqW-oBA6LnlcBC6Squj-1" target="JXqW-oBA6LnlcBC6Squj-11">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="JXqW-oBA6LnlcBC6Squj-16" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="JXqW-oBA6LnlcBC6Squj-14" target="JXqW-oBA6LnlcBC6Squj-6">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="JXqW-oBA6LnlcBC6Squj-14" value="login_user()" style="shape=card;whiteSpace=wrap;html=1;" vertex="1" parent="1">
