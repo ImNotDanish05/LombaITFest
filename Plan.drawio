@@ -1,6 +1,6 @@
 <mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36" version="27.1.6">
   <diagram name="Page-1" id="75r0CHqdmpS8ziVCV765">
-    <mxGraphModel dx="2836" dy="1741" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+    <mxGraphModel dx="2349" dy="1466" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -395,7 +395,7 @@
         <mxCell id="xB-aLpheTIVvpIYeBYx6-68" value="Suruh user pilih mana yang di unchecklist (jadi defaultnya dichecklist)" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
           <mxGeometry x="1105" y="390" width="120" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="xB-aLpheTIVvpIYeBYx6-70" value="Proses Delete" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+        <mxCell id="xB-aLpheTIVvpIYeBYx6-70" value="Proses Delete jika is_owner" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
           <mxGeometry x="1102.5" y="540" width="120" height="60" as="geometry" />
         </mxCell>
         <mxCell id="xB-aLpheTIVvpIYeBYx6-72" value="Selesai" style="ellipse;whiteSpace=wrap;html=1;" vertex="1" parent="1">
