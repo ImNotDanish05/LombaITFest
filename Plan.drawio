@@ -1,6 +1,6 @@
 <mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36" version="27.1.6">
   <diagram name="Page-1" id="75r0CHqdmpS8ziVCV765">
-    <mxGraphModel dx="2836" dy="1741" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+    <mxGraphModel dx="2896" dy="1775" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -332,10 +332,7 @@
           </mxGeometry>
         </mxCell>
         <mxCell id="xB-aLpheTIVvpIYeBYx6-47" value="Memasukan Data Comment ke Database" style="shape=card;whiteSpace=wrap;html=1;" vertex="1" parent="1">
-          <mxGeometry x="688.75" y="1220" width="125" height="140" as="geometry" />
-        </mxCell>
-        <mxCell id="xB-aLpheTIVvpIYeBYx6-48" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="xB-aLpheTIVvpIYeBYx6-42" target="xB-aLpheTIVvpIYeBYx6-47">
-          <mxGeometry relative="1" as="geometry" />
+          <mxGeometry x="688.75" y="1340" width="125" height="140" as="geometry" />
         </mxCell>
         <mxCell id="xB-aLpheTIVvpIYeBYx6-52" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="xB-aLpheTIVvpIYeBYx6-49" target="xB-aLpheTIVvpIYeBYx6-51">
           <mxGeometry relative="1" as="geometry" />
