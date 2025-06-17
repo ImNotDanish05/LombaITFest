@@ -383,6 +383,9 @@
             </Array>
           </mxGeometry>
         </mxCell>
+        <mxCell id="xB-aLpheTIVvpIYeBYx6-69" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="xB-aLpheTIVvpIYeBYx6-66" target="xB-aLpheTIVvpIYeBYx6-68">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
         <mxCell id="xB-aLpheTIVvpIYeBYx6-66" value="Mengambil Data Comment di database" style="shape=card;whiteSpace=wrap;html=1;" vertex="1" parent="1">
           <mxGeometry x="1102.5" y="158" width="125" height="140" as="geometry" />
         </mxCell>
