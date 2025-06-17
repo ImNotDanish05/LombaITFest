@@ -1,6 +1,6 @@
 <mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36" version="27.1.4">
   <diagram name="Page-1" id="75r0CHqdmpS8ziVCV765">
-    <mxGraphModel dx="3448" dy="2086" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+    <mxGraphModel dx="2511" dy="1558" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -179,6 +179,14 @@
             </Array>
           </mxGeometry>
         </mxCell>
+        <mxCell id="JXqW-oBA6LnlcBC6Squj-82" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="JXqW-oBA6LnlcBC6Squj-67" target="JXqW-oBA6LnlcBC6Squj-19">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="-890" y="-320" />
+              <mxPoint x="-640" y="-320" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
         <mxCell id="JXqW-oBA6LnlcBC6Squj-67" value="Memasukan Data" style="shape=card;whiteSpace=wrap;html=1;" vertex="1" parent="1">
           <mxGeometry x="-952.5" y="-560" width="125" height="140" as="geometry" />
         </mxCell>
@@ -191,11 +199,25 @@
         <mxCell id="JXqW-oBA6LnlcBC6Squj-71" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="JXqW-oBA6LnlcBC6Squj-9" target="JXqW-oBA6LnlcBC6Squj-69">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
+        <mxCell id="JXqW-oBA6LnlcBC6Squj-80" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="JXqW-oBA6LnlcBC6Squj-72" target="JXqW-oBA6LnlcBC6Squj-19">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
         <mxCell id="JXqW-oBA6LnlcBC6Squj-72" value="Mengupdate Data" style="shape=card;whiteSpace=wrap;html=1;" vertex="1" parent="1">
           <mxGeometry x="-787.5" y="-560" width="125" height="140" as="geometry" />
         </mxCell>
+        <mxCell id="JXqW-oBA6LnlcBC6Squj-83" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="JXqW-oBA6LnlcBC6Squj-73" target="JXqW-oBA6LnlcBC6Squj-19">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
         <mxCell id="JXqW-oBA6LnlcBC6Squj-73" value="Menghapus Data" style="shape=card;whiteSpace=wrap;html=1;" vertex="1" parent="1">
           <mxGeometry x="-622.5" y="-560" width="125" height="140" as="geometry" />
+        </mxCell>
+        <mxCell id="JXqW-oBA6LnlcBC6Squj-84" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="JXqW-oBA6LnlcBC6Squj-74" target="JXqW-oBA6LnlcBC6Squj-19">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="-390" y="-320" />
+              <mxPoint x="-640" y="-320" />
+            </Array>
+          </mxGeometry>
         </mxCell>
         <mxCell id="JXqW-oBA6LnlcBC6Squj-74" value="Mengde;ete Data" style="shape=card;whiteSpace=wrap;html=1;" vertex="1" parent="1">
           <mxGeometry x="-452.5" y="-560" width="125" height="140" as="geometry" />
