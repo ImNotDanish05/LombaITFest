@@ -1,6 +1,6 @@
 <mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36" version="27.1.6">
   <diagram name="Page-1" id="75r0CHqdmpS8ziVCV765">
-    <mxGraphModel dx="3593" dy="2168" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+    <mxGraphModel dx="3972" dy="2382" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -354,6 +354,9 @@
         </mxCell>
         <mxCell id="xB-aLpheTIVvpIYeBYx6-56" value="delete_judol_comment&lt;br&gt;(use_gemini)" style="shape=card;whiteSpace=wrap;html=1;" vertex="1" parent="1">
           <mxGeometry x="1080" y="-160" width="170" height="210" as="geometry" />
+        </mxCell>
+        <mxCell id="xB-aLpheTIVvpIYeBYx6-57" value="&lt;h1 style=&quot;margin-top: 0px;&quot;&gt;Save_and_show_comments&lt;/h1&gt;&lt;div&gt;Untuk mengambil komentar user, ditunjukkan, lalu dihapus&lt;/div&gt;" style="text;html=1;whiteSpace=wrap;overflow=hidden;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="-680" y="1850" width="340" height="120" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
