@@ -1,6 +1,6 @@
 <mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36" version="27.1.6">
   <diagram name="Page-1" id="75r0CHqdmpS8ziVCV765">
-    <mxGraphModel dx="2609" dy="1613" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+    <mxGraphModel dx="2836" dy="1741" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -273,13 +273,13 @@
         <mxCell id="xB-aLpheTIVvpIYeBYx6-50" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="xB-aLpheTIVvpIYeBYx6-21" target="xB-aLpheTIVvpIYeBYx6-49">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="xB-aLpheTIVvpIYeBYx6-21" value="get_comment&lt;div&gt;(youtube link)&lt;/div&gt;" style="shape=card;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+        <mxCell id="xB-aLpheTIVvpIYeBYx6-21" value="get_comment&lt;div&gt;(youtube link,&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;use_GeminiAI (Bool)&lt;/span&gt;)&lt;/div&gt;" style="shape=card;whiteSpace=wrap;html=1;" vertex="1" parent="1">
           <mxGeometry x="-305" y="1090" width="170" height="210" as="geometry" />
         </mxCell>
         <mxCell id="xB-aLpheTIVvpIYeBYx6-27" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="xB-aLpheTIVvpIYeBYx6-24" target="xB-aLpheTIVvpIYeBYx6-25">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="xB-aLpheTIVvpIYeBYx6-24" value="get_comment&lt;div&gt;(youtube link)&lt;/div&gt;" style="shape=card;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+        <mxCell id="xB-aLpheTIVvpIYeBYx6-24" value="get_comment&lt;div&gt;(youtube link,&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;use_GeminiAI (Bool)&lt;/span&gt;)&lt;/div&gt;" style="shape=card;whiteSpace=wrap;html=1;" vertex="1" parent="1">
           <mxGeometry x="430" y="-165" width="170" height="210" as="geometry" />
         </mxCell>
         <mxCell id="xB-aLpheTIVvpIYeBYx6-25" value="Memasukan Data video &amp;amp; Mengambil Data video" style="shape=card;whiteSpace=wrap;html=1;" vertex="1" parent="1">
