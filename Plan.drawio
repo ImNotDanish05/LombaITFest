@@ -190,7 +190,7 @@
         <mxCell id="JXqW-oBA6LnlcBC6Squj-67" value="Memasukan Data" style="shape=card;whiteSpace=wrap;html=1;" vertex="1" parent="1">
           <mxGeometry x="-952.5" y="-560" width="125" height="140" as="geometry" />
         </mxCell>
-        <mxCell id="JXqW-oBA6LnlcBC6Squj-69" value="Memasukan" style="shape=card;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+        <mxCell id="JXqW-oBA6LnlcBC6Squj-69" value="Memasukan Data user" style="shape=card;whiteSpace=wrap;html=1;" vertex="1" parent="1">
           <mxGeometry x="-117.5" y="440" width="125" height="140" as="geometry" />
         </mxCell>
         <mxCell id="JXqW-oBA6LnlcBC6Squj-70" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.505;entryY=0.063;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="JXqW-oBA6LnlcBC6Squj-7" target="JXqW-oBA6LnlcBC6Squj-9">
