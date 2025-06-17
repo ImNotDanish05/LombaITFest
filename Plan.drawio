@@ -346,7 +346,7 @@
         <mxCell id="xB-aLpheTIVvpIYeBYx6-73" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="xB-aLpheTIVvpIYeBYx6-53" target="xB-aLpheTIVvpIYeBYx6-72">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="xB-aLpheTIVvpIYeBYx6-53" value="delete_judol_comment&lt;br&gt;(use_gemini)" style="shape=card;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+        <mxCell id="xB-aLpheTIVvpIYeBYx6-53" value="delete_judol_comment" style="shape=card;whiteSpace=wrap;html=1;" vertex="1" parent="1">
           <mxGeometry x="-305" y="1840" width="170" height="210" as="geometry" />
         </mxCell>
         <mxCell id="xB-aLpheTIVvpIYeBYx6-56" value="delete_judol_comment" style="shape=card;whiteSpace=wrap;html=1;" vertex="1" parent="1">
