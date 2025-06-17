@@ -1,6 +1,6 @@
 <mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36" version="27.1.6">
   <diagram name="Page-1" id="75r0CHqdmpS8ziVCV765">
-    <mxGraphModel dx="2647" dy="1634" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+    <mxGraphModel dx="3036" dy="1854" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -19,7 +19,7 @@
         <mxCell id="JXqW-oBA6LnlcBC6Squj-5" value="Choose Channel" style="ellipse;whiteSpace=wrap;html=1;" parent="1" vertex="1">
           <mxGeometry x="-270.5" y="240" width="120" height="80" as="geometry" />
         </mxCell>
-        <mxCell id="JXqW-oBA6LnlcBC6Squj-6" value="Delete Comment Judol" style="ellipse;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+        <mxCell id="JXqW-oBA6LnlcBC6Squj-6" value="Get Comment Judol" style="ellipse;whiteSpace=wrap;html=1;" parent="1" vertex="1">
           <mxGeometry x="-302.5" y="710" width="185" height="130" as="geometry" />
         </mxCell>
         <mxCell id="JXqW-oBA6LnlcBC6Squj-7" value="Input user &amp;amp; channel" style="shape=parallelogram;perimeter=parallelogramPerimeter;whiteSpace=wrap;html=1;fixedSize=1;" parent="1" vertex="1">
@@ -270,6 +270,9 @@
         <mxCell id="xB-aLpheTIVvpIYeBYx6-19" value="&lt;h1 style=&quot;margin-top: 0px;&quot;&gt;Save_and_show_comments&lt;/h1&gt;&lt;div&gt;Untuk mengambil komentar user, ditunjukkan, lalu dihapus&lt;/div&gt;" style="text;html=1;whiteSpace=wrap;overflow=hidden;rounded=0;" vertex="1" parent="1">
           <mxGeometry x="-662.5" y="715" width="340" height="120" as="geometry" />
         </mxCell>
+        <mxCell id="xB-aLpheTIVvpIYeBYx6-50" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="xB-aLpheTIVvpIYeBYx6-21" target="xB-aLpheTIVvpIYeBYx6-49">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
         <mxCell id="xB-aLpheTIVvpIYeBYx6-21" value="delete_comment_judol&lt;div&gt;(youtube link)&lt;/div&gt;" style="shape=card;whiteSpace=wrap;html=1;" vertex="1" parent="1">
           <mxGeometry x="-305" y="1090" width="170" height="210" as="geometry" />
         </mxCell>
@@ -328,14 +331,14 @@
             </Array>
           </mxGeometry>
         </mxCell>
-        <mxCell id="xB-aLpheTIVvpIYeBYx6-45" value="" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
-          <mxGeometry x="1020" y="1150" width="120" height="60" as="geometry" />
-        </mxCell>
         <mxCell id="xB-aLpheTIVvpIYeBYx6-47" value="Memasukan Data Comment ke Database" style="shape=card;whiteSpace=wrap;html=1;" vertex="1" parent="1">
           <mxGeometry x="688.75" y="1220" width="125" height="140" as="geometry" />
         </mxCell>
         <mxCell id="xB-aLpheTIVvpIYeBYx6-48" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="xB-aLpheTIVvpIYeBYx6-42" target="xB-aLpheTIVvpIYeBYx6-47">
           <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="xB-aLpheTIVvpIYeBYx6-49" value="Get Comment Judol" style="ellipse;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="-312.5" y="1410" width="185" height="130" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
