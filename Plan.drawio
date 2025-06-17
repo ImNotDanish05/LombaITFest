@@ -1,6 +1,6 @@
 <mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36" version="27.1.6">
   <diagram name="Page-1" id="75r0CHqdmpS8ziVCV765">
-    <mxGraphModel dx="2647" dy="1634" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+    <mxGraphModel dx="3036" dy="1854" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -225,8 +225,20 @@
         <mxCell id="JXqW-oBA6LnlcBC6Squj-74" value="Mengde;ete Data" style="shape=card;whiteSpace=wrap;html=1;" parent="1" vertex="1">
           <mxGeometry x="-452.5" y="-560" width="125" height="140" as="geometry" />
         </mxCell>
+        <mxCell id="xB-aLpheTIVvpIYeBYx6-4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="xB-aLpheTIVvpIYeBYx6-1" target="xB-aLpheTIVvpIYeBYx6-3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
         <mxCell id="xB-aLpheTIVvpIYeBYx6-1" value="Output channel denga&lt;div&gt;unikode email&lt;/div&gt;" style="shape=parallelogram;perimeter=parallelogramPerimeter;whiteSpace=wrap;html=1;fixedSize=1;" vertex="1" parent="1">
           <mxGeometry x="87.5" y="90" width="150" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="xB-aLpheTIVvpIYeBYx6-7" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="xB-aLpheTIVvpIYeBYx6-3" target="xB-aLpheTIVvpIYeBYx6-6">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="xB-aLpheTIVvpIYeBYx6-3" value="Print channel list" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="102.5" y="250" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="xB-aLpheTIVvpIYeBYx6-6" value="input channel&lt;div&gt;(pilihan)&lt;/div&gt;" style="shape=parallelogram;perimeter=parallelogramPerimeter;whiteSpace=wrap;html=1;fixedSize=1;" vertex="1" parent="1">
+          <mxGeometry x="102.5" y="428" width="120" height="60" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
