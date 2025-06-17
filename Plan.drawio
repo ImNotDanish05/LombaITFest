@@ -1,6 +1,6 @@
 <mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36" version="27.1.6">
   <diagram name="Page-1" id="75r0CHqdmpS8ziVCV765">
-    <mxGraphModel dx="2511" dy="1558" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+    <mxGraphModel dx="2574" dy="1593" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -352,7 +352,7 @@
         <mxCell id="xB-aLpheTIVvpIYeBYx6-53" value="delete_judol_comment&lt;br&gt;(use_gemini)" style="shape=card;whiteSpace=wrap;html=1;" vertex="1" parent="1">
           <mxGeometry x="-305" y="1840" width="170" height="210" as="geometry" />
         </mxCell>
-        <mxCell id="xB-aLpheTIVvpIYeBYx6-56" value="delete_judol_comment&lt;br&gt;(use_gemini)" style="shape=card;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+        <mxCell id="xB-aLpheTIVvpIYeBYx6-56" value="delete_judol_comment" style="shape=card;whiteSpace=wrap;html=1;" vertex="1" parent="1">
           <mxGeometry x="1080" y="-160" width="170" height="210" as="geometry" />
         </mxCell>
         <mxCell id="xB-aLpheTIVvpIYeBYx6-57" value="&lt;h1 style=&quot;margin-top: 0px;&quot;&gt;Delete Comment Judol&lt;/h1&gt;&lt;div&gt;Akan memilih komentar yang dicurigai judol, lalu di delete&lt;/div&gt;" style="text;html=1;whiteSpace=wrap;overflow=hidden;rounded=0;" vertex="1" parent="1">
@@ -382,6 +382,15 @@
               <mxPoint x="940" y="1775" />
             </Array>
           </mxGeometry>
+        </mxCell>
+        <mxCell id="xB-aLpheTIVvpIYeBYx6-66" value="Mengambil Data Comment di database" style="shape=card;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="1102.5" y="158" width="125" height="140" as="geometry" />
+        </mxCell>
+        <mxCell id="xB-aLpheTIVvpIYeBYx6-67" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.511;entryY=0.051;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="xB-aLpheTIVvpIYeBYx6-56" target="xB-aLpheTIVvpIYeBYx6-66">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="xB-aLpheTIVvpIYeBYx6-68" value="Suruh user pilih mana yang di unchecklist (jadi defaultnya dichecklist)" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="1105" y="390" width="120" height="60" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
