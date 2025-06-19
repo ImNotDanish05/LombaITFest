@@ -1,0 +1,1 @@
+- Aplikasinya hanya mendapatkan token terbatas selama 1 jam (jadinya tanpa refresh_token)

@@ -32,7 +32,7 @@ function loadYoutubeCredentials() {
         const client_secret = credentials_youtube_api_web.client_secret;
         const redirect_uris = credentials_youtube_api_web.redirect_uris
         const javascript_origins = credentials_youtube_api_web.javascript_origins;
-
+        console.log(`${prefix} ✔ Berhasil load credentials_youtube_api.json`)
         return {
             client_id,
             project_id,
