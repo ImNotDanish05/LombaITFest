@@ -1,2 +1,3 @@
 - Aplikasinya tetap memakai refresh_token untuk membuat token baru selamanya
 - Tapi, saat close website, ada warning untuk mau menghapus data mereka atau tidak
+- Gemini AI untuk saat ujicoba, pakai Gemininya Danish, nanti saat dikumpulin, pakai punyanya syauqi atau adzi
