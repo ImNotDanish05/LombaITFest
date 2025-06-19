@@ -1,0 +1,17 @@
+{
+  "name": "lombaitfest",
+  "version": "1.0.0",
+  "description": "A web-based tool that allows users to safely and securely scan their own YouTube videos for misleading or clickbait (\"judol\") comments and automatically remove them.",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^16.5.0",
+    "express": "^5.1.0"
+  }
+}
