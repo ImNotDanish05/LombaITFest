@@ -1,4 +1,4 @@
-1.	Database (https://dbdiagram.io/home) - Syauqi
+1.	Database https://dbdiagram.io/home - Syauqi
     -	Buat kerangka
     -	Dianalisa (dicek ulang)
     -	Dibuat (dalam MongoDB)
@@ -10,3 +10,14 @@
     -	Ngedeteksi komentar judol (pakai github yang pernah dikirim + improvisasi)
     -	Ngebuat program yang APInya bisa menghapus komentar yang dipilh dari step sebelumnya
     -	Penggabungan Database sama Backend
+
+
+    | Langkah                                  | Status   | Catatan                              |
+| ---------------------------------------- | -------- | ------------------------------------ |
+| 🔄 OAuth2 redirect ke backend            | ✅/❌      | Cek apakah token dikembalikan sukses |
+| 📥 Backend simpan data OAuth ke DB       | ✅/❌      | Cek struktur datanya                 |
+| 🔍 Buat fungsi ambil komentar dari DB    | ✅/❌      | Fungsi `getKomentar()` misalnya      |
+| 🤖 Siapkan koneksi ke Gemini atau AI     | ✅/❌      | Pakai API Key & handler              |
+| 🧠 Prompt deteksi judol                  | ✅/❌      | Kasih contoh dan format output 1/0   |
+| 💾 Simpan hasil klasifikasi ke DB        | ✅/❌      | Tambah field `is_judol: true/false`  |
+| 🎨 Bonus: tampilkan hasilnya di frontend | Optional | Biar kelihatan progres AI-nya 😎     |
