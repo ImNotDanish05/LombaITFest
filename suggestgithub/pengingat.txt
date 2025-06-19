@@ -1,1 +1,2 @@
-- Aplikasinya hanya mendapatkan token terbatas selama 1 jam (jadinya tanpa refresh_token)
+- Aplikasinya tetap memakai refresh_token untuk membuat token baru selamanya
+- Tapi, saat close website, ada warning untuk mau menghapus data mereka atau tidak
