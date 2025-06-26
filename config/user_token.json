@@ -5,7 +5,12 @@
   "access_token": "ya29.a0AS3H6NxD8E1wIBXei0p03WpEphVOS-5_4-MRZzM13NK-bJOBTegF2-B6B3XWyNMMASCfs8uSFRZAIKRgFkJwJbWM5ukJZQEqaj0xuCshEx4SfU31G8wXmv6GVStDRKp8yjvvKLLM8zPXUarO2lUsAP2ExuLZN-H_ov9EjXHqaCgYKATQSARASFQHGX2MiO42Eao-ECN2xe4-lQGDjYA0175",
   "refresh_token": "1//0gDoywaMyFb5vCgYIARAAGBASNwF-L9IrW7qrvbIxWvcPJ__PgHI_WD5toKHghEEhoOwt21r-kWQ0CgZmxQi4vRZpgfwySsCGYoQ",
   "expire": 1750326780615,
-  "scope": "https://www.googleapis.com/auth/youtube.force-ssl https://www.googleapis.com/auth/userinfo.profile openid https://www.googleapis.com/auth/userinfo.email",
+  "scope": [
+    "https://www.googleapis.com/auth/youtube.force-ssl",
+    "https://www.googleapis.com/auth/userinfo.profile",
+    "openid",
+    "https://www.googleapis.com/auth/userinfo.email"
+  ],
   "token_type": "Bearer",
   "created_at": "2025-06-19T08:53:01.734Z"
 }
