@@ -90,21 +90,75 @@ app.get('/start', async (req, res) => {
 
     console.log(`📺 Mengecek video: ${title} (${videoId})`);
 
-    const spamComments = await getSpamComments(youtube, videoId);
-    let totalSpam = 0;
+    // Ambil komentar spam beserta teksnya
+    let spamComments = [];
+    let nextPageToken = '';
+    do {
+      const resComments = await youtube.commentThreads.list({
+        part: 'snippet',
+        videoId,
+        maxResults: 100,
+        pageToken: nextPageToken
+      });
 
-    if (spamComments.length > 0) {
-      console.log(`🚨 ${spamComments.length} komentar spam ditemukan. Menghapus...`);
-      await deleteComments(youtube, spamComments);
-      totalSpam = spamComments.length;
-    } else {
-      console.log('✅ Tidak ada komentar spam.');
+      spamComments.push(
+        ...resComments.data.items
+          .filter(item => {
+            const text = item.snippet.topLevelComment.snippet.textOriginal;
+            return getJudolComment(text);
+          })
+          .map(item => ({
+            id: item.snippet.topLevelComment.id,
+            text: item.snippet.topLevelComment.snippet.textDisplay,
+            author: item.snippet.topLevelComment.snippet.authorDisplayName
+          }))
+      );
+      nextPageToken = resComments.data.nextPageToken;
+    } while (nextPageToken);
+
+    if (spamComments.length === 0) {
+      return res.send(`<h1>✅ Selesai</h1><p>Total komentar spam yang dihapus: <strong>0</strong></p>`);
     }
 
-    res.send(`<h1>✅ Selesai</h1><p>Total komentar spam yang dihapus: <strong>${totalSpam}</strong></p>`);
+    // Tampilkan daftar komentar spam dan tombol hapus
+    let listHtml = spamComments.map(c =>
+      `<li><b>${c.author}:</b> ${c.text}</li>`
+    ).join('');
+    res.send(`
+      <h1>🚨 Ditemukan ${spamComments.length} komentar spam</h1>
+      <ul>${listHtml}</ul>
+      <form method="POST" action="/delete-spam">
+        <input type="hidden" name="ids" value="${spamComments.map(c => c.id).join(',')}">
+        <button type="submit">Hapus Semua Komentar Spam Ini</button>
+      </form>
+    `);
   } catch (err) {
     console.error('Error saat membersihkan:', err.response?.data || err.message || err);
     res.status(500).send('Terjadi kesalahan saat membersihkan komentar.');
+  }
+});
+
+// Endpoint untuk menghapus komentar spam
+app.post('/delete-spam', express.urlencoded({ extended: true }), async (req, res) => {
+  if (!fs.existsSync(TOKEN_PATH)) {
+    return res.send('Belum login. <a href="/login">Login dulu</a>');
+  }
+  try {
+    const tokenData = JSON.parse(fs.readFileSync(TOKEN_PATH));
+    oauth2Client.setCredentials({
+      access_token: tokenData.access_token,
+      refresh_token: tokenData.refresh_token,
+      expiry_date: tokenData.expire
+    });
+    const youtube = google.youtube({ version: 'v3', auth: oauth2Client });
+    const ids = req.body.ids ? req.body.ids.split(',').filter(Boolean) : [];
+    if (ids.length === 0) {
+      return res.send(`<h1>✅ Selesai</h1><p>Total komentar spam yang dihapus: <strong>0</strong></p><p><i>Tidak ada ID komentar yang dikirim.</i></p>`);
+    }
+    await deleteComments(youtube, ids);
+    res.send(`<h1>✅ Selesai</h1><p>Total komentar spam yang dihapus: <strong>${ids.length}</strong></p>`);
+  } catch (err) {
+    res.status(500).send(`<h1>Gagal menghapus komentar.</h1><pre>${err && (err.response?.data ? JSON.stringify(err.response.data, null, 2) : err.message || err.toString())}</pre>`);
   }
 });
 
@@ -158,8 +212,8 @@ app.get('/auth/callback', async (req, res) => {
       <p><a href="/start">Mulai Bersihkan Komentar</a></p>
       <p><a href="/blockedwords">Edit Daftar Kata Terlarang</a></p>`);
   } catch (err) {
-    console.error('Gagal login:', err);
-    res.status(500).send('Login gagal.');
+    // Tampilkan error detail di browser
+    res.status(500).send(`<h1>Login gagal.</h1><pre>${err && (err.response?.data ? JSON.stringify(err.response.data, null, 2) : err.message || err.toString())}</pre>`);
   }
 });
 
@@ -227,7 +281,8 @@ async function deleteComments(youtube, ids) {
       });
       console.log(`🧹 Berhasil hapus ${batch.length} komentar`);
     } catch (err) {
-      console.error('Gagal hapus:', err.message);
+      console.error('Gagal hapus:', err.message, err.response?.data);
+      throw err; // <-- Tambahkan ini agar error dilempar ke catch di atas
     }
   }
 }
