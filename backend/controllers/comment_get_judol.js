@@ -93,7 +93,7 @@ const comments = [
 
     for (const comment of comments) {
         const isSpamManual = getJudolComment(comment);
-        console.log(`🧪 Manual check for: "${comment}" → ${isSpamManual ? 'SPAM' : 'AMAN'}`);
+        console.log(`🧪 Manual check for: "${comment}" → ${isSpamManual}`);
 
         if (!isSpamManual) {
             notDetectedManually.push(comment);
@@ -104,6 +104,6 @@ const comments = [
 
     for (const comment of notDetectedManually) {
         const isSpamAI = await getJudolCommentAi(comment);
-        console.log(`🔍 AI check for: "${comment}" → ${isSpamAI ? 'SPAM' : 'AMAN'}`);
+        console.log(`🔍 AI check for: "${comment}" → ${isSpamAI}`);
     }
 })();
