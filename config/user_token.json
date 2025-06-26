@@ -1,16 +1,16 @@
 {
-  "google_id": "112210683402349534071",
-  "email": "satrioadzipriambodho@gmail.com",
-  "username": "Satrio Adzi Priambodho",
-  "access_token": "ya29.a0AS3H6NxD8E1wIBXei0p03WpEphVOS-5_4-MRZzM13NK-bJOBTegF2-B6B3XWyNMMASCfs8uSFRZAIKRgFkJwJbWM5ukJZQEqaj0xuCshEx4SfU31G8wXmv6GVStDRKp8yjvvKLLM8zPXUarO2lUsAP2ExuLZN-H_ov9EjXHqaCgYKATQSARASFQHGX2MiO42Eao-ECN2xe4-lQGDjYA0175",
-  "refresh_token": "1//0gDoywaMyFb5vCgYIARAAGBASNwF-L9IrW7qrvbIxWvcPJ__PgHI_WD5toKHghEEhoOwt21r-kWQ0CgZmxQi4vRZpgfwySsCGYoQ",
-  "expire": 1750326780615,
+  "google_id": "107345426201680317503",
+  "email": "satrioadzi551@gmail.com",
+  "username": "Satrio Adzi",
+  "access_token": "ya29.a0AS3H6NyDU0yYZn4PIN7C9ssttwkIRnEPmWKFR6rbRfgm2k3KBJGR8O_4LVC-oNPjjDGJ08D237RXSUQnpchXDBRXL8ZQkmNncuLG5HhRl9SXIGzpGObWRAUszWbI3yYAnk5IAp8oqW8G3XIKe-LlrG6uRekCeu4xldr2lilRaCgYKAXISARcSFQHGX2MiEdx6DYI8LjzKGqLSUrm10A0175",
+  "refresh_token": "1//0g3OURjwgz_dJCgYIARAAGBASNwF-L9IrPPbOykqK3it-sB0D_2Fdf2W90O5OUpbyOjXjCzKT-FEQuxH01U4luixhus2Gw9qUuf4",
+  "expire": 1750912899599,
   "scope": [
     "https://www.googleapis.com/auth/youtube.force-ssl",
-    "https://www.googleapis.com/auth/userinfo.profile",
+    "https://www.googleapis.com/auth/userinfo.email",
     "openid",
-    "https://www.googleapis.com/auth/userinfo.email"
+    "https://www.googleapis.com/auth/userinfo.profile"
   ],
   "token_type": "Bearer",
-  "created_at": "2025-06-19T08:53:01.734Z"
+  "created_at": "2025-06-26T03:41:40.713Z"
 }
