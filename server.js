@@ -7,7 +7,7 @@ const app = express();
 app.use(cors());
 app.use(bodyParser.json());
 
-mongoose.connect('mongodb+srv://syauqi:uEvXkvuchxV2XV1t@kontenjudol.tyvz5in.mongodb.net/dbKontenJudol?retryWrites=true&w=majority', {
+mongoose.connect('mongodb+srv://syauqi:RU5Jch8oORT91cnL@youtubedata.cqgmi5j.mongodb.net/dbKontenJudol/', {
   useNewUrlParser: true,
   useUnifiedTopology: true
 })
