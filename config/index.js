@@ -102,6 +102,13 @@ app.post('/blockedwords', (req, res) => {
   res.redirect('/blockedwords');
 });
 
+// Fungsi untuk mengambil videoId dari link YouTube
+function getVideoIdFromUrl(url) {
+  // Mendukung format: https://www.youtube.com/watch?v=xxxx atau youtu.be/xxxx
+  const match = url.match(/(?:v=|\/)([0-9A-Za-z_-]{11})/);
+  return match ? match[1] : null;
+}
+
 app.get('/start', async (req, res) => {
   if (!fs.existsSync(TOKEN_PATH)) {
     return res.send('Belum login. <a href="/login">Login dulu</a>');
@@ -116,31 +123,30 @@ app.get('/start', async (req, res) => {
     });
 
     const youtube = google.youtube({ version: 'v3', auth: oauth2Client });
-    const channelId = process.env.YOUTUBE_CHANNEL_ID;
+    const videoUrl = process.env.YOUTUBE_CHANNEL_ID;
+    const videoId = getVideoIdFromUrl(videoUrl);
 
-    const channelRes = await youtube.channels.list({
-      part: 'contentDetails',
-      id: channelId
+    if (!videoId) {
+      return res.status(400).send('Link YouTube tidak valid di .env');
+    }
+
+    const titleRes = await youtube.videos.list({
+      part: 'snippet',
+      id: videoId
     });
 
-    const uploadsId = channelRes.data.items[0].contentDetails.relatedPlaylists.uploads;
-    const allVideos = await getAllVideos(youtube, uploadsId);
+    const title = titleRes.data.items[0]?.snippet?.title || 'Video';
 
+    console.log(`📺 Mengecek video: ${title} (${videoId})`);
+
+    const spamComments = await getSpamComments(youtube, videoId);
     let totalSpam = 0;
-
-    for (const video of allVideos) {
-      const title = video.snippet.title;
-      const videoId = video.snippet.resourceId.videoId;
-      console.log(`📺 Mengecek video: ${title} (${videoId})`);
-
-      const spamComments = await getSpamComments(youtube, videoId);
-      if (spamComments.length > 0) {
-        console.log(`🚨 ${spamComments.length} komentar spam ditemukan. Menghapus...`);
-        await deleteComments(youtube, spamComments);
-        totalSpam += spamComments.length;
-      } else {
-        console.log('✅ Tidak ada komentar spam.');
-      }
+    if (spamComments.length > 0) {
+      console.log(`🚨 ${spamComments.length} komentar spam ditemukan. Menghapus...`);
+      await deleteComments(youtube, spamComments);
+      totalSpam = spamComments.length;
+    } else {
+      console.log('✅ Tidak ada komentar spam.');
     }
 
     res.send(`<h1>✅ Selesai</h1><p>Total komentar spam yang dihapus: <strong>${totalSpam}</strong></p>`);
@@ -149,22 +155,6 @@ app.get('/start', async (req, res) => {
     res.status(500).send('Terjadi kesalahan saat membersihkan komentar.');
   }
 });
-
-async function getAllVideos(youtube, playlistId) {
-  const videos = [];
-  let nextPage = '';
-  do {
-    const res = await youtube.playlistItems.list({
-      part: 'snippet',
-      playlistId,
-      maxResults: 50,
-      pageToken: nextPage
-    });
-    videos.push(...res.data.items);
-    nextPage = res.data.nextPageToken;
-  } while (nextPage);
-  return videos;
-}
 
 function getJudolComment(text) {
   const normalizedText = text.normalize('NFKD');
@@ -175,18 +165,27 @@ function getJudolComment(text) {
 }
 
 async function getSpamComments(youtube, videoId) {
-  const res = await youtube.commentThreads.list({
-    part: 'snippet',
-    videoId,
-    maxResults: 100
-  });
+  let comments = [];
+  let nextPageToken = '';
+  do {
+    const res = await youtube.commentThreads.list({
+      part: 'snippet',
+      videoId,
+      maxResults: 100,
+      pageToken: nextPageToken
+    });
 
-  return res.data.items
-    .filter(item => {
-      const text = item.snippet.topLevelComment.snippet.textDisplay;
-      return getJudolComment(text);
-    })
-    .map(item => item.snippet.topLevelComment.id);
+    comments.push(
+      ...res.data.items
+        .filter(item => {
+          const text = item.snippet.topLevelComment.snippet.textDisplay;
+          return getJudolComment(text);
+        })
+        .map(item => item.snippet.topLevelComment.id)
+    );
+    nextPageToken = res.data.nextPageToken;
+  } while (nextPageToken);
+  return comments;
 }
 
 async function deleteComments(youtube, ids) {
