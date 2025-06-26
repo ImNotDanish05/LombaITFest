@@ -22,12 +22,17 @@ const SCOPES = [
 
 const client_id = process.env.GOOGLE_CLIENT_ID;
 const client_secret = process.env.GOOGLE_CLIENT_SECRET;
-const redirect_uris = [process.env.REDIRECT_URI];
+const redirect_uri = process.env.REDIRECT_URI;
+
+if (!client_id || !client_secret || !redirect_uri) {
+  console.error('Pastikan GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, dan REDIRECT_URI sudah diatur di .env');
+  process.exit(1);
+}
 
 const oauth2Client = new google.auth.OAuth2(
   client_id,
   client_secret,
-  redirect_uris[0]
+  redirect_uri
 );
 
 // Simpan token baru jika diperbarui
