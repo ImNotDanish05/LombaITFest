@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>CRUD USERS</title>
+</head>
+<body>
+  <h1>DATA USERS</h1>
+
+  <form id="usersForm">
+    <input type="text" id="google_id" placeholder="ID Google" required />
+    <input type="text" id="email" placeholder="Email" required />
+    <input type="text" id="username" placeholder="Username" required />
+    <input type="text" id="role" placeholder="Role" required />
+    <input type="text" id="access_token" placeholder="Access Token" required />
+    <input type="text" id="refresh_token" placeholder="Refresh Token" required />
+    <input type="datetime-local" id="expiry" placeholder="Expiry" required />
+    <input type="text" id="scope" placeholder="Scope" required />
+    <input type="text" id="token_type" placeholder="Token Type" required />
+    <input type="text" id="user_id" placeholder="User ID" required />
+    <input type="datetime-local" id="created_at" required />
+    <button type="submit" id="submitBtn">Simpan Data</button>
+  </form>
+
+  <ul id="usersList"></ul>
+
+  <script>
+    const apiURL = 'http://localhost:3000/api/users';
+
+    let editMode = false;
+    let editId = null;
+
+    async function loadUsers() {
+      try {
+        const res = await fetch(apiURL);
+        const data = await res.json();
+        const list = document.getElementById('usersList');
+        list.innerHTML = '';
+
+        data.forEach((users, index) => {
+          const li = document.createElement('li');
+          li.innerHTML = `
+            <b>Username:</b> ${users.username} | <b>Email:</b> ${users.email} | <b>Role:</b> ${users.role} <br>
+            <b>Google ID:</b> ${users.google_id} | <b>User ID:</b> ${users.user_id} <br>
+            <b>Access Token:</b> ${users.access_token} <br>
+            <b>Refresh Token:</b> ${users.refresh_token} <br>
+            <b>Token Type:</b> ${users.token_type} | <b>Expiry:</b> ${new Date(users.expiry).toLocaleString()} <br>
+            <b>Scope:</b> ${Array.isArray(users.scope) ? users.scope.join(', ') : users.scope} <br>
+            <b>Created At:</b> ${new Date(users.created_at).toLocaleString()} <br>
+            <small>ID MongoDB: ${users._id}</small><br>
+            <button onclick="editData(${index})">Edit</button>
+            <button onclick="hapusData('${users._id}')">Hapus</button>
+            <hr/>
+          `;
+          li.dataset.userIndex = index;
+          li.dataset.userData = JSON.stringify(users);
+          list.appendChild(li);
+        });
+      } catch (error) {
+        console.error('Error loading users:', error);
+      }
+    }
+
+    async function submitUsers(e) {
+      e.preventDefault();
+
+      const data = {
+        google_id: document.getElementById('google_id').value,
+        email: document.getElementById('email').value,
+        username: document.getElementById('username').value,
+        role: document.getElementById('role').value,
+        access_token: document.getElementById('access_token').value,
+        refresh_token: document.getElementById('refresh_token').value,
+        expiry: document.getElementById('expiry').value,
+        scope: document.getElementById('scope').value.split(', ').filter(s => s.trim()),
+        token_type: document.getElementById('token_type').value,
+        user_id: document.getElementById('user_id').value,
+        created_at: document.getElementById('created_at').value
+      };
+
+      const config = {
+        method: editMode ? 'PUT' : 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      };
+
+      const url = editMode ? `${apiURL}/${editId}` : apiURL;
+      
+      try {
+        const response = await fetch(url, config);
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        console.log(editMode ? 'Data updated successfully' : 'Data created successfully');
+        
+        document.getElementById('usersForm').reset();
+        document.getElementById('submitBtn').textContent = 'Simpan Data';
+        editMode = false;
+        editId = null;
+        loadUsers();
+      } catch (error) {
+        console.error('Error submitting data:', error);
+        alert('Error: ' + error.message);
+      }
+    }
+
+    async function hapusData(id) {
+      if (confirm('Yakin ingin menghapus data ini?')) {
+        try {
+          await fetch(`${apiURL}/${id}`, { method: 'DELETE' });
+          loadUsers();
+        } catch (error) {
+          console.error('Error deleting data:', error);
+        }
+      }
+    }
+
+    function editData(index) {
+      const usersList = document.getElementById('usersList');
+      const userElement = usersList.children[index];
+      const userData = JSON.parse(userElement.dataset.userData);
+      
+      document.getElementById('google_id').value = userData.google_id || '';
+      document.getElementById('email').value = userData.email || '';
+      document.getElementById('username').value = userData.username || '';
+      document.getElementById('role').value = userData.role || '';
+      document.getElementById('access_token').value = userData.access_token || '';
+      document.getElementById('refresh_token').value = userData.refresh_token || '';
+      document.getElementById('expiry').value = userData.expiry ? new Date(userData.expiry).toISOString().slice(0, 16) : '';
+      document.getElementById('scope').value = Array.isArray(userData.scope) ? userData.scope.join(', ') : (userData.scope || '');
+      document.getElementById('token_type').value = userData.token_type || '';
+      document.getElementById('user_id').value = userData.user_id || '';
+      document.getElementById('created_at').value = userData.created_at ? new Date(userData.created_at).toISOString().slice(0, 16) : '';
+
+      editMode = true;
+      editId = userData._id;
+      document.getElementById('submitBtn').textContent = 'Update Data';
+      
+      console.log('Edit mode activated for ID:', editId);
+    }
+
+    document.getElementById('usersForm').addEventListener('submit', submitUsers);
+    loadUsers();
+  </script>
+</body>
+</html>

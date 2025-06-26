@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>CRUD LOGS</title>
+</head>
+<body>
+  <h1>DATA LOGS</h1>
+
+  <form id="logsForm">
+    <input type="text" id="user_id" placeholder="ID User" required />
+    <input type="text" id="action" placeholder="Action" required />
+    <input type="text" id="comment_id" placeholder="ID Komentar" required />
+    <input type="text" id="video_id" placeholder="ID Video" required />
+    <input type="datetime-local" id="timestamp" required/>
+    <input type="text" id="status" placeholder="Status" required />
+    <textarea id="message" placeholder="Pesan" required></textarea>
+    <button type="submit">Simpan Data</button>
+  </form>
+
+  <ul id="logsList"></ul>
+
+  <script>
+    const apiURL = 'http://localhost:3000/api/logs';
+
+    let editMode = false;
+    let editId = null;
+
+    async function loadLogs() {
+      const res = await fetch(apiURL);
+      const data = await res.json();
+      const list = document.getElementById('logsList');
+      list.innerHTML = '';
+        data.forEach(log => {
+            const li = document.createElement('li');
+            li.innerHTML = `
+            <b>ID User: ${log.user_id}</b> | Action: ${log.action} | ID Komentar: ${log.comment_id} | ID Video: ${log.video_id} <br>
+            <small>Timestamp: ${new Date(log.timestamp).toLocaleString()} | Status: ${log.status} | Pesan: ${log.message}</small> <br>
+            <button onclick="editData('${log._id}', '${log.user_id}', '${log.action}', '${log.comment_id}', '${log.video_id}', '${new Date(log.timestamp).toISOString().slice(0, 16)}', '${log.status}', '${log.message}')">Edit</button>
+            <button onclick="hapusData('${log._id}')">Hapus</button>
+            <hr/>
+            `;
+            list.appendChild(li);
+        });
+    }
+
+    async function submitlogs(e) {
+      e.preventDefault();
+
+      const rawTimestamp = document.getElementById('timestamp').value;
+
+      const data = {
+        user_id: document.getElementById('user_id').value,
+        action: document.getElementById('action').value,
+        comment_id: document.getElementById('comment_id').value,
+        video_id: document.getElementById('video_id').value,
+        status: document.getElementById('status').value,
+        message: document.getElementById('message').value
+      };
+
+      if (rawTimestamp) {
+        data.timestamp = new Date(rawTimestamp);
+      }
+
+      const config = {
+        method: editMode ? 'PUT' : 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      };
+
+      const url = editMode ? `${apiURL}/${editId}` : apiURL;
+      await fetch(url, config);
+
+      document.getElementById('logsForm').reset();
+      editMode = false;
+      editId = null;
+      loadLogs();
+    }
+
+    async function hapusData(id) {
+      await fetch(`${apiURL}/${id}`, { method: 'DELETE' });
+      loadLogs();
+    }
+
+    function editData(id, user_id, action, comment_id, video_id, timestamp, status, message) {
+      document.getElementById('user_id').value = user_id;
+      document.getElementById('action').value = action;
+      document.getElementById('comment_id').value = comment_id;
+      document.getElementById('video_id').value = video_id;
+      document.getElementById('timestamp').value = new Date(timestamp).toISOString().slice(0, 16);
+      document.getElementById('status').value = status;
+      document.getElementById('message').value = message;
+
+      editMode = true;
+      editId = id;
+}
+    document.getElementById('logsForm').addEventListener('submit', submitlogs);
+    loadLogs();
+  </script>
+</body>
+</html>
