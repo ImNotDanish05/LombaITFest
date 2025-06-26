@@ -11,7 +11,6 @@ const port = process.env.PORT || 3000;
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-const CREDENTIALS_PATH = path.join(__dirname, 'credentials_youtube_api.json');
 const TOKEN_PATH = path.join(__dirname, 'user_token.json');
 const BLOCKED_WORDS_PATH = path.join(__dirname, 'blockedword.json');
 const SCOPES = [
@@ -21,15 +20,9 @@ const SCOPES = [
   'profile'
 ];
 
-const credentials = {
-  web: {
-    client_id: process.env.GOOGLE_CLIENT_ID,
-    client_secret: process.env.GOOGLE_CLIENT_SECRET,
-    redirect_uris: [process.env.REDIRECT_URI]
-  }
-};
-
-const { client_secret, client_id, redirect_uris } = credentials.web;
+const client_id = process.env.GOOGLE_CLIENT_ID;
+const client_secret = process.env.GOOGLE_CLIENT_SECRET;
+const redirect_uris = [process.env.REDIRECT_URI];
 
 const oauth2Client = new google.auth.OAuth2(
   client_id,
@@ -37,7 +30,7 @@ const oauth2Client = new google.auth.OAuth2(
   redirect_uris[0]
 );
 
-// Simpan refresh token saat diperbarui
+// Simpan token baru jika diperbarui
 oauth2Client.on('tokens', (tokens) => {
   if (tokens.refresh_token) {
     const updated = {
@@ -48,7 +41,6 @@ oauth2Client.on('tokens', (tokens) => {
   }
 });
 
-// Mendapatkan videoId dari URL
 function getVideoIdFromUrl(url) {
   if (!url) return null;
   const match = url.match(/(?:v=|\/)([0-9A-Za-z_-]{11})/);
