@@ -21,7 +21,14 @@ const SCOPES = [
   'profile'
 ];
 
-const credentials = JSON.parse(fs.readFileSync(CREDENTIALS_PATH, 'utf8'));
+const credentials = {
+  web: {
+    client_id: process.env.GOOGLE_CLIENT_ID,
+    client_secret: process.env.GOOGLE_CLIENT_SECRET,
+    redirect_uris: [process.env.REDIRECT_URI]
+  }
+};
+
 const { client_secret, client_id, redirect_uris } = credentials.web;
 
 const oauth2Client = new google.auth.OAuth2(
@@ -30,10 +37,20 @@ const oauth2Client = new google.auth.OAuth2(
   redirect_uris[0]
 );
 
-// Fungsi untuk mengambil videoId dari link YouTube
+// Simpan refresh token saat diperbarui
+oauth2Client.on('tokens', (tokens) => {
+  if (tokens.refresh_token) {
+    const updated = {
+      ...tokens,
+      created_at: new Date().toISOString()
+    };
+    fs.writeFileSync(TOKEN_PATH, JSON.stringify(updated, null, 2));
+  }
+});
+
+// Mendapatkan videoId dari URL
 function getVideoIdFromUrl(url) {
   if (!url) return null;
-  // Mendukung format: https://www.youtube.com/watch?v=xxxx atau youtu.be/xxxx
   const match = url.match(/(?:v=|\/)([0-9A-Za-z_-]{11})/);
   return match ? match[1] : null;
 }
@@ -52,16 +69,15 @@ app.get('/start', async (req, res) => {
     });
 
     const youtube = google.youtube({ version: 'v3', auth: oauth2Client });
-    const videoUrl = process.env.YOUTUBE_CHANNEL_ID;
+    const videoUrl = process.env.YOUTUBE_VIDEO_URL;
 
     if (!videoUrl) {
-      return res.status(400).send('YOUTUBE_CHANNEL_ID tidak ditemukan di .env');
+      return res.status(400).send('YOUTUBE_VIDEO_URL tidak ditemukan di .env');
     }
 
     const videoId = getVideoIdFromUrl(videoUrl);
-
     if (!videoId) {
-      return res.status(400).send('Link YouTube tidak valid di .env');
+      return res.status(400).send('Link video YouTube tidak valid di .env');
     }
 
     const titleRes = await youtube.videos.list({
@@ -69,12 +85,17 @@ app.get('/start', async (req, res) => {
       id: videoId
     });
 
-    const title = titleRes.data.items[0]?.snippet?.title || 'Video';
+    if (!titleRes.data.items.length) {
+      return res.status(404).send('Video tidak ditemukan atau tidak memiliki akses.');
+    }
+
+    const title = titleRes.data.items[0].snippet.title;
 
     console.log(`📺 Mengecek video: ${title} (${videoId})`);
 
     const spamComments = await getSpamComments(youtube, videoId);
     let totalSpam = 0;
+
     if (spamComments.length > 0) {
       console.log(`🚨 ${spamComments.length} komentar spam ditemukan. Menghapus...`);
       await deleteComments(youtube, spamComments);
@@ -189,7 +210,7 @@ async function getSpamComments(youtube, videoId) {
     comments.push(
       ...res.data.items
         .filter(item => {
-          const text = item.snippet.topLevelComment.snippet.textDisplay;
+          const text = item.snippet.topLevelComment.snippet.textOriginal;
           return getJudolComment(text);
         })
         .map(item => item.snippet.topLevelComment.id)
