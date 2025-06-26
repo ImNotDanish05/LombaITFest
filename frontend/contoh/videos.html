@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>CRUD VIDEOS</title>
+</head>
+<body>
+  <h1>DATA VIDEOS</h1>
+
+  <form id="videosForm">
+    <input type="text" id="user_id" placeholder="User ID" required />
+    <input type="text" id="video_id" placeholder="Video ID" required />
+    <input type="text" id="title" placeholder="Judul Video" required />
+    <input type="text" id="description" placeholder="Deskripsi" required />
+    <input type="datetime-local" id="published_at" required/>
+    <input type="text" id="thumbnail_url" placeholder="Thumbnail URL" required />
+    <input type="number" id="comments_count" placeholder="Jumlah Komentar" required />
+    <label>
+      <input type="checkbox" id="is_processed" /> 
+    </label>
+    <input type="datetime-local" id="created_at" required/>
+    <button type="submit">Simpan Data</button>
+  </form>
+
+  <ul id="videosList"></ul>
+
+  <script>
+    const apiURL = 'http://localhost:3000/api/videos';
+
+    let editMode = false;
+    let editId = null;
+
+    async function loadVideos() {
+      const res = await fetch(apiURL);
+      const data = await res.json();
+      const list = document.getElementById('videosList');
+      list.innerHTML = '';
+
+      data.forEach(videos => {
+  const li = document.createElement('li');
+  li.innerHTML = `
+    <b>Judul:</b> ${videos.title} | <b>User:</b> ${videos.user_id} | <b>Dipublikasi:</b> ${new Date(videos.published_at).toLocaleString()} <br>
+    <b>Deskripsi:</b> ${videos.description} <br>
+    <b>Thumbnail:</b> <a href="${videos.thumbnail_url}" target="_blank">Lihat</a> | <b>Komentar:</b> ${videos.comments_count} <br>
+    <b>Diproses:</b> ${videos.is_processed ? '✅' : '❌'} | <b>Dibuat:</b> ${new Date(videos.created_at).toLocaleString()} <br>
+    <small>ID MongoDB: ${videos._id}</small><br>
+    <button onclick="editData(
+      '${videos._id}',
+      '${videos.user_id}',
+      '${videos.video_id}',
+      '${videos.title.replace(/'/g, "\\'")}',
+      '${videos.description.replace(/'/g, "\\'")}',
+      '${videos.published_at}',
+      '${videos.thumbnail_url}',
+      ${videos.comments_count},
+      ${videos.is_processed},
+      '${videos.created_at}'
+    )">Edit</button>
+    <button onclick="hapusData('${videos._id}')">Hapus</button>
+    <hr/>
+  `;
+  list.appendChild(li);
+});
+
+    }
+
+    async function submitVideos(e) {
+      e.preventDefault();
+
+      const data = {
+        user_id: document.getElementById('user_id').value,
+        video_id: document.getElementById('video_id').value,
+        title: document.getElementById('title').value,
+        description: document.getElementById('description').value,
+        published_at: new Date(document.getElementById('published_at').value),
+        thumbnail_url: document.getElementById('thumbnail_url').value,
+        comments_count: Number(document.getElementById('comments_count').value),
+        is_processed: document.getElementById('is_processed').checked,
+        created_at: new Date(document.getElementById('created_at').value)
+  };
+
+      const config = {
+        method: editMode ? 'PUT' : 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      };
+
+      const url = editMode ? `${apiURL}/${editId}` : apiURL;
+      await fetch(url, config);
+
+      document.getElementById('videosForm').reset();
+      editMode = false;
+      editId = null;
+      loadVideos();
+    }
+
+    async function hapusData(id) {
+      await fetch(`${apiURL}/${id}`, { method: 'DELETE' });
+      loadVideos();
+    }
+
+    function editData(id, user_id, video_id, title, description, published_at, thumbnail_url, comments_count, is_processed, created_at) {
+    document.getElementById('user_id').value = user_id;
+    document.getElementById('video_id').value = video_id;
+    document.getElementById('title').value = title;
+    document.getElementById('description').value = description;
+    document.getElementById('published_at').value = new Date(published_at).toISOString().slice(0, 16);
+    document.getElementById('thumbnail_url').value = thumbnail_url;
+    document.getElementById('comments_count').value = comments_count;
+    document.getElementById('is_processed').checked = is_processed;
+    document.getElementById('created_at').value = new Date(created_at).toISOString().slice(0, 16);
+
+    editMode = true;
+    editId = id;
+}
+
+
+    document.getElementById('videosForm').addEventListener('submit', submitVideos);
+    loadVideos();
+  </script>
+</body>
+</html>

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>CRUD COMMENTS</title>
+</head>
+<body>
+  <h1>DATA COMMENTS</h1>
+
+  <form id="commentsForm">
+    <input type="text" id="video_id" placeholder="ID Video" required />
+    <input type="text" id="comment_id" placeholder="ID Komentar" required />
+    <input type="text" id="author_name" placeholder="Nama Akun" required />
+    <input type="text" id="text" placeholder="Komentar" required />
+    <input type="datetime-local" id="published_at" required/>
+    <label>
+      <input type="checkbox" id="is_judol" /> is judol
+    </label>
+    <button type="submit">Simpan Data</button>
+  </form>
+
+  <ul id="commentsList"></ul>
+
+  <script>
+    const apiURL = 'http://localhost:3000/api/comments';
+
+    let editMode = false;
+    let editId = null;
+
+    async function loadComments() {
+      const res = await fetch(apiURL);
+      const data = await res.json();
+      const list = document.getElementById('commentsList');
+      list.innerHTML = '';
+
+      data.forEach(comment => {
+        const li = document.createElement('li');
+        li.innerHTML = `
+          <b> ID Video : ${comment.video_id}</b> | ID Komentar :  ${comment.comment_id} | Nama Akun : ${comment.author_name} | Komentar : ${comment.text} <br>
+          <small> ID : ${comment._id}</small> <br>
+          <button onclick="editData('${comment._id}', '${comment.video_id}', '${comment.comment_id}', '${comment.author_name}', ${comment.text}, '${comment.published_at}', ${comment.is_judol})">Edit</button>
+          <button onclick="hapusData('${comment._id}')">Hapus</button>
+          <hr/>
+        `;
+        list.appendChild(li);
+      });
+    }
+
+    async function submitComments(e) {
+      e.preventDefault();
+
+      const data = {
+        video_id: document.getElementById('video_id').value,
+        comment_id: document.getElementById('comment_id').value,
+        author_name: document.getElementById('author_name').value,
+        text: document.getElementById('text').value,
+        published_at: document.getElementById('published_at').value,
+        is_judol: document.getElementById('is_judol').checked
+        };
+
+      const config = {
+        method: editMode ? 'PUT' : 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      };
+
+      const url = editMode ? `${apiURL}/${editId}` : apiURL;
+      await fetch(url, config);
+
+      document.getElementById('commentsForm').reset();
+      editMode = false;
+      editId = null;
+      loadComments();
+    }
+
+    async function hapusData(id) {
+      await fetch(`${apiURL}/${id}`, { method: 'DELETE' });
+      loadComments();
+    }
+
+    function editData(id, video_id, comment_id, author_name, text, published_at, is_judol) {
+      document.getElementById('video_id').value = video_id;
+      document.getElementById('comment_id').value = comment_id;
+      document.getElementById('author_name').value = author_name;
+      document.getElementById('text').value = text;
+      document.getElementById('published_at').value = new Date(published_at).toISOString().slice(0, 16);
+      document.getElementById('is_judol').checked = is_judol;
+
+      editMode = true;
+      editId = id;
+    }
+
+    document.getElementById('commentsForm').addEventListener('submit', submitComments);
+    loadComments();
+  </script>
+</body>
+</html>
