@@ -4,33 +4,42 @@ const express = require('express');
 
 function getJudolComment(text) {
     const normalizedText = text.normalize("NFKD");
-    if (text !== normalizedText) { 
+
+    // Deteksi jika ada karakter combining (misalnya A̷P̷N̷)
+    const hasCombiningChar = /[\u0300-\u036F]/.test(text);
+    if (text !== normalizedText || hasCombiningChar) { 
         return true;
     }
 
+    // Cek dari file blockedword.json
     const blockedWords = JSON.parse(fs.readFileSync("./config/blockedword.json"));
     const lowerText = text.toLowerCase();
-
     if (blockedWords.some(word => lowerText.includes(word.toLowerCase()))) {
         return true;
     }
 
+    // Periksa tiap kata
     const words = text.split(/\s+/);
     for (const word of words) {
         const capitalCount = [...word].filter(c => c >= 'A' && c <= 'Z').length;
 
-        // Cek: kapital antara 2-3 → spam
+        // Cek jika kapital antara 2–3 → spam
         if (capitalCount > 1 && capitalCount <= 3) {
             return true;
         }
 
-        // Cek: campuran kapital & huruf kecil tidak wajar → spam
+        // Cek pola kapital tidak wajar (misal: "jUDoL", "ARgaA")
         const isAllCaps = word === word.toUpperCase();
         const isAllLower = word === word.toLowerCase();
         const isCapitalized = word[0] === word[0].toUpperCase() && word.slice(1) === word.slice(1).toLowerCase();
 
         if (!isAllCaps && !isAllLower && !isCapitalized) {
-            return true; // contoh: "ARGaA", "jUDoL", "gRAtiS"
+            return true;
+        }
+
+        // Cek karakter non-standar (selain alfabet biasa dan angka)
+        if (/[^a-zA-Z0-9\s]/.test(word)) {
+            return true;
         }
     }
 
@@ -38,5 +47,6 @@ function getJudolComment(text) {
 }
 
 
-const test = getJudolComment("ARGaA");
+
+const test = getJudolComment("");
 console.log(test);
