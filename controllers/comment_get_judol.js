@@ -14,5 +14,5 @@ function getJudolComment(text) {
     return blockedWords.some(word => lowerText.includes(word.toLowerCase()));
 }
 
-const test = getJudolComment("Arga.");
+const test = getJudolComment("🦋ALEXIS🦋1.7🦋.");
 console.log(test);
