@@ -34,5 +34,5 @@ app.use('/api/users', usersRoutes);
 const videosRoutes = require('./routes/videos');
 app.use('/api/videos', videosRoutes);
 
-const PORT = 3000;
+const PORT = 4000;
 app.listen(PORT, () => console.log(`Server is running on port http://localhost:${PORT}`));
