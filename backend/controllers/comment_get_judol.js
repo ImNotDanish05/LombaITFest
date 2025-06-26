@@ -1,8 +1,15 @@
 const LoadData = require('../utils/LoadData');
 const fs = require('fs');
 const express = require('express');
+const dotenv = require('dotenv');
+dotenv.config();
+
+const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
 
 function getJudolComment(text) {
+    if (!text) {
+        return false; // Tidak ada teks yang diberikan
+    }
     const normalizedText = text.normalize("NFKD");
 
     // Deteksi jika ada karakter combining (misalnya A̷P̷N̷)
@@ -12,7 +19,7 @@ function getJudolComment(text) {
     }
 
     // Cek dari file blockedword.json
-    const blockedWords = JSON.parse(fs.readFileSync("./config/blockedword.json"));
+    const blockedWords = JSON.parse(fs.readFileSync("./backend/config/blockedword.json"));
     const lowerText = text.toLowerCase();
     if (blockedWords.some(word => lowerText.includes(word.toLowerCase()))) {
         return true;
