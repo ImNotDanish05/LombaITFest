@@ -78,56 +78,6 @@ app.get('/login', (req, res) => {
   `);
 });
 
-// Terms page
-app.get('/terms', (req, res) => {
-  res.send(`
-    <h1><em>Terms and Conditions – YTJudolRemover</em></h1>
-    <p><strong>Last Updated: 26 June 2025</strong></p>
-    <p>Please read these Terms and Conditions ("Terms", "Terms and Conditions") carefully before using <em>YTJudolRemover</em> (“the Service”) operated by the <em>CodeNova Team</em> ("we", "our", or "us"). Your access to and use of the Service is conditioned on your acceptance of and compliance with these Terms. If you do not agree with any part of the terms, you may not access the Service.</p>
-    <hr>
-    <h2><em>1. Acceptance of Terms</em></h2>
-    <p>By accessing or using <em>YTJudolRemover</em>, you agree to be bound by these Terms and all applicable laws and regulations. Your use of the Service constitutes your acknowledgment that you have read, understood, and agreed to be legally bound by these Terms. Continued use of the Service following any updates or changes to these Terms will constitute your acceptance of those changes.</p>
-    <hr>
-    <h2><em>2. Use of Service</em></h2>
-    <p><em>YTJudolRemover</em> is developed by the CodeNova Team to detect and manage “judol” comments (provocative, misleading, or irrelevant content) on YouTube videos.</p>
-    <p>Users may input a YouTube video link—either their own or someone else’s—to analyze the comment section.</p>
-    <ul>
-      <li>If the video belongs to the user, the Service may offer options to hide or manage disruptive comments.</li>
-      <li>If the video does not belong to the user, the Service allows the user to report such comments as spam.</li>
-    </ul>
-    <p>Users may manually review, approve, or ignore detected comments, giving them full control and flexibility.</p>
-    <p>The application is strictly limited to this purpose. We do not and will not use the collected data for any unrelated, unauthorized, or malicious activities.</p>
-    <hr>
-    <h2><em>3. Data Collection & Use</em></h2>
-    <p><em>YTJudolRemover</em> utilizes the YouTube Data API v3 to authenticate users and access their YouTube account data for the sole purpose of enabling comment analysis and moderation features.</p>
-    <p>Only the minimal necessary data is accessed to perform the following:</p>
-    <ul>
-      <li>Authenticate the user via OAuth</li>
-      <li>Retrieve video and comment data for moderation</li>
-    </ul>
-    <p>No personal data is permanently stored, shared, or sold. CodeNova Team guarantees responsible use of user data and does not engage in any misuse or unethical manipulation of account information.</p>
-    <hr>
-    <h2><em>4. Limitations of Liability</em></h2>
-    <p>While CodeNova Team makes every effort to secure and protect user data, we are not liable for any unauthorized access, data loss, or exposure resulting from circumstances beyond our control, such as:</p>
-    <ul>
-      <li>Platform vulnerabilities</li>
-      <li>Third-party attacks</li>
-      <li>User negligence in managing personal account access</li>
-    </ul>
-    <p>Users are fully responsible for maintaining the security of their Google account credentials.<br>
-    We do not take responsibility for the exposure of user data unless proven to be caused by direct abuse or negligence from our system.</p>
-    <hr>
-    <h2><em>5. Modifications to These Terms</em></h2>
-    <p>We reserve the right to update or revise these Terms at any time. Substantial changes will be communicated via appropriate means. Continued use of <em>YTJudolRemover</em> after modifications indicates acceptance of the updated Terms.</p>
-    <hr>
-    <h2><em>6. Contact Information</em></h2>
-    <p>If you have any questions or concerns regarding these Terms and Conditions, please reach out to us via:</p>
-    <p>📧 <em><a href="mailto:imnotdanish05bussiness@gmail.com">imnotdanish05bussiness@gmail.com</a></em></p>
-    <hr>
-    <p><a href="/login">Kembali ke Login</a></p>
-  `);
-});
-
 // Google OAuth callback
 app.get('/auth/callback', async (req, res) => {
   const code = req.query.code;
