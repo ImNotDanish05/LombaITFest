@@ -35,7 +35,7 @@ function getJudolComment(text) {
 
         if (!isAllCaps && !isAllLower && !isCapitalized) return true;
 
-        if (/[^a-zA-Z0-9\s]/.test(word)) return true;
+        if (/[^a-zA-Z0-9\s.,!?'"()<>:@#\-]/.test(word)) return true;
     }
 
     return false;
@@ -46,12 +46,12 @@ async function getJudolCommentAi(comments) {
     if (!comments || comments.length === 0) return [];
 
     const prompt = comments.map((text, i) => `${i + 1}. ${text}`).join('\n');
-    console.log(prompt);
+
     const systemPrompt = `
 Kamu adalah filter pendeteksi komentar spam di YouTube. Tugasmu adalah menandai komentar yang mengandung promosi terselubung, judi, slot, pinjaman, atau sejenisnya.
 
-Berikan jawaban dalam format array JSON yang hanya berisi true atau false, sesuai urutan komentar:
-Contoh: [false, true, false]
+Berikan jawaban dalam format array JSON yang hanya berisi 1 atau 0, sesuai urutan komentar:
+Contoh: [0, 1, 0]
 `;
 
     try {
@@ -74,13 +74,22 @@ Contoh: [false, true, false]
         );
 
         const raw = response.data.choices[0].message.content.trim();
-        const parsed = JSON.parse(raw);
-        return parsed;
+        const cleaned = raw.replace(/```json|```/g, '').trim();
+
+        try {
+            const parsed = JSON.parse(cleaned);
+            return parsed;
+        } catch (jsonErr) {
+            console.error("❌ Gagal parse JSON dari AI:\n", cleaned);
+            return comments.map(() => 0); // fallback: dianggap aman semua
+        }
+
     } catch (error) {
         console.error("❌ Error AI:", error.message);
-        return comments.map(() => false);
+        return comments.map(() => 0);
     }
 }
+
 
 
 
