@@ -1,3 +1,4 @@
+// JANGAN COBA INI, INI HANYA CONTOH KODE UNTUK MENGGUNAKAN DEEPSEEK CHAT API UNTUK KLASIFIKASI KOMENTAR
 require('dotenv').config();
 const axios = require('axios');
 
