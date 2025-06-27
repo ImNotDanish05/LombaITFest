@@ -136,3 +136,5 @@ const comments = [
         console.log(`🔍 AI check for: "${notDetectedManually[i]}" → ${status}`);
     });
 })();
+
+module.exports = { getJudolComment };
