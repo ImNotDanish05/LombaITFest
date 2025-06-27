@@ -107,3 +107,5 @@ const comments = [
         console.log(`🔍 AI check for: "${comment}" → ${isSpamAI ? 'SPAM' : 'AMAN'}`);
     }
 })();
+
+module.exports = { getJudolComment };
