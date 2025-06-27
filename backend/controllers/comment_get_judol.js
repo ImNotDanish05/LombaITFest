@@ -137,4 +137,4 @@ const comments = [
     });
 })();
 
-
+module.exports = { getJudolComment };

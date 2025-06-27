@@ -31,6 +31,8 @@ ${comments.map((c, i) => `${i+1}. "${c}"`).join('\n')}`;
   }
 }
 
+module.exports = { classifyComments };
+
 (async () => {
   const test = [
     "Haiii!",
