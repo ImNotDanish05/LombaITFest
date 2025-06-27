@@ -3,6 +3,7 @@ const { google } = require('googleapis');
 const fs = require('fs');
 const path = require('path');
 const dotenv = require('dotenv');
+const LoadData = require('./../utils/LoadData');
 dotenv.config({ path: path.join(__dirname, '.env') });
 
 const app = express();
@@ -19,10 +20,10 @@ const SCOPES = [
   'email',
   'profile'
 ];
-
-const client_id = process.env.GOOGLE_CLIENT_ID;
-const client_secret = process.env.GOOGLE_CLIENT_SECRET;
-const redirect_uri = process.env.REDIRECT_URI;
+const YTdata = LoadData.loadYoutubeCredentials();
+const client_id = YTdata.client_id;
+const client_secret = YTdata.client_secret;
+const redirect_uri = YTdata.redirect_uris[0] || process.env.REDIRECT_URI;
 
 if (!client_id || !client_secret || !redirect_uri) {
   console.error('Pastikan GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, dan REDIRECT_URI sudah diatur di .env');
