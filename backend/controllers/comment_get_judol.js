@@ -46,7 +46,7 @@ async function getJudolCommentAi(comments) {
     if (!comments || comments.length === 0) return [];
 
     const prompt = comments.map((text, i) => `${i + 1}. ${text}`).join('\n');
-
+    console.log(prompt);
     const systemPrompt = `
 Kamu adalah filter pendeteksi komentar spam di YouTube. Tugasmu adalah menandai komentar yang mengandung promosi terselubung, judi, slot, pinjaman, atau sejenisnya.
 
@@ -90,7 +90,14 @@ const comments = [
     "A̷P̷N̷S̷L̷O̷T̷ GACOR BANGET!",
     "Main slot di situs xxx gacor",
     "Suka banget sama kontennya",
-    "Mantap WD tiap malam bro"
+    "Mantap WD tiap malam bro",
+    "Aku main judi online untung cuyyy, ke web judol.com",
+    "Gimana cara menang judi slot?",
+    "Aku suka main judi, ada yang mau join?",
+    "Video kamu keren banget, pengen belajar bareng deh :D",
+    "Aku baru menang judi online, seneng banget!",
+    "Add roblox gw dong kak",
+    "Minecraft add aku dong di essentials"
 ];
 
 // === Proses Manual → AI
