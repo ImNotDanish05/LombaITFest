@@ -42,23 +42,26 @@ function getJudolComment(text) {
 }
 
 // === AI Check ===
-async function getJudolCommentAi(text) {
-    if (!text) return false;
+async function getJudolCommentAi(comments) {
+    if (!comments || comments.length === 0) return [];
+
+    const prompt = comments.map((text, i) => `${i + 1}. ${text}`).join('\n');
+
+    const systemPrompt = `
+Kamu adalah filter pendeteksi komentar spam di YouTube. Tugasmu adalah menandai komentar yang mengandung promosi terselubung, judi, slot, pinjaman, atau sejenisnya.
+
+Berikan jawaban dalam format array JSON yang hanya berisi true atau false, sesuai urutan komentar:
+Contoh: [false, true, false]
+`;
 
     try {
         const response = await axios.post(
-            'https://openrouter.ai/api/v1/chat/completions',
+            "https://openrouter.ai/api/v1/chat/completions",
             {
                 model: "mistralai/mistral-small-3.2-24b-instruct",
                 messages: [
-                    {
-                        role: "system",
-                        content: "Kamu adalah sistem pendeteksi komentar spam di YouTube. Jawablah hanya dengan 'true' jika komentar tersebut adalah spam (misalnya promosi judi online, judol, slot, pinjaman, dsb), atau 'false' jika bukan spam."
-                    },
-                    {
-                        role: "user",
-                        content: `Komentar: "${text}"`
-                    }
+                    { role: "system", content: systemPrompt.trim() },
+                    { role: "user", content: prompt }
                 ],
                 temperature: 0.2,
             },
@@ -70,13 +73,15 @@ async function getJudolCommentAi(text) {
             }
         );
 
-        const result = response.data.choices[0].message.content.trim().toLowerCase();
-        return result === 'true';
+        const raw = response.data.choices[0].message.content.trim();
+        const parsed = JSON.parse(raw);
+        return parsed;
     } catch (error) {
         console.error("❌ Error AI:", error.message);
-        return false;
+        return comments.map(() => false);
     }
 }
+
 
 
 // === Contoh Daftar Komentar ===
@@ -84,7 +89,8 @@ const comments = [
     "Keren banget videonya!",
     "A̷P̷N̷S̷L̷O̷T̷ GACOR BANGET!",
     "Main slot di situs xxx gacor",
-    "Suka banget sama kontennya"
+    "Suka banget sama kontennya",
+    "Mantap WD tiap malam bro"
 ];
 
 // === Proses Manual → AI
@@ -93,17 +99,26 @@ const comments = [
 
     for (const comment of comments) {
         const isSpamManual = getJudolComment(comment);
-        console.log(`🧪 Manual check for: "${comment}" → ${isSpamManual}`);
+        const status = isSpamManual ? 1 : 0;
+        console.log(`🧪 Manual check for: "${comment}" → ${status}`);
 
         if (!isSpamManual) {
             notDetectedManually.push(comment);
         }
     }
 
-    console.log(`\n🧠 Mengecek ${notDetectedManually.length} komentar lewat AI...\n`);
-
-    for (const comment of notDetectedManually) {
-        const isSpamAI = await getJudolCommentAi(comment);
-        console.log(`🔍 AI check for: "${comment}" → ${isSpamAI}`);
+    if (notDetectedManually.length === 0) {
+        console.log("✅ Semua komentar berhasil terdeteksi manual sebagai spam.");
+        return;
     }
+
+    console.log(`\n🧠 Mengecek ${notDetectedManually.length} komentar lewat AI...\n`);
+    const hasilAi = await getJudolCommentAi(notDetectedManually);
+
+    hasilAi.forEach((hasil, i) => {
+        const status = hasil ? 1 : 0;
+        console.log(`🔍 AI check for: "${notDetectedManually[i]}" → ${status}`);
+    });
 })();
+
+
