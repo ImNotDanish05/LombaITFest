@@ -236,17 +236,44 @@ app.post('/start', async (req, res) => {
       return res.send(`<h1>✅ Selesai</h1><p>Total komentar spam yang dihapus: <strong>0</strong></p>`);
     }
 
-    // Tampilkan daftar komentar spam dan tombol hapus
-    let listHtml = spamComments.map(c =>
-      `<li><b>${c.author}:</b> ${c.text}</li>`
+    // Tampilkan daftar komentar spam dengan checkbox
+    let listHtml = spamComments.map((c, idx) =>
+      `<li>
+        <label>
+          <input type="checkbox" class="comment-checkbox" name="ids" value="${c.id}">
+          <b>${c.author}:</b> ${c.text}
+        </label>
+      </li>`
     ).join('');
     res.send(`
       <h1>🚨 Ditemukan ${spamComments.length} komentar spam</h1>
-      <ul>${listHtml}</ul>
-      <form method="POST" action="/delete-spam">
-        <input type="hidden" name="ids" value="${spamComments.map(c => c.id).join(',')}">
-        <button type="submit">Hapus Semua Komentar Spam Ini</button>
+      <form method="POST" action="/delete-spam" id="deleteForm">
+        <label>
+          <input type="checkbox" id="selectAll"> Pilih Semua
+        </label>
+        <ul style="list-style:none;padding-left:0">${listHtml}</ul>
+        <button type="submit" id="deleteBtn" disabled>Hapus Komentar Terpilih</button>
       </form>
+      <script>
+        const selectAll = document.getElementById('selectAll');
+        const checkboxes = document.querySelectorAll('.comment-checkbox');
+        const deleteBtn = document.getElementById('deleteBtn');
+        function updateDeleteBtn() {
+          deleteBtn.disabled = document.querySelectorAll('.comment-checkbox:checked').length === 0;
+        }
+        selectAll.addEventListener('change', function() {
+          checkboxes.forEach(cb => cb.checked = selectAll.checked);
+          updateDeleteBtn();
+        });
+        checkboxes.forEach(cb => {
+          cb.addEventListener('change', function() {
+            updateDeleteBtn();
+            if (!this.checked) selectAll.checked = false;
+            else if (document.querySelectorAll('.comment-checkbox:checked').length === checkboxes.length) selectAll.checked = true;
+          });
+        });
+        updateDeleteBtn();
+      </script>
     `);
   } catch (err) {
     console.error('Error saat membersihkan:', err.response?.data || err.message || err);
