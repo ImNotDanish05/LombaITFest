@@ -49,7 +49,7 @@ oauth2Client.on('tokens', (tokens) => {
 
 // === Import fungsi manual dan AI ===
 const { getJudolComment } = require('../controllers/comment_get_judol');
-const { classifyComments } = require('../controllers/test_ai');
+// const { classifyComments } = require('../controllers/test_ai');
 
 function getVideoIdFromUrl(url) {
   if (!url) return null;
@@ -131,21 +131,21 @@ app.get('/start', async (req, res) => {
 
     // Analisis AI untuk komentar yang tidak terdeteksi manual
     let aiSpamIds = [];
-    if (notJudolRaw.length > 0) {
-      const aiResults = await classifyComments(notJudolRaw);
-      notJudolComments.forEach((item, idx) => {
-        const aiResult = aiResults[idx];
-        if (
-          aiResult === true ||
-          aiResult === 'true' ||
-          aiResult === 1 ||
-          aiResult === '1'
-        ) {
-          spamComments.push(item);
-          aiSpamIds.push(item.id);
-        }
-      });
-    }
+    // if (notJudolRaw.length > 0) {
+    //   const aiResults = await classifyComments(notJudolRaw);
+    //   notJudolComments.forEach((item, idx) => {
+    //     const aiResult = aiResults[idx];
+    //     if (
+    //       aiResult === true ||
+    //       aiResult === 'true' ||
+    //       aiResult === 1 ||
+    //       aiResult === '1'
+    //     ) {
+    //       spamComments.push(item);
+    //       aiSpamIds.push(item.id);
+    //     }
+    //   });
+    // }
 
     if (spamComments.length === 0) {
       return res.send(`<h1>✅ Selesai</h1><p>Total komentar spam yang dihapus: <strong>0</strong></p>`);

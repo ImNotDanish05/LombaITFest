@@ -93,48 +93,49 @@ Contoh: [0, 1, 0]
 
 
 
-// === Contoh Daftar Komentar ===
-const comments = [
-    "Keren banget videonya!",
-    "A̷P̷N̷S̷L̷O̷T̷ GACOR BANGET!",
-    "Main slot di situs xxx gacor",
-    "Suka banget sama kontennya",
-    "Mantap WD tiap malam bro",
-    "Aku main judi online untung cuyyy, ke web judol.com",
-    "Gimana cara menang judi slot?",
-    "Aku suka main judi, ada yang mau join?",
-    "Video kamu keren banget, pengen belajar bareng deh :D",
-    "Aku baru menang judi online, seneng banget!",
-    "Add roblox gw dong kak",
-    "Minecraft add aku dong di essentials"
-];
+// Eksekusi contoh hanya jika file ini dijalankan langsung
+if (require.main === module) {
+    const comments = [
+        "Keren banget videonya!",
+        "A̷P̷N̷S̷L̷O̷T̷ GACOR BANGET!",
+        "Main slot di situs xxx gacor",
+        "Suka banget sama kontennya",
+        "Mantap WD tiap malam bro",
+        "Aku main judi online untung cuyyy, ke web judol.com",
+        "Gimana cara menang judi slot?",
+        "Aku suka main judi, ada yang mau join?",
+        "Video kamu keren banget, pengen belajar bareng deh :D",
+        "Aku baru menang judi online, seneng banget!",
+        "Add roblox gw dong kak",
+        "Minecraft add aku dong di essentials"
+    ];
 
-// === Proses Manual → AI
-(async () => {
-    const notDetectedManually = [];
+    (async () => {
+        const notDetectedManually = [];
 
-    for (const comment of comments) {
-        const isSpamManual = getJudolComment(comment);
-        const status = isSpamManual ? 1 : 0;
-        console.log(`🧪 Manual check for: "${comment}" → ${status}`);
+        for (const comment of comments) {
+            const isSpamManual = getJudolComment(comment);
+            const status = isSpamManual ? 1 : 0;
+            console.log(`🧪 Manual check for: "${comment}" → ${status}`);
 
-        if (!isSpamManual) {
-            notDetectedManually.push(comment);
+            if (!isSpamManual) {
+                notDetectedManually.push(comment);
+            }
         }
-    }
 
-    if (notDetectedManually.length === 0) {
-        console.log("✅ Semua komentar berhasil terdeteksi manual sebagai spam.");
-        return;
-    }
+        if (notDetectedManually.length === 0) {
+            console.log("✅ Semua komentar berhasil terdeteksi manual sebagai spam.");
+            return;
+        }
 
-    console.log(`\n🧠 Mengecek ${notDetectedManually.length} komentar lewat AI...\n`);
-    const hasilAi = await getJudolCommentAi(notDetectedManually);
+        console.log(`\n🧠 Mengecek ${notDetectedManually.length} komentar lewat AI...\n`);
+        const hasilAi = await getJudolCommentAi(notDetectedManually);
 
-    hasilAi.forEach((hasil, i) => {
-        const status = hasil ? 1 : 0;
-        console.log(`🔍 AI check for: "${notDetectedManually[i]}" → ${status}`);
-    });
-})();
+        hasilAi.forEach((hasil, i) => {
+            const status = hasil ? 1 : 0;
+            console.log(`🔍 AI check for: "${notDetectedManually[i]}" → ${status}`);
+        });
+    })();
+}
 
-module.exports = { getJudolComment };
+module.exports = { getJudolComment, getJudolCommentAi };
