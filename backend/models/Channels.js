@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const channelSchema = new mongoose.Schema({
+const channelsSchema = new mongoose.Schema({
     user_id : {type: String, required: true},
     channel_id : {type: String, required: true},
     title: {type: String, required: true},
@@ -9,4 +9,4 @@ const channelSchema = new mongoose.Schema({
     is_active: {type: Boolean, required: true, default: true},
 })
 
-module.exports = mongoose.model('Channel', channelSchema);
+module.exports = mongoose.model('Channels', channelsSchema);

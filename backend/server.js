@@ -12,7 +12,7 @@ mongoose.connect('mongodb+srv://syauqi:RU5Jch8oORT91cnL@youtubedata.cqgmi5j.mong
 .catch((err) => console.error('Connection error:', err));
 
 //channel
-const channelRoutes = require('./routes/channel');
+const channelRoutes = require('./routes/channels');
 app.use('/api/channel', channelRoutes);
 
 //comments
@@ -30,6 +30,10 @@ app.use('/api/users', usersRoutes);
 //videos
 const videosRoutes = require('./routes/videos');
 app.use('/api/videos', videosRoutes);
+
+// youtube
+const youtubeRoutes = require('./controllers/youtube');
+app.use('/', youtubeRoutes);
 
 const PORT = 3000;
 app.listen(PORT, () => console.log(`Server is running on port http://localhost:${PORT}`));

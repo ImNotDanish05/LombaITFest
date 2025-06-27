@@ -3,7 +3,7 @@ const { google } = require('googleapis');
 const fs = require('fs');
 const path = require('path');
 const dotenv = require('dotenv');
-const LoadData = require('./../utils/LoadData');
+const LoadData = require('../../utils/LoadData');
 dotenv.config({ path: path.join(__dirname, '.env') });
 
 const app = express();
@@ -41,7 +41,7 @@ oauth2Client.on('tokens', (tokens) => {
 });
 
 // Import fungsi deteksi judol
-const { getJudolComment } = require('../controllers/comment_get_judol');
+const { getJudolComment } = require('../comment_get_judol');
 
 // Helper: ambil videoId dari url
 function getVideoIdFromUrl(url) {
@@ -351,3 +351,5 @@ app.listen(port, () => {
   console.log(`✅ Server aktif di http://localhost:${port}`);
   console.log(`🔐 Login: http://localhost:${port}/login`);
 });
+
+module.exports = app;
