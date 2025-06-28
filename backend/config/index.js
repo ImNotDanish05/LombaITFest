@@ -294,7 +294,15 @@ app.post('/delete-spam', express.urlencoded({ extended: true }), async (req, res
       expiry_date: tokenData.expire
     });
     const youtube = google.youtube({ version: 'v3', auth: oauth2Client });
-    const ids = req.body.ids ? req.body.ids.split(',').filter(Boolean) : [];
+
+    // Perbaikan: handle satu atau banyak id
+    let ids = [];
+    if (Array.isArray(req.body.ids)) {
+      ids = req.body.ids;
+    } else if (typeof req.body.ids === 'string') {
+      ids = [req.body.ids];
+    }
+
     if (ids.length === 0) {
       return res.send(`<h1>✅ Selesai</h1><p>Total komentar spam yang dihapus: <strong>0</strong></p><p><i>Tidak ada ID komentar yang dikirim.</i></p>`);
     }
