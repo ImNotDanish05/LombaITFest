@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const Channel = require('../models/Channel');
+const Channel = require('../models/Channels');
 
 // CREATE
 router.post('/', async (req, res) => {
