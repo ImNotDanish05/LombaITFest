@@ -36,5 +36,9 @@ app.use('/api/videos', videosRoutes);
 const youtubeRoutes = require('./controllers/youtube');
 app.use('/', youtubeRoutes);
 
+// index page
+const indexRoute = require('./routes/index');
+app.use('/', indexRoute);
+
 const PORT = 3000;
 app.listen(PORT, () => console.log(`Server is running on port http://localhost:${PORT}`));
