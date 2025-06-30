@@ -1,0 +1,216 @@
+/* Basic Reset & Typography */
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  margin: 0;
+  padding: 0;
+  line-height: 1.6;
+  color: var(--text-color);
+  background-color: var(--bg-color);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Color Variables for Theming */
+:root {
+  --bg-color: #ffffff;
+  --text-color: #333333;
+  --heading-color: #1a1a1a;
+  --link-color: #007bff;
+  --link-hover-color: #0056b3;
+  --border-color: #e0e0e0;
+  --button-bg: #f0f0f0;
+  --button-text: #333333;
+  --button-hover-bg: #e0e0e0;
+  --note-bg: #f8f9fa;
+  --note-border: #dee2e6;
+  --list-marker-color: #666;
+}
+
+body.dark-mode {
+  --bg-color: #1a1a1a;
+  --text-color: #e0e0e0;
+  --heading-color: #f0f0f0;
+  --link-color: #8ab4f8;
+  --link-hover-color: #a8c7fa;
+  --border-color: #444444;
+  --button-bg: #333333;
+  --button-text: #e0e0e0;
+  --button-hover-bg: #444444;
+  --note-bg: #282828;
+  --note-border: #3a3a3a;
+  --list-marker-color: #b0b0b0;
+}
+
+/* Layout and Structure */
+header {
+  background-color: var(--bg-color);
+  padding: 30px 20px;
+  border-bottom: 1px solid var(--border-color);
+  text-align: center;
+}
+
+h1 {
+  color: var(--heading-color);
+  font-size: 2.5em;
+  margin-bottom: 10px;
+}
+
+main {
+  max-width: 900px;
+  margin: 40px auto;
+  padding: 0 20px;
+}
+
+section {
+  margin-bottom: 30px;
+  padding: 20px;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  background-color: var(--bg-color);
+}
+
+h2 {
+  color: var(--heading-color);
+  font-size: 1.8em;
+  margin-top: 0;
+  margin-bottom: 15px;
+  border-bottom: 2px solid var(--link-color);
+  padding-bottom: 5px;
+}
+
+p {
+  margin-bottom: 15px;
+}
+
+ul {
+  list-style: disc;
+  margin-left: 25px;
+  margin-bottom: 15px;
+}
+
+li {
+  margin-bottom: 8px;
+  color: var(--text-color);
+}
+
+/* Specific Element Styling */
+.last-updated {
+  font-size: 0.9em;
+  color: #777;
+}
+
+.dark-mode .last-updated {
+  color: #aaa;
+}
+
+a {
+  color: var(--link-color);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+a:hover {
+  text-decoration: underline;
+  color: var(--link-hover-color);
+}
+
+.note {
+  background-color: var(--note-bg);
+  border-left: 5px solid var(--note-border);
+  padding: 15px;
+  margin-top: 20px;
+  border-radius: 4px;
+  font-style: italic;
+  color: var(--text-color);
+}
+
+/* Theme Toggle Button */
+.theme-toggle-container {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 1000;
+}
+
+.toggle-button {
+  background-color: var(--button-bg);
+  color: var(--button-text);
+  border: 1px solid var(--border-color);
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.toggle-button:hover {
+  background-color: var(--button-hover-bg);
+  transform: translateY(-2px);
+}
+
+.toggle-button:active {
+  transform: translateY(0);
+}
+
+.icon {
+  width: 24px;
+  height: 24px;
+  filter: var(--icon-filter, none); /* For potential SVG color changes */
+}
+
+/* Adjust SVG color for dark mode if needed, though sun/moon icons often handle this visually */
+.dark-mode .icon {
+  /* Example: filter: invert(1); if the SVG is black on transparent */
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  h1 {
+    font-size: 2em;
+  }
+
+  h2 {
+    font-size: 1.5em;
+  }
+
+  main {
+    margin: 20px auto;
+    padding: 0 15px;
+  }
+
+  section {
+    padding: 15px;
+  }
+
+  .theme-toggle-container {
+    bottom: 15px;
+    right: 15px;
+  }
+
+  .toggle-button {
+    width: 45px;
+    height: 45px;
+  }
+
+  .icon {
+    width: 20px;
+    height: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  h1 {
+    font-size: 1.8em;
+  }
+
+  h2 {
+    font-size: 1.3em;
+  }
+
+  section {
+    padding: 10px;
+  }
+}
