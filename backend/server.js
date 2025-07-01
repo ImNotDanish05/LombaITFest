@@ -41,7 +41,7 @@ app.use('/', youtubeRoutes);
 
 // index page
 const indexRoute = require('./routes/index');
-app.use('/info', indexRoute);
+app.use('/', indexRoute);
 
 app.get('/', (req, res) => {
   res.render('pages/index');
