@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" href="/images/logo_CodeNova.png" type="image/x-icon">
+    <title>Privacy Policy – YTJudolRemover</title>
+    <link rel="stylesheet" href="/css/styles.css" />
+</head>
+<body>
+    <header>
+        <h1>Privacy Policy – YTJudolRemover</h1>
+        <p class="last-updated"><strong>Last Updated:</strong> 1 July 2025</p>
+    </header>
+
+    <main>
+        <section class="intro-section">
+            <p>
+                This Privacy Policy explains how YTJudolRemover (“the Service”), operated by the CodeNova Team (“we,” “our,” or “us”), collects, uses, stores, and protects user data when you use the Service. By using the Service, you agree to this Privacy Policy.
+            </p>
+        </section>
+
+        <section id="information-we-collect">
+            <h2>1. Information We Collect</h2>
+            <p>
+                We collect and store the following data from users to provide and improve our Service:
+            </p>
+            <ul>
+                <li><strong>User Data (via OAuth):</strong> Google ID, email, username, role, access & refresh tokens, token expiry, OAuth scopes, token type, internal user ID, created date.</li>
+                <li><strong>Channel Data:</strong> User ID, channel ID, title, subscribers, active status.</li>
+                <li><strong>Video Data:</strong> User ID, video ID, title, description, published date, thumbnail URL, comments count, processing status, created date.</li>
+                <li><strong>Comments Data:</strong> Video ID, comment ID, author name, text, published date, judol flag status.</li>
+            </ul>
+        </section>
+
+        <section id="how-we-collect-data">
+            <h2>2. How We Collect Data</h2>
+            <ul>
+                <li>Through <strong>OAuth2 authorization</strong> when users connect their YouTube accounts.</li>
+                <li>From user input: when a user submits a YouTube video link to analyze comments.</li>
+            </ul>
+        </section>
+
+        <section id="why-we-collect-data">
+            <h2>3. Why We Collect Data</h2>
+            <p>
+                We use this data solely to:
+            </p>
+            <ul>
+                <li>Help users detect, manage, and optionally remove or report "judol" (provocative or misleading) comments on their YouTube videos.</li>
+                <li>Enable automatic comment deletion/hiding on videos owned by the user.</li>
+                <li>Enable reporting of comments as spam on videos not owned by the user.</li>
+            </ul>
+        </section>
+
+        <section id="data-storage-retention">
+            <h2>4. Data Storage & Retention</h2>
+            <ul>
+                <li>All user data is securely stored in a MongoDB database.</li>
+                <li>Data remains stored until the user actively deletes their account using the <strong>Delete Account</strong> feature.</li>
+                <li>After deletion, related data is permanently removed from our system.</li>
+            </ul>
+        </section>
+
+        <section id="who-can-access-your-data">
+            <h2>5. Who Can Access Your Data</h2>
+            <ul>
+                <li>Only the CodeNova Team (three members) and the user themselves.</li>
+                <li>We do <strong>not</strong> sell, share, or publish user data to any external party.</li>
+            </ul>
+        </section>
+
+        <section id="cookies-session-management">
+            <h2>6. Cookies & Session Management</h2>
+            <p>
+                We use <strong>cookies</strong> to keep users logged in automatically between sessions, improving the user experience.
+            </p>
+            <p>
+                We do <strong>not</strong> use cookies or other tracking technologies for advertising or analytics.
+            </p>
+        </section>
+
+        <section id="your-data-rights">
+            <h2>7. Your Data Rights</h2>
+            <ul>
+                <li>You can delete your account and all related data anytime without contacting us manually, through the <strong>Delete Account</strong> feature.</li>
+                <li>You may also contact us for questions about your data.</li>
+            </ul>
+        </section>
+
+        <section id="data-security">
+            <h2>8. Data Security</h2>
+            <p>
+                We implement reasonable security measures to protect user data. However, users are responsible for safeguarding their own Google account credentials.
+            </p>
+        </section>
+
+        <section id="updates-to-this-privacy-policy">
+            <h2>9. Updates to This Privacy Policy</h2>
+            <p>
+                We may update this Privacy Policy. Substantial changes will be communicated appropriately. Continued use of the Service indicates acceptance of the updated policy.
+            </p>
+        </section>
+
+        <section id="contact">
+            <h2>10. Contact</h2>
+            <p>
+                If you have any questions about this Privacy Policy, please contact:
+                <br /><a href="mailto:imnotdanish05bussiness@gmail.com">📧 <strong>imnotdanish05bussiness@gmail.com</strong></a>
+            </p>
+        </section>
+    </main>
+
+    <aside class="theme-toggle-container">
+        <button class="toggle-button" id="themeToggle" aria-label="Toggle Theme">
+            <img id="themeIcon" class="icon" src="/images/half-moon.svg" alt="theme icon" />
+        </button>
+    </aside>
+
+    <script>
+        const toggleBtn = document.getElementById('themeToggle');
+        const themeIcon = document.getElementById('themeIcon');
+        const body = document.body;
+
+        // Function to set the theme based on the dark mode preference
+        function setTheme(darkMode) {
+            if (darkMode) {
+                body.classList.add('dark-mode');
+                themeIcon.src = '/images/sun.svg';
+                themeIcon.alt = 'Sun icon for light theme';
+            } else {
+                body.classList.remove('dark-mode');
+                themeIcon.src = '/images/half-moon.svg';
+                themeIcon.alt = 'Half moon icon for dark theme';
+            }
+        }
+
+        // Function to check system dark mode preference
+        function isSystemDarkMode() {
+            return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        }
+
+        // Initialize theme based on system preference or last saved preference
+        let darkMode = localStorage.getItem('darkMode') === 'true';
+        if (localStorage.getItem('darkMode') === null) {
+            darkMode = isSystemDarkMode();
+        }
+        setTheme(darkMode);
+
+        // Event listener for theme toggle button
+        toggleBtn.addEventListener('click', () => {
+            darkMode = !darkMode;
+            setTheme(darkMode);
+            localStorage.setItem('darkMode', darkMode); // Save user's preference
+        });
+
+        // Listen for changes in system dark mode preference
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (event) => {
+            if (localStorage.getItem('darkMode') === null) { // Only update if user hasn't set a preference
+                darkMode = event.matches;
+                setTheme(darkMode);
+            }
+        });
+    </script>
+</body>
+</html>
