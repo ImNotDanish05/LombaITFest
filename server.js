@@ -20,6 +20,7 @@ mongoose.connect('mongodb+srv://syauqi:RU5Jch8oORT91cnL@youtubedata.cqgmi5j.mong
 .then(() => console.log('MongoDB Atlas connected'))
 .catch((err) => console.error('Connection error:', err));
 
+
 // channel
 const channelRoutes = require('./routes/channels');
 app.use('/api/channel', channelRoutes);
@@ -69,6 +70,11 @@ const oauth2Client = new google.auth.OAuth2(
   process.env.GOOGLE_CLIENT_SECRET,
   process.env.REDIRECT_URI
 );
+
+//route home
+app.get('/home', (req, res) => {
+  res.render('pages/home');
+});
 
 // Endpoint login
 app.get('/login', (req, res) => {
