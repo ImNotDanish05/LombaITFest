@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" href="/images/logo_CodeNova.png" type="image/x-icon">
+  <title>Terms and Conditions – YTJudolRemover</title>
+  <link rel="stylesheet" href="/css/styles.css" />
+</head>
+<body>
+  <header>
+    <h1>Terms and Conditions – YTJudolRemover</h1>
+    <p class="last-updated"><strong>Last Updated:</strong> 27 June 2025</p>
+  </header>
+
+  <main>
+    <section class="intro-section">
+      <p>
+        Please read these Terms and Conditions ("Terms") carefully before using
+        <strong>YTJudolRemover</strong> ("the Service") operated by the <strong>CodeNova Team</strong> ("we", "our", or "us").
+        Your access to and use of the Service is conditioned on your acceptance of and compliance with these Terms. If you do not agree with any part of the terms, you may not access the Service.
+      </p>
+    </section>
+
+    <section id="acceptance-of-terms">
+      <h2>1. Acceptance of Terms</h2>
+      <p>
+        By accessing or using YTJudolRemover, you agree to be bound by these Terms and all applicable laws and regulations.
+        Your use of the Service constitutes your acknowledgment that you have read, understood, and agreed to be legally
+        bound by these Terms. Continued use of the Service following any updates or changes to these Terms will constitute
+        your acceptance of those changes.
+      </p>
+    </section>
+
+    <section id="use-of-service">
+      <h2>2. Use of Service</h2>
+      <p>
+        YTJudolRemover is developed by the CodeNova Team to detect and manage “judol” comments (provocative, misleading,
+        or irrelevant content) on YouTube videos.
+      </p>
+      <p>
+        Users may input a YouTube video link—either their own or someone else’s—to analyze the comment section. If the
+        video belongs to the user, the Service may offer options to hide or manage disruptive comments. If the video does
+        not belong to the user, the Service allows the user to report such comments as spam.
+      </p>
+      <p>
+        Users may manually review, approve, or ignore detected comments, giving them full control and flexibility.
+      </p>
+      <p class="note">
+        The application is strictly limited to this purpose. We do not and will not use the collected data for any unrelated,
+        unauthorized, or malicious activities.
+      </p>
+    </section>
+
+    <section id="data-collection-and-use">
+      <h2>3. Data Collection & Use</h2>
+      <p>
+        YTJudolRemover utilizes the YouTube Data API v3 to authenticate users and access their YouTube account data for
+        the sole purpose of enabling comment analysis and moderation features.
+      </p>
+      <p>
+        Only the minimal necessary data is accessed to perform the following:
+      </p>
+      <ul>
+        <li>Authenticate the user via OAuth</li>
+        <li>Retrieve video and comment data for moderation</li>
+      </ul>
+      <p class="note">
+        No personal data is permanently stored, shared, or sold. CodeNova Team guarantees responsible use of user data and does not engage in any misuse or unethical manipulation of account information.
+      </p>
+    </section>
+
+    <section id="limitations-of-liability">
+      <h2>4. Limitations of Liability</h2>
+      <p>
+        While CodeNova Team makes every effort to secure and protect user data, we are not liable for any unauthorized
+        access, data loss, or exposure resulting from circumstances beyond our control, such as:
+      </p>
+      <ul>
+        <li>Platform vulnerabilities</li>
+        <li>Third-party attacks</li>
+        <li>User negligence in managing personal account access</li>
+      </ul>
+      <p class="note">
+        Users are fully responsible for maintaining the security of their Google account credentials. We do not take
+        responsibility for the exposure of user data unless proven to be caused by direct abuse or negligence from our system.
+      </p>
+    </section>
+
+    <section id="modifications-to-terms">
+      <h2>5. Modifications to These Terms</h2>
+      <p>
+        We reserve the right to update or revise these Terms at any time. Substantial changes will be communicated via
+        appropriate means. Continued use of YTJudolRemover after modifications indicates acceptance of the updated Terms.
+      </p>
+    </section>
+
+    <section id="contact-information">
+      <h2>6. Contact Information</h2>
+      <p>
+        If you have any questions or concerns regarding these Terms and Conditions, please reach out to us via:
+        <br /><a href="mailto:imnotdanish05bussiness@gmail.com">📧 <strong>imnotdanish05bussiness@gmail.com</strong></a>
+      </p>
+    </section>
+  </main>
+
+  <aside class="theme-toggle-container">
+    <button class="toggle-button" id="themeToggle" aria-label="Toggle Theme">
+      <img id="themeIcon" class="icon" src="/images/half-moon.svg" alt="theme icon" />
+    </button>
+  </aside>
+
+  <script>
+    const toggleBtn = document.getElementById('themeToggle');
+    const themeIcon = document.getElementById('themeIcon');
+    const body = document.body;
+
+    // Function to set the theme based on the dark mode preference
+    function setTheme(darkMode) {
+      if (darkMode) {
+        body.classList.add('dark-mode');
+        themeIcon.src = '/images/sun.svg';
+        themeIcon.alt = 'Sun icon for light theme';
+      } else {
+        body.classList.remove('dark-mode');
+        themeIcon.src = '/images/half-moon.svg';
+        themeIcon.alt = 'Half moon icon for dark theme';
+      }
+    }
+
+    // Function to check system dark mode preference
+    function isSystemDarkMode() {
+      return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    }
+
+    // Initialize theme based on system preference or last saved preference
+    let darkMode = localStorage.getItem('darkMode') === 'true';
+    if (localStorage.getItem('darkMode') === null) {
+      darkMode = isSystemDarkMode();
+    }
+    setTheme(darkMode);
+
+    // Event listener for theme toggle button
+    toggleBtn.addEventListener('click', () => {
+      darkMode = !darkMode;
+      setTheme(darkMode);
+      localStorage.setItem('darkMode', darkMode); // Save user's preference
+    });
+
+    // Listen for changes in system dark mode preference
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (event) => {
+      if (localStorage.getItem('darkMode') === null) { // Only update if user hasn't set a preference
+        darkMode = event.matches;
+        setTheme(darkMode);
+      }
+    });
+  </script>
+</body>
+</html>

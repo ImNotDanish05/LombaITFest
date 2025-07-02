@@ -2,6 +2,12 @@
 <html>
 <head>
   <title>Komentar Spam</title>
+  <style>
+    body { font-family: Arial, sans-serif; }
+    ul { list-style: none; padding-left: 0; }
+    li { margin-bottom: 8px; }
+    #deleteBtn:disabled { background: #ccc; color: #888; }
+  </style>
 </head>
 <body>
   <h1>🚨 Ditemukan <%= spamComments.length %> komentar spam</h1>
@@ -9,7 +15,7 @@
     <label>
       <input type="checkbox" id="selectAll"> Pilih Semua
     </label>
-    <ul style="list-style:none;padding-left:0">
+    <ul>
       <% spamComments.forEach(function(c) { %>
         <li>
           <label>
