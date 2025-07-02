@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const youtubeController = require('../controllers/youtubeController'); // pastikan path dan nama file benar
+const youtubeController = require('../controllers/youtube/index');
 
 // Tampilkan form input link YouTube
 router.get('/start-form', youtubeController.showStartForm);

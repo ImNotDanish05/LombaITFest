@@ -1,6 +1,4 @@
 node_modules/
-package-lock.json
-package.json
 backend/config/user_token.json
 **/user_token.json
 .blackboxrules
