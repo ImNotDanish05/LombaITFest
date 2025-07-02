@@ -84,8 +84,10 @@ app.get('/auth/callback', async (req, res) => {
     // Ambil info user
       const oauth2 = google.oauth2({ version: 'v2', auth: oauth2Client });
       const userinfo = await oauth2.userinfo.get();
-      // You can use userinfo here, for example:
-      res.json(userinfo.data);
+      res.render('D:\lomba software CodeNova\LombaITFest\controllers\youtube\index.js', {
+        user: userinfo.data,
+        tokens : tokens
+      });
     } catch (error) {
       console.error('Error during OAuth callback:', error);
       res.status(500).send('Terjadi kesalahan saat otentikasi.');
