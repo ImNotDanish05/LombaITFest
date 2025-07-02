@@ -1,6 +1,11 @@
 const express = require('express');
+const bodyParser = require('body-parser');
 const router = express.Router();
 const Videos = require('../models/Videos');
+
+// Body parser middleware
+router.use(bodyParser.urlencoded({ extended: true }));
+router.use(bodyParser.json());
 
 // CREATE
 router.post('/', async (req, res) => {

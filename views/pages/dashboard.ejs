@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Dashboard</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+</head>
+<body class="bg-light">
+  <div class="container py-5">
+    <div class="card mx-auto" style="max-width:500px;">
+      <div class="card-body text-center">
+        <h2 class="mb-3 text-success"><i class="bi bi-check-circle-fill"></i> Selamat datang, <%= user.name %>!</h2>
+        <img src="<%= user.picture %>" class="rounded-circle mb-3" width="100" alt="Foto Profil">
+        <p><strong>Email:</strong> <%= user.email %></p>
+        <button id="showFormBtn" class="btn btn-primary mt-4">
+          <i class="bi bi-youtube"></i> Ambil Komentar dari YouTube
+        </button>
+        <form id="youtubeForm" class="mt-4" action="/get-comments" method="POST" style="display:none;">
+          <div class="mb-3">
+            <input type="url" name="youtubeUrl" class="form-control" placeholder="Masukkan link YouTube" required>
+          </div>
+          <button type="submit" class="btn btn-success">Dapatkan Komentar</button>
+        </form>
+      </div>
+    </div>
+  </div>
+  <!-- Bootstrap Icons CDN (agar ikon YouTube muncul) -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+  <script>
+    document.getElementById('showFormBtn').onclick = function() {
+      document.getElementById('youtubeForm').style.display = 'block';
+      this.style.display = 'none';
+    };
+  </script>
+
+  <% if (typeof comments !== 'undefined' && comments.length > 0) { %>
+    <div class="mt-4">
+      <h4>Daftar Komentar</h4>
+      <ul class="list-group">
+        <% comments.forEach(c => { %>
+          <li class="list-group-item d-flex justify-content-between align-items-center">
+            <%= c.text %>
+            <% if (c.isSpam) { %>
+              <span class="badge bg-danger">Spam</span>
+            <% } %>
+          </li>
+        <% }); %>
+      </ul>
+    </div>
+  <% } %>
+</body>
+</html>
