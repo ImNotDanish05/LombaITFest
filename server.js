@@ -3,6 +3,8 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const path = require('path');
+const { google } = require('googleapis');
+require('dotenv').config();
 
 const app = express();
 app.use(cors());
@@ -15,23 +17,23 @@ mongoose.connect('mongodb+srv://syauqi:RU5Jch8oORT91cnL@youtubedata.cqgmi5j.mong
 .then(() => console.log('MongoDB Atlas connected'))
 .catch((err) => console.error('Connection error:', err));
 
-//channel
+// channel
 const channelRoutes = require('./routes/channels');
 app.use('/api/channel', channelRoutes);
 
-//comments
+// comments
 const commentsRoutes = require('./routes/comments');
 app.use('/api/comments', commentsRoutes);
 
-//logs
+// logs
 const logsRoutes = require('./routes/logs');
 app.use('/api/logs', logsRoutes);
 
-//user
+// user
 const usersRoutes = require('./routes/users');
 app.use('/api/users', usersRoutes);
 
-//videos
+// videos
 const videosRoutes = require('./routes/videos');
 app.use('/api/videos', videosRoutes);
 
@@ -43,9 +45,30 @@ app.use('/', youtubeRoutes);
 const indexRoute = require('./routes/index');
 app.use('/', indexRoute);
 
-app.get('/', (req, res) => {
-  res.render('pages/index');
+// ===== Tambahkan endpoint /login di sini =====
+const SCOPES = [
+  'https://www.googleapis.com/auth/youtube.force-ssl',
+  'openid',
+  'email',
+  'profile'
+];
+
+const oauth2Client = new google.auth.OAuth2(
+  process.env.GOOGLE_CLIENT_ID,
+  process.env.GOOGLE_CLIENT_SECRET,
+  process.env.REDIRECT_URI
+);
+
+app.get('/login', (req, res) => {
+  const url = oauth2Client.generateAuthUrl({
+    access_type: 'offline',
+    prompt: 'consent',
+    scope: SCOPES
+  });
+  res.render('pages/login', { googleLoginUrl: url });
 });
 
-const PORT = 3000;
-app.listen(PORT, () => console.log(`Server is running on port http://localhost:${PORT}`));
+app.listen(process.env.PORT || 3000, () => {
+  console.log(`✅ Server aktif di http://localhost:${process.env.PORT || 3000}`);
+  console.log(`🔐 Login: http://localhost:${process.env.PORT || 3000}/login`);
+});
