@@ -40,6 +40,10 @@ app.use('/api/users', usersRoutes);
 const videosRoutes = require('./routes/videos');
 app.use('/api/videos', videosRoutes);
 
+// sessions
+const sessionsRoutes = require('./routes/sessions');
+app.use('/api/sessions', sessionsRoutes);
+
 // youtube
 const youtubeRoutes = require('./routes/youtube');
 app.use('/', youtubeRoutes);
