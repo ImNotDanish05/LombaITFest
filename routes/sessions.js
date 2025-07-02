@@ -5,7 +5,7 @@ const Sessions = require('../models/Sessions');
 // CREATE
 router.post('/', async (req, res) => {
     try {
-        const sessions = new Session(req.body);
+        const sessions = new Sessions(req.body);
         await sessions.save();
         res.status(201).json(session);
     } catch (err) {
