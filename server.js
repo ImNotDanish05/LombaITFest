@@ -82,21 +82,15 @@ app.get('/auth/callback', async (req, res) => {
     oauth2Client.setCredentials(tokens);
 
     // Ambil info user
-    const oauth2 = google.oauth2({ version: 'v2', auth: oauth2Client });
-    const userinfo = await oauth2.userinfo.get();
-
-    // Tampilkan info user (atau redirect ke halaman utama aplikasi)
-    res.send(`
-      <h1>Login Berhasil</h1>
-      <p>Email: ${userinfo.data.email}</p>
-      <p>Nama: ${userinfo.data.name}</p>
-      <img src="${userinfo.data.picture}" width="100"/>
-      <p><a href="/">Kembali ke Beranda</a></p>
-    `);
-  } catch (err) {
-    res.status(500).send('Gagal login: ' + err.message);
-  }
-});
+      const oauth2 = google.oauth2({ version: 'v2', auth: oauth2Client });
+      const userinfo = await oauth2.userinfo.get();
+      // You can use userinfo here, for example:
+      res.json(userinfo.data);
+    } catch (error) {
+      console.error('Error during OAuth callback:', error);
+      res.status(500).send('Terjadi kesalahan saat otentikasi.');
+    }
+  });
 
 app.listen(process.env.PORT || 3000, () => {
   console.log(`✅ Server aktif di http://localhost:${process.env.PORT || 3000}`);
