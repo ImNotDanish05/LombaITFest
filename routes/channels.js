@@ -1,6 +1,11 @@
 const express = require('express');
+const bodyParser = require('body-parser');
 const router = express.Router();
 const Channel = require('../models/Channels');
+
+// Body parser middleware
+router.use(bodyParser.urlencoded({ extended: true }));
+router.use(bodyParser.json());
 
 // CREATE
 router.post('/', async (req, res) => {
