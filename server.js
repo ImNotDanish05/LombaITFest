@@ -138,22 +138,23 @@ app.get('/dashboard/:id', async (req, res) => {
 });
 
 app.post('/get-comments', async (req, res) => {
-  console.log('req.body:', req.body); // Debug
-  const youtubeUrl = req.body.youtubeUrl;
-  const match = youtubeUrl.match(/(?:v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
-  if (!match) return res.status(400).send('Link YouTube tidak valid.');
-  const videoId = match[1];
-  console.log('videoId:', videoId);
-
   try {
-    const { google } = require('googleapis');
-    const youtube = google.youtube({ version: 'v3', auth: process.env.YOUTUBE_API_KEY });
+    // Debug: cek body
+    console.log('req.body:', req.body);
+
+    const youtubeUrl = req.body.youtubeUrl;
+    // Ekstrak videoId dari URL YouTube
+    const match = youtubeUrl.match(/(?:v=|youtu\.be\/|youtube\.com\/shorts\/)([a-zA-Z0-9_-]{11})/);
+    if (!match) return res.status(400).send('Link YouTube tidak valid.');
+    const videoId = match[1];
+
+    // Ambil komentar dari YouTube Data API
+    const youtube = google.youtube({ version: 'v3', auth: oauth2Client });
     const response = await youtube.commentThreads.list({
       part: 'snippet',
       videoId,
       maxResults: 20
     });
-    console.log('YouTube API response:', response.data);
 
     const comments = response.data.items.map(item => item.snippet.topLevelComment.snippet.textDisplay);
 
@@ -177,7 +178,7 @@ app.post('/get-comments', async (req, res) => {
     }
 
     // Ambil data user dari database (misal dari session, atau ambil user pertama untuk demo)
-    const user = await Users.findOne(); // Ganti dengan user yang sesuai jika pakai session
+    const user = await Users.findOne(); // Ganti dengan user yang sesuai jika pakai session/login
 
     // Render dashboard dengan daftar komentar
     res.render('pages/dashboard', {
