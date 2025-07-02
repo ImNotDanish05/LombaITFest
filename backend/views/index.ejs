@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Komentar Spam</title>
+</head>
+<body>
+  <h1>🚨 Ditemukan <%= spamComments.length %> komentar spam</h1>
+  <form method="POST" action="/delete-spam" id="deleteForm">
+    <label>
+      <input type="checkbox" id="selectAll"> Pilih Semua
+    </label>
+    <ul style="list-style:none;padding-left:0">
+      <% spamComments.forEach(function(c) { %>
+        <li>
+          <label>
+            <input type="checkbox" class="comment-checkbox" name="ids" value="<%= c.id %>">
+            <b><%= c.author %>:</b> <%= c.text %>
+          </label>
+        </li>
+      <% }); %>
+    </ul>
+    <button type="submit" id="deleteBtn" disabled>Hapus Komentar Terpilih</button>
+  </form>
+  <script>
+    const selectAll = document.getElementById('selectAll');
+    const checkboxes = document.querySelectorAll('.comment-checkbox');
+    const deleteBtn = document.getElementById('deleteBtn');
+    function updateDeleteBtn() {
+      deleteBtn.disabled = document.querySelectorAll('.comment-checkbox:checked').length === 0;
+    }
+    selectAll.addEventListener('change', function() {
+      checkboxes.forEach(cb => cb.checked = selectAll.checked);
+      updateDeleteBtn();
+    });
+    checkboxes.forEach(cb => {
+      cb.addEventListener('change', function() {
+        updateDeleteBtn();
+        if (!this.checked) selectAll.checked = false;
+        else if (document.querySelectorAll('.comment-checkbox:checked').length === checkboxes.length) selectAll.checked = true;
+      });
+    });
+    updateDeleteBtn();
+  </script>
+</body>
+</html>

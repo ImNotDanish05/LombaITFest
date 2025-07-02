@@ -11,6 +11,8 @@ const port = process.env.PORT || 3000;
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, '../../views'));
 
 const TOKEN_PATH = path.join(__dirname, 'user_token.json');
 const BLOCKED_WORDS_PATH = path.join(__dirname, 'blockedword.json');
@@ -185,46 +187,7 @@ app.post('/start', async (req, res) => {
     if (spamComments.length === 0) {
       return res.send(`<h1>✅ Selesai</h1><p>Total komentar spam yang dihapus: <strong>0</strong></p>`);
     }
-
-    // Tampilkan daftar komentar spam dengan checkbox
-    let listHtml = spamComments.map((c, idx) =>
-      `<li>
-        <label>
-          <input type="checkbox" class="comment-checkbox" name="ids" value="${c.id}">
-          <b>${c.author}:</b> ${c.text}
-        </label>
-      </li>`
-    ).join('');
-    res.send(`
-      <h1>🚨 Ditemukan ${spamComments.length} komentar spam</h1>
-      <form method="POST" action="/delete-spam" id="deleteForm">
-        <label>
-          <input type="checkbox" id="selectAll"> Pilih Semua
-        </label>
-        <ul style="list-style:none;padding-left:0">${listHtml}</ul>
-        <button type="submit" id="deleteBtn" disabled>Hapus Komentar Terpilih</button>
-      </form>
-      <script>
-        const selectAll = document.getElementById('selectAll');
-        const checkboxes = document.querySelectorAll('.comment-checkbox');
-        const deleteBtn = document.getElementById('deleteBtn');
-        function updateDeleteBtn() {
-          deleteBtn.disabled = document.querySelectorAll('.comment-checkbox:checked').length === 0;
-        }
-        selectAll.addEventListener('change', function() {
-          checkboxes.forEach(cb => cb.checked = selectAll.checked);
-          updateDeleteBtn();
-        });
-        checkboxes.forEach(cb => {
-          cb.addEventListener('change', function() {
-            updateDeleteBtn();
-            if (!this.checked) selectAll.checked = false;
-            else if (document.querySelectorAll('.comment-checkbox:checked').length === checkboxes.length) selectAll.checked = true;
-          });
-        });
-        updateDeleteBtn();
-      </script>
-    `);
+    res.render('index', { spamComments });
   } catch (err) {
     console.error('Error saat membersihkan:', err.response?.data || err.message || err);
     res.status(500).send('Terjadi kesalahan saat membersihkan komentar.');
