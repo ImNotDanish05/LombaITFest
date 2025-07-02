@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>CRUD SESSIONS</title>
+</head>
+<body>
+  <h1>DATA SESSIONS</h1>
+
+  <form id="sessionsForm">
+    <input type="text" id="user_google_id" placeholder="User Google ID" required />
+    <input type="text" id="session_id" placeholder="Session ID" required />
+    <input type="datetime-local" id="created_at" required />
+    <input type="datetime-local" id="expires_at" required />
+    <button type="submit">Simpan Data</button>
+  </form>
+
+  <ul id="sessionsList"></ul>
+
+  <script>
+    const apiURL = 'http://localhost:3000/api/sessions';
+
+    let editMode = false;
+    let editId = null;
+
+    async function loadSessions() {
+      const res = await fetch(apiURL);
+      const data = await res.json();
+      const list = document.getElementById('sessionsList');
+      list.innerHTML = '';
+
+      data.forEach(session => {
+        const li = document.createElement('li');
+        li.innerHTML = `
+          <br> user google id : ${session.user_google_id} | Session ID : ${session.session_id} | Created : ${session.created_at} | Expiry : ${session.expirires_at}<br>
+          <small> ID : ${session._id}</small> <br>
+          <button onclick="editData('${session._id}', '${session.user_google_id}', '${session.session_id}', '${session.created_at}', ${session.expirires_at})">Edit</button>
+          <button onclick="hapusData('${session._id}')">Hapus</button>
+          <hr/>
+        `;
+        list.appendChild(li);
+      });
+    }
+
+    async function submitSessions(e) {
+      e.preventDefault();
+
+      const data = {
+        user_google_id: document.getElementById('user_google_id').value,
+        session_id: document.getElementById('session_id').value,
+        created_at: document.getElementById('created_at').value,
+        expires_at: document.getElementById('expires_at').value
+        };
+
+      const config = {
+        method: editMode ? 'PUT' : 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      };
+
+      const url = editMode ? `${apiURL}/${editId}` : apiURL;
+      await fetch(url, config);
+
+      document.getElementById('sessionsForm').reset();
+      editMode = false;
+      editId = null;
+      loadSessions();
+    }
+
+    async function hapusData(id) {
+      await fetch(`${apiURL}/${id}`, { method: 'DELETE' });
+      loadSessions();
+    }
+
+    function editData(id, user_google_id, session_id, created_at, expires_at) {
+        document.getElementById('user_google_id').value = user_google_id;
+        document.getElementById('session_id').value = session_id;
+        document.getElementById('created_at').value = created_at;
+        document.getElementById('expires_at').value = expires_at;
+
+      editMode = true;
+      editId = id;
+    }
+
+    document.getElementById('sessionsForm').addEventListener('submit', submitSessions);
+    loadSessions();
+  </script>
+</body>
+</html>
