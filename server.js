@@ -1,12 +1,12 @@
+require('dotenv').config({ path: './backend/config/.env' }); // Pastikan path ke .env benar
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const path = require('path');
 const { google } = require('googleapis');
-require('dotenv').config();
-
 const app = express();
+
 app.use(cors());
 app.use(bodyParser.json());
 app.set('view engine', 'ejs');
@@ -45,7 +45,11 @@ app.use('/', youtubeRoutes);
 const indexRoute = require('./routes/index');
 app.use('/', indexRoute);
 
-// ===== Tambahkan endpoint /login di sini =====
+// Debug: cek apakah env terbaca
+console.log('CLIENT_ID:', process.env.GOOGLE_CLIENT_ID);
+console.log('CLIENT_SECRET:', process.env.GOOGLE_CLIENT_SECRET);
+console.log('REDIRECT_URI:', process.env.REDIRECT_URI);
+
 const SCOPES = [
   'https://www.googleapis.com/auth/youtube.force-ssl',
   'openid',
@@ -59,6 +63,7 @@ const oauth2Client = new google.auth.OAuth2(
   process.env.REDIRECT_URI
 );
 
+// Endpoint login
 app.get('/login', (req, res) => {
   const url = oauth2Client.generateAuthUrl({
     access_type: 'offline',
@@ -66,6 +71,31 @@ app.get('/login', (req, res) => {
     scope: SCOPES
   });
   res.render('pages/login', { googleLoginUrl: url });
+});
+
+app.get('/auth/callback', async (req, res) => {
+  const code = req.query.code;
+  if (!code) return res.status(400).send('Kode otorisasi tidak ditemukan.');
+
+  try {
+    const { tokens } = await oauth2Client.getToken(code);
+    oauth2Client.setCredentials(tokens);
+
+    // Ambil info user
+    const oauth2 = google.oauth2({ version: 'v2', auth: oauth2Client });
+    const userinfo = await oauth2.userinfo.get();
+
+    // Tampilkan info user (atau redirect ke halaman utama aplikasi)
+    res.send(`
+      <h1>Login Berhasil</h1>
+      <p>Email: ${userinfo.data.email}</p>
+      <p>Nama: ${userinfo.data.name}</p>
+      <img src="${userinfo.data.picture}" width="100"/>
+      <p><a href="/">Kembali ke Beranda</a></p>
+    `);
+  } catch (err) {
+    res.status(500).send('Gagal login: ' + err.message);
+  }
 });
 
 app.listen(process.env.PORT || 3000, () => {
