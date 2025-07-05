@@ -266,14 +266,25 @@ app.post('/get-comments', authSession, async (req, res) => {
     console.log(`Total komentar yang diambil: ${allComments.length}`);
 
     // Deteksi spam manual & AI
+    // allComments.map itu fungsinya untuk output array boolean (contoh: [true, false, true]) dan itu disimpan di manualResults
+    // Jadi manualResults[i] itu isinya true/false apakah komentar ke-i terdeteksi sebagai spam secara manual
     const manualResults = allComments.map(c => getJudolComment(c.text));
-    const notDetectedManually = allComments.filter((c, i) => !manualResults[i]).map(c => c.text);
+    // notDetectedManually adalah komentar yang tidak terdeteksi sebagai spam secara manual
+    const notDetectedManually = allComments.filter(
+      (c, i) => !manualResults[i]
+    )
+    .map(c => c.text);
+    // aiResults adalah hasil dari AI yang akan diisi nanti. Output dari AIini adalah array boolean juga, hanya saja menggunakan 1/0 sebagai output (1 untuk spam, 0 untuk bukan spam)
+    // Jadi aiResults[i] itu isinya 1/0 apakah komentar ke-i terdeteksi sebagai spam oleh AI
+    // Jika tidak ada komentar yang tidak terdeteksi secara manual, maka aiResults akan kosong
     let aiResults = [];
     if (notDetectedManually.length > 0) {
       aiResults = await getJudolCommentAi(notDetectedManually);
     }
 
     // Gabungkan hasil manual & AI
+    // spamResults adalah hasil akhir yang akan digunakan untuk menandai komentar sebagai spam atau tidak
+    // Jadi spamResults[i] itu isinya 1/0 apakah komentar ke-i terdeteksi sebagai spam
     let spamResults = [];
     let aiIdx = 0;
     for (let i = 0; i < allComments.length; i++) {
@@ -287,9 +298,30 @@ app.post('/get-comments', authSession, async (req, res) => {
     // Ambil data user dari database
     const user = await Users.findOne();
 
+    // Debugging: tampilkan jumlah komentar dan spam
+    // console.log('Semua Komentar:');
+    // console.log(allComments);
+    // console.log('manualResults:', manualResults);
+    // console.log('notDetectedManually:', notDetectedManually);
+    // console.log('aiResults:', aiResults);
+    // console.log('spamResults:', spamResults);
+    // const fs = require('fs');
+
+    // const debugData = {
+    //   semuaKomentar: allComments,
+    //   manualResults,
+    //   notDetectedManually,
+    //   aiResults,
+    //   spamResults
+    // };
+
+    // // Simpan jadi JSON biar rapi:
+    // fs.writeFileSync('debug-log.json', JSON.stringify(debugData, null, 2), 'utf-8');
+
+
     // Gabungkan spam ke komentar
     const commentsWithSpam = allComments.map((c, i) => ({
-      ...c,
+      ...c, // ...c akan menyebarkan semua properti dari komentar
       isSpam: spamResults[i]
     }));
 

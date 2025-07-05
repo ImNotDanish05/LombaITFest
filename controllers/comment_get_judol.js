@@ -55,9 +55,15 @@ function getJudolComment(text) {
     if (blockedWords.some(word => lowerText.includes(word.toLowerCase()))) return true;
 
     const words = text.split(/\s+/);
+
+    // Cek setiap kata
     for (const word of words) {
         if (!word) continue;
+        
+        // NEW: deteksi kalau kata itu link
+        const isLink = /^https?:\/\//i.test(word) || /^www\./i.test(word);
 
+        if (isLink) continue; // aman, lanjut ke kata berikutnya
         // Hitung jumlah huruf kapital per kata
         const capitalCount = [...word].filter(c => c >= 'A' && c <= 'Z').length;
         if (capitalCount > 1) return true;  // ✅ kalau ada >1 kapital → spam
@@ -72,6 +78,7 @@ function getJudolComment(text) {
 
         // Deteksi karakter aneh (tidak whitelist emoji)
         if (/[^a-zA-Z0-9\s.,!?'"()<>:@#\-]/.test(word)) return true;
+        
     }
 
     return false;

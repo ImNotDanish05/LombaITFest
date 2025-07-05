@@ -3,3 +3,4 @@ backend/config/user_token.json
 **/user_token.json
 .blackboxrules
 test.js
+debug-log.json
