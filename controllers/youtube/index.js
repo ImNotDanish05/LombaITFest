@@ -35,7 +35,8 @@ oauth2Client.on('tokens', (tokens) => {
 
 function getVideoIdFromUrl(url) {
   if (!url) return null;
-  const match = url.match(/(?:v=|\/)([0-9A-Za-z_-]{11})/);
+  const pattern = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com|youtu\.be)\/(?:watch\?v=|embed\/|shorts\/)?([a-zA-Z0-9_-]{11})/;
+  const match = url.match(pattern);
   return match ? match[1] : null;
 }
 

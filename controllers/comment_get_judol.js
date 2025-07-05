@@ -9,13 +9,46 @@ dotenv.config();
 const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
 
 // === Manual Check ===
+// function getJudolComment(text) {
+//     if (!text) return false;
+
+//     const normalizedText = text.normalize("NFKD");
+//     const hasCombiningChar = /[\u0300-\u036F]/.test(text);
+//     if (text !== normalizedText || hasCombiningChar) return true;
+
+//     const blockedWordsPath = path.join(__dirname, '../config/blockedword.json');
+//     const blockedWords = JSON.parse(fs.readFileSync(blockedWordsPath));
+//     const lowerText = text.toLowerCase();
+//     if (blockedWords.some(word => lowerText.includes(word.toLowerCase()))) return true;
+
+//     const words = text.split(/\s+/);
+//     for (const word of words) {
+//         if (!word) continue;
+
+//         const capitalCount = [...word].filter(c => c >= 'A' && c <= 'Z').length;
+//         if (capitalCount > 1 && capitalCount <= 3) return true;
+
+//         const isAllCaps = word === word.toUpperCase();
+//         const isAllLower = word === word.toLowerCase();
+//         const isCapitalized = /^[A-Z][a-z]+$/.test(word);
+
+//         if (!isAllCaps && !isAllLower && !isCapitalized) return true;
+
+//         if (/[^a-zA-Z0-9\s.,!?'"()<>:@#\-]/.test(word)) return true;
+//     }
+
+//     return false;
+// }
+
 function getJudolComment(text) {
     if (!text) return false;
 
+    // Normalisasi text
     const normalizedText = text.normalize("NFKD");
     const hasCombiningChar = /[\u0300-\u036F]/.test(text);
     if (text !== normalizedText || hasCombiningChar) return true;
 
+    // Cek blocked words
     const blockedWordsPath = path.join(__dirname, '../config/blockedword.json');
     const blockedWords = JSON.parse(fs.readFileSync(blockedWordsPath));
     const lowerText = text.toLowerCase();
@@ -25,15 +58,19 @@ function getJudolComment(text) {
     for (const word of words) {
         if (!word) continue;
 
+        // Hitung jumlah huruf kapital per kata
         const capitalCount = [...word].filter(c => c >= 'A' && c <= 'Z').length;
-        if (capitalCount > 1 && capitalCount <= 3) return true;
+        if (capitalCount > 1) return true;  // ✅ kalau ada >1 kapital → spam
 
+        // Cek pola normal
         const isAllCaps = word === word.toUpperCase();
         const isAllLower = word === word.toLowerCase();
         const isCapitalized = /^[A-Z][a-z]+$/.test(word);
 
-        if (!isAllCaps && !isAllLower && !isCapitalized) return true;
+        // Kalau bentuknya aneh (campur aduk) → spam
+        if (!isAllCaps && !isAllLower && !isCapitalized && capitalCount !== 1) return true;
 
+        // Deteksi karakter aneh (tidak whitelist emoji)
         if (/[^a-zA-Z0-9\s.,!?'"()<>:@#\-]/.test(word)) return true;
     }
 

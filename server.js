@@ -4,6 +4,7 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const path = require('path');
 const { google } = require('googleapis');
+const { getVideoIdFromUrl } = require('./controllers/youtube/index');
 const { getJudolComment, getJudolCommentAi } = require('./controllers/comment_get_judol');
 const authSession  = require('./controllers/authSession');
 const Users = require('./models/Users');
@@ -231,27 +232,42 @@ app.get('/delete-account', authSession, async (req, res) => {
 app.post('/get-comments', authSession, async (req, res) => {
   try {
     const youtubeUrl = req.body.youtubeUrl;
-    const match = youtubeUrl.match(/(?:v=|youtu\.be\/|youtube\.com\/shorts\/)([a-zA-Z0-9_-]{11})/);
+    const match = getVideoIdFromUrl(youtubeUrl);
     if (!match) return res.status(400).send('Link YouTube tidak valid.');
-    const videoId = match[1];
+    const videoId = match;
 
-    // Pastikan oauth2Client sudah set credentials user yang login!
-    const youtube = google.youtube({ version: 'v3', auth: oauth2Client });
-    const response = await youtube.commentThreads.list({
-      part: 'snippet',
-      videoId,
-      maxResults: 20
+    oauth2Client.setCredentials({
+      access_token: req.user.access_token,
+      refresh_token: req.user.refresh_token
     });
 
-    // Simpan commentId juga!
-    const comments = response.data.items.map(item => ({
-      text: item.snippet.topLevelComment.snippet.textDisplay,
-      commentId: item.snippet.topLevelComment.id
-    }));
+    const youtube = google.youtube({ version: 'v3', auth: oauth2Client });
+
+    let allComments = [];
+    let nextPageToken = null;
+
+    do {
+      const response = await youtube.commentThreads.list({
+        part: 'snippet',
+        videoId,
+        maxResults: 100,
+        pageToken: nextPageToken || ''
+      });
+
+      const commentsBatch = response.data.items.map(item => ({
+        text: item.snippet.topLevelComment.snippet.textDisplay,
+        commentId: item.snippet.topLevelComment.id
+      }));
+
+      allComments = allComments.concat(commentsBatch);
+      nextPageToken = response.data.nextPageToken;
+    } while (nextPageToken);
+
+    console.log(`Total komentar yang diambil: ${allComments.length}`);
 
     // Deteksi spam manual & AI
-    const manualResults = comments.map(c => getJudolComment(c.text));
-    const notDetectedManually = comments.filter((c, i) => !manualResults[i]).map(c => c.text);
+    const manualResults = allComments.map(c => getJudolComment(c.text));
+    const notDetectedManually = allComments.filter((c, i) => !manualResults[i]).map(c => c.text);
     let aiResults = [];
     if (notDetectedManually.length > 0) {
       aiResults = await getJudolCommentAi(notDetectedManually);
@@ -260,7 +276,7 @@ app.post('/get-comments', authSession, async (req, res) => {
     // Gabungkan hasil manual & AI
     let spamResults = [];
     let aiIdx = 0;
-    for (let i = 0; i < comments.length; i++) {
+    for (let i = 0; i < allComments.length; i++) {
       if (manualResults[i]) {
         spamResults.push(1);
       } else {
@@ -272,7 +288,7 @@ app.post('/get-comments', authSession, async (req, res) => {
     const user = await Users.findOne();
 
     // Gabungkan spam ke komentar
-    const commentsWithSpam = comments.map((c, i) => ({
+    const commentsWithSpam = allComments.map((c, i) => ({
       ...c,
       isSpam: spamResults[i]
     }));
@@ -290,6 +306,7 @@ app.post('/get-comments', authSession, async (req, res) => {
     res.status(500).send('Gagal mengambil komentar.');
   }
 });
+
 
 // Route POST delete-comments
 app.post('/delete-comments', authSession, async (req, res) => {
