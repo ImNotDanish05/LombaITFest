@@ -425,14 +425,17 @@ app.post('/delete-comments', authSession, async (req, res) => {
           });
         }
       } else {
-        // Report as spam (YouTube gak punya API langsung "report", jadi pake rejected juga)
-        await youtube.comments.setModerationStatus({
-          id,
-          moderationStatus: 'rejected'
-        });
+        // Jika bukan pemilik, hanya bisa tandai sebagai spam
+        await youtube.comments.markAsSpam({ id });
       }
     }
-    res.redirect('back');
+    res.render('success',
+      { message: 'Komentar berhasil diproses.',
+         isOwner,
+        permanentDelete,
+        selectedIds: selectedIds.length 
+      }
+    );
   } catch (err) {
     console.error('Gagal memproses komentar:', err);
     res.status(500).send('Gagal memproses komentar.');

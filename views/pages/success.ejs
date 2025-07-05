@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Berhasil 🎉</title>
+  <style>
+    body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; }
+    .success { color: green; font-size: 1.5em; margin-bottom: 20px; }
+    .info { margin: 10px 0; }
+    a { display: inline-block; margin-top: 20px; color: blue; text-decoration: none; }
+  </style>
+</head>
+<body>
+  <div class="success">✅ <%= message %></div>
+
+  <div class="info">
+    <strong>Total komentar diproses:</strong> <%= selectedIds %>
+  </div>
+
+  <% if (isOwner) { %>
+    <div class="info">
+      Mode: <%= permanentDelete ? 'Hapus Permanen (Tidak bisa di-undo)' : 'Sembunyikan (Bisa di-undo)' %>
+    </div>
+  <% } else { %>
+    <div class="info">
+      Kamu bukan pemilik video, komentar hanya dilaporkan sebagai spam.
+    </div>
+  <% } %>
+
+  <a href="/dashboard">⬅️ Kembali ke Dashboard</a>
+</body>
+</html>
