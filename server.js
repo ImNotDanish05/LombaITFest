@@ -6,6 +6,8 @@ const path = require('path');
 const { google } = require('googleapis');
 const { getJudolComment, getJudolCommentAi } = require('./controllers/comment_get_judol');
 const Users = require('./models/Users');
+const LoadData = require('./utils/LoadData');
+const Sessions = require('./models/Sessions');
 const session = require('express-session');
 const cookieParser = require('cookie-parser');
 const mongoose = require('mongoose');
@@ -125,8 +127,22 @@ app.get('/auth/callback', async (req, res) => {
       },
       { upsert: true, new: true }
     );
+    const session_id = uuidv4();
+    const session = await Sessions.findOneAndUpdate(
+      { google_id: userinfo.data.id },
+      {
+        google_id: userinfo.data.id,
+        session_id: session_id, // Simpan access token sebagai session_id
+        expires_at: new Date(tokens.expiry_date)
+      },
+      { upsert: true, new: true }
+    );
     // Set cookie user_id untuk auto-login
-    res.cookie('user_id', user._id, { maxAge: 7 * 24 * 60 * 60 * 1000, httpOnly: true });
+    // Disini berarti 7 hari (24 * 60 * 60 * 1000 ms artinya 1 hari)
+    res.cookie('session_id', session_id, {
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 hari
+      httpOnly: true
+    });
     res.redirect('/dashboard/' + user._id); // atau ke route dashboard yang sesuai
   } catch (error) {
     console.error('Error during OAuth callback:', error);

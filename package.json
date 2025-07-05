@@ -9,6 +9,7 @@
     "express": "^5.1.0",
     "express-session": "^1.18.1",
     "googleapis": "^150.0.1",
-    "mongoose": "^8.16.1"
+    "mongoose": "^8.16.1",
+    "uuid": "^11.1.0"
   }
 }
