@@ -5,11 +5,14 @@ const bodyParser = require('body-parser');
 const path = require('path');
 const { google } = require('googleapis');
 const { getJudolComment, getJudolCommentAi } = require('./controllers/comment_get_judol');
+const { authSession }  = require('../controllers/authSession');
 const Users = require('./models/Users');
 const LoadData = require('./utils/LoadData');
 const Sessions = require('./models/Sessions');
+
 const session = require('express-session');
 const cookieParser = require('cookie-parser');
+const { v4: uuidv4 } = require('uuid');
 const mongoose = require('mongoose');
 
 const app = express();
