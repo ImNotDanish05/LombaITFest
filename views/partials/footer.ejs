@@ -1,15 +1,285 @@
-<footer class="custom-footer text-white mt-auto">
-    <div class="container text-center">
-        <h5 class="mb-3">Judol Comments Remover</h5>
-        <p class="mb-1">&copy; <%= new Date().getFullYear() %> <strong>CodeNova</strong>. All rights reserved.</p>
-        <small class="text-light opacity-75">Powered by Express & EJS</small>
-        <div class="social-icons-container">
-            <a href="https://www.facebook.com/" target="_blank" aria-label="Facebook"><i class="bi bi-facebook"></i></a>
-            <a href="https://twitter.com/" target="_blank" aria-label="Twitter"><i class="bi bi-twitter-x"></i></a>
-            <a href="https://github.com/" target="_blank" aria-label="GitHub"><i class="bi bi-github"></i></a>
+<!-- Custom Footer with Modern Styling -->
+<footer class="custom-footer">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-4 col-md-6 mb-4">
+                <h5 class="footer-title">
+                    <img src="/images/logo_app.png" alt="Logo" class="footer-emoji" style="height:3.5rem; width:auto; vertical-align:middle; margin-right:0.5rem;">
+                    YTJudolRemover
+                </h5>
+                <p class="footer-description">
+                    Solusi terbaik untuk membersihkan komentar judi online di YouTube. 
+                    Lindungi channel Anda dan jaga profesionalitas konten.
+                </p>
+            </div>
+            
+            <div class="col-lg-2 col-md-6 mb-4">
+                <h6 class="footer-subtitle">Menu</h6>
+                <ul class="footer-links">
+                    <li><a href="#">Home</a></li>
+                    <li><a href="#">Features</a></li>
+                    <li><a href="#">Pricing</a></li>
+                    <li><a href="#">About</a></li>
+                </ul>
+            </div>
+            
+            <div class="col-lg-2 col-md-6 mb-4">
+                <h6 class="footer-subtitle">Support</h6>
+                <ul class="footer-links">
+                    <li><a href="#">Help Center</a></li>
+                    <li><a href="#">Contact</a></li>
+                    <li><a href="#">FAQ</a></li>
+                    <li><a href="#">API Docs</a></li>
+                </ul>
+            </div>
+            
+            <div class="col-lg-2 col-md-6 mb-4">
+                <h6 class="footer-subtitle">Legal</h6>
+                <ul class="footer-links">
+                    <li><a href="PrivacyPolicy">Privacy Policy</a></li>
+                    <li><a href="/TermsAndConditions">Terms of Service</a></li>
+                    <li><a href="#">Cookie Policy</a></li>
+                    <li><a href="#">Disclaimer</a></li>
+                </ul>
+            </div>
+            
+            <div class="col-lg-2 col-md-6 mb-4">
+                <h6 class="footer-subtitle">Connect</h6>
+                <div class="social-icons-container">
+                    <a href="https://github.com/ImNotDanish05" class="social-icon github" title="GitHub">
+                        <i class="bi bi-github"></i>
+                    </a>
+                    <a href="#" class="social-icon twitter" title="Twitter">
+                        <i class="bi bi-twitter"></i>
+                    </a>
+                    <a href="https://www.instagram.com/danish_mahdi05/" class="social-icon instagram" title="Instagram">
+                        <i class="bi bi-instagram"></i>
+                    </a>
+                    <a href="https://www.youtube.com/@ImNotDanish05" class="social-icon youtube" title="YouTube">
+                        <i class="bi bi-youtube"></i>
+                    </a>
+                </div>
+            </div>
         </div>
-        <div class="mt-4 pt-3 border-top border-secondary opacity-50">
-            <small>Politeknik Negeri Ngawi</small>
+        
+        <hr class="footer-divider">
+        
+        <div class="row align-items-center">
+            <div class="col-md-6">
+                <small class="copyright">
+                    &copy; 2024 YTJudolRemover. All rights reserved.
+                </small>
+            </div>
+            <div class="col-md-6 text-md-end">
+                <small class="footer-info">
+                    Made with <span class="text-danger">❤️</span> in Solinep
+                </small>
+            </div>
         </div>
     </div>
 </footer>
+
+<style>
+/* Custom Footer Styling */
+.custom-footer {
+    background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
+    color: #e0e0e0;
+    padding: 50px 0 20px;
+    box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.3);
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+    position: relative;
+    z-index: 10;
+    overflow: hidden;
+}
+
+.custom-footer::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="50" cy="50" r="1" fill="rgba(255,255,255,0.02)"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+    pointer-events: none;
+}
+
+.footer-title {
+    color: #ffd369;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    font-size: 1.5rem;
+}
+
+.footer-emoji {
+    display: inline-block;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+.footer-description {
+    color: #c0c0c0;
+    font-weight: 300;
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+}
+
+.footer-subtitle {
+    color: #ffffff;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    font-size: 1.1rem;
+    position: relative;
+    padding-bottom: 0.5rem;
+}
+
+.footer-subtitle::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 30px;
+    height: 2px;
+    background: linear-gradient(90deg, #ffd369, transparent);
+}
+
+.footer-links {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.footer-links li {
+    margin-bottom: 0.5rem;
+}
+
+.footer-links a {
+    color: #c0c0c0;
+    text-decoration: none;
+    font-weight: 300;
+    transition: all 0.3s ease;
+    padding: 0.25rem 0;
+    display: inline-block;
+}
+
+.footer-links a:hover {
+    color: #ffd369;
+    transform: translateX(5px);
+}
+
+.social-icons-container {
+    display: flex;
+    gap: 15px;
+    margin-top: 1rem;
+}
+
+.social-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    color: #ffffff;
+    font-size: 1.2rem;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.social-icon:hover {
+    transform: translateY(-3px) scale(1.1);
+    box-shadow: 0 5px 20px rgba(255, 211, 105, 0.3);
+}
+
+.social-icon.github:hover {
+    background: #24292e;
+    color: #ffd369;
+}
+.social-icon.twitter:hover {
+    background: #1da1f2;
+    color: #fff;
+}
+.social-icon.instagram:hover {
+    background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
+    color: #fff;
+}
+.social-icon.youtube:hover {
+    background: #ff0000;
+    color: #fff;
+}
+
+.footer-divider {
+    border: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    margin: 2rem 0 1.5rem;
+}
+
+.copyright,
+.footer-info {
+    color: #a0a0a0;
+    font-weight: 300;
+}
+
+.footer-info .text-danger {
+    animation: heartbeat 1.5s infinite;
+}
+
+@keyframes heartbeat {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .custom-footer {
+        padding: 40px 0 20px;
+        border-top-left-radius: 15px;
+        border-top-right-radius: 15px;
+    }
+    
+    .footer-title {
+        font-size: 1.3rem;
+    }
+    
+    .social-icons-container {
+        justify-content: center;
+        gap: 10px;
+    }
+    
+    .social-icon {
+        width: 35px;
+        height: 35px;
+        font-size: 1.1rem;
+    }
+    
+    .col-md-6.text-md-end {
+        text-align: center !important;
+        margin-top: 1rem;
+    }
+}
+
+/* Scroll reveal animation */
+.custom-footer {
+    animation: slideInUp 0.8s ease-out;
+}
+
+@keyframes slideInUp {
+    from {
+        opacity: 0;
+        transform: translateY(50px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+</style>
