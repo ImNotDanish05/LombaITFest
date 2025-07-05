@@ -407,19 +407,38 @@ app.post('/delete-comments', authSession, async (req, res) => {
   if (!selectedIds) return res.redirect('back');
   if (typeof selectedIds === 'string') selectedIds = [selectedIds];
 
-  // Pastikan oauth2Client sudah set credentials user yang login!
+  const isOwner = req.body.isOwner === '1';
+  const permanentDelete = req.body.permanentDelete === '1';
+
   try {
     const youtube = google.youtube({ version: 'v3', auth: oauth2Client });
     for (const id of selectedIds) {
-      await youtube.comments.delete({ id });
+      if (isOwner) {
+        if (permanentDelete) {
+          // Hapus permanen
+          await youtube.comments.delete({ id });
+        } else {
+          // Hide (bisa di-undo)
+          await youtube.comments.setModerationStatus({
+            id,
+            moderationStatus: 'rejected'
+          });
+        }
+      } else {
+        // Report as spam (YouTube gak punya API langsung "report", jadi pake rejected juga)
+        await youtube.comments.setModerationStatus({
+          id,
+          moderationStatus: 'rejected'
+        });
+      }
     }
-    // Setelah hapus, redirect ke dashboard (atau tampilkan pesan sukses)
     res.redirect('back');
   } catch (err) {
-    console.error('Gagal menghapus komentar:', err);
-    res.status(500).send('Gagal menghapus komentar.');
+    console.error('Gagal memproses komentar:', err);
+    res.status(500).send('Gagal memproses komentar.');
   }
 });
+
 
 app.get('/', async (req, res) => {
   let isLoggedIn = false;

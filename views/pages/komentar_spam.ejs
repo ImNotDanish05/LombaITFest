@@ -18,6 +18,7 @@
   <% } %>
   
   <form method="POST" action="/delete-comments" id="deleteForm">
+    <input type="hidden" name="isOwner" value="<%= user.isOwner ? '1' : '0' %>">
     <label>
       <input type="checkbox" id="selectAll"> Pilih Semua
     </label>
