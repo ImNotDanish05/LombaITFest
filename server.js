@@ -245,6 +245,28 @@ app.post('/get-comments', authSession, async (req, res) => {
 
     const youtube = google.youtube({ version: 'v3', auth: oauth2Client });
 
+    // Mengambil data akun youtube user
+    const channelResponse = await youtube.channels.list({
+      part: 'id,snippet',
+      mine: true
+    });
+    const userChannelId = channelResponse.data.items[0].id;
+
+    // Mengambil data akun pemilik video
+    const videoResponse = await youtube.videos.list({
+      part: 'snippet',
+      id: videoId
+    });
+    const videoChannelId = videoResponse.data.items[0].snippet.channelId;
+
+    // Cek apakah user yang login adalah pemilik video
+    const isOwner = userChannelId === videoChannelId;
+    if (isOwner) {
+      console.log("Ini video milik user sendiri!");
+    } else {
+      console.log("Ini video orang lain!");
+    }
+
     let allComments = [];
     let nextPageToken = null;
     let count = 0;
@@ -362,13 +384,15 @@ app.post('/get-comments', authSession, async (req, res) => {
 
     fs.writeFileSync('debug-log.json', JSON.stringify(debugData, null, 2), 'utf-8');
 
-    res.render('pages/dashboard', {
+    res.render('pages/komentar_spam', {
       user: {
         name: req.user.username,
         email: req.user.email,
-        picture: req.user.picture
+        picture: req.user.picture,
+        isOwner: isOwner
       },
       comments: onlySpamComments
+      
     });
   } catch (err) {
     console.error('YouTube API error:', err);

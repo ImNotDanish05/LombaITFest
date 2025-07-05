@@ -7,16 +7,31 @@
     ul { list-style: none; padding-left: 0; }
     li { margin-bottom: 8px; }
     #deleteBtn:disabled { background: #ccc; color: #888; }
+    .warning { color: red; font-weight: bold; margin-bottom: 10px; }
   </style>
 </head>
 <body>
-  <h1>🚨 Ditemukan <%= spamComments.length %> komentar spam</h1>
-  <form method="POST" action="/delete-spam" id="deleteForm">
+  <h1>🚨 Ditemukan <%= comments.length %> komentar spam</h1>
+  
+  <% if (!user.isOwner) { %>
+    <div class="warning">⚠️ Kamu bukan pemilik video ini. Kamu hanya bisa melaporkan komentar sebagai spam, bukan menghapusnya permanent.</div>
+  <% } %>
+  
+  <form method="POST" action="/delete-comments" id="deleteForm">
     <label>
       <input type="checkbox" id="selectAll"> Pilih Semua
     </label>
+    
+    <% if (user.isOwner) { %>
+      <div style="margin-top:8px;">
+        <label>
+          <input type="checkbox" name="permanentDelete" value="1"> Hapus Permanen (Tidak bisa di-undo)
+        </label>
+      </div>
+    <% } %>
+
     <ul>
-      <% spamComments.forEach(function(c) { %>
+      <% comments.forEach(function(c) { %>
         <li>
           <label>
             <input type="checkbox" class="comment-checkbox" name="ids" value="<%= c.id %>">
@@ -25,8 +40,14 @@
         </li>
       <% }); %>
     </ul>
-    <button type="submit" id="deleteBtn" disabled>Hapus Komentar Terpilih</button>
+    
+    <% if (user.isOwner) { %>
+      <button type="submit" id="deleteBtn" disabled>Hapus Komentar Terpilih</button>
+    <% } else { %>
+      <button type="submit" id="deleteBtn" disabled>Report sebagai Spam</button>
+    <% } %>
   </form>
+
   <script>
     const selectAll = document.getElementById('selectAll');
     const checkboxes = document.querySelectorAll('.comment-checkbox');

@@ -49,7 +49,12 @@ function getJudolComment(text) {
 
         if (!isAllCaps && !isAllLower && !isCapitalized && capitalCount !== 1) return true;
 
-        if (/[^a-zA-Z0-9\s.,!?'"()<>:@#\-:😅😹]/.test(word)) return true;
+        // if (/[^a-zA-Z0-9\s.,!?'"()<>:@#\-:😅😹]/.test(word)) return true;
+
+        // Cara lebih aman untuk deteksi karakter aneh
+        if (/[\u0000-\u001F\u007F-\u009F]/.test(word)) {
+            return true; // ada karakter kontrol → spam
+        }
     }
 
     // Cek blocked words

@@ -61,6 +61,7 @@
   <% if (typeof comments !== 'undefined' && comments.length > 0) { %>
     <div class="mt-4">
       <h4>Daftar Komentar</h4>
+      <h1>🚨 Ditemukan <%= comments.length %> komentar spam</h1>
       <form action="/delete-comments" method="POST">
         <div class="mb-2 text-start">
           <input type="checkbox" id="selectAll" class="form-check-input">
