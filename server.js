@@ -157,7 +157,7 @@ app.get('/auth/callback', async (req, res) => {
       {
         google_id: userinfo.data.id,
         session_id: session_id, // Simpan access token sebagai session_id
-        expires_at: new Date(tokens.expiry_date)
+        expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 hari
       },
       { upsert: true, new: true }
     );
