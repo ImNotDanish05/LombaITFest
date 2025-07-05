@@ -5,7 +5,7 @@ const bodyParser = require('body-parser');
 const path = require('path');
 const { google } = require('googleapis');
 const { getJudolComment, getJudolCommentAi } = require('./controllers/comment_get_judol');
-const { authSession }  = require('../controllers/authSession');
+const authSession  = require('./controllers/authSession');
 const Users = require('./models/Users');
 const LoadData = require('./utils/LoadData');
 const Sessions = require('./models/Sessions');
@@ -154,7 +154,7 @@ app.get('/auth/callback', async (req, res) => {
 });
 
 // Dashboard dengan id (akses setelah login)
-app.get('/dashboard/:id', async (req, res) => {
+app.get('/dashboard/:id', authSession, async (req, res) => {
   try {
     let userId = req.params.id;
     if (!userId && req.cookies.user_id) {
@@ -176,7 +176,7 @@ app.get('/dashboard/:id', async (req, res) => {
 });
 
 // Dashboard tanpa id (akses otomatis via cookie)
-app.get('/dashboard', async (req, res) => {
+app.get('/dashboard', authSession, async (req, res) => {
   const userId = req.cookies.user_id;
   if (!userId) return res.redirect('/');
   const user = await Users.findById(userId).lean();
@@ -194,7 +194,7 @@ app.get('/dashboard', async (req, res) => {
 });
 
 // --- HAPUS AKUN: Hapus user dari DB dan hapus cookie ---
-app.get('/delete-account', async (req, res) => {
+app.get('/delete-account', authSession, async (req, res) => {
   try {
     const userId = req.cookies.user_id;
     if (userId) {
@@ -208,7 +208,7 @@ app.get('/delete-account', async (req, res) => {
 });
 
 // Route POST get-comments
-app.post('/get-comments', async (req, res) => {
+app.post('/get-comments', authSession, async (req, res) => {
   try {
     const youtubeUrl = req.body.youtubeUrl;
     const match = youtubeUrl.match(/(?:v=|youtu\.be\/|youtube\.com\/shorts\/)([a-zA-Z0-9_-]{11})/);
@@ -272,7 +272,7 @@ app.post('/get-comments', async (req, res) => {
 });
 
 // Route POST delete-comments
-app.post('/delete-comments', async (req, res) => {
+app.post('/delete-comments', authSession, async (req, res) => {
   let selectedIds = req.body.commentId;
   if (!selectedIds) return res.redirect('back');
   if (typeof selectedIds === 'string') selectedIds = [selectedIds];
