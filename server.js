@@ -403,7 +403,8 @@ app.post('/get-comments', authSession, async (req, res) => {
 
 // Route POST delete-comments
 app.post('/delete-comments', authSession, async (req, res) => {
-  let selectedIds = req.body.commentId;
+  let selectedIds = req.body.ids;
+  console.log('Selected IDs:', selectedIds);
   if (!selectedIds) return res.redirect('back');
   if (typeof selectedIds === 'string') selectedIds = [selectedIds];
 
@@ -411,14 +412,24 @@ app.post('/delete-comments', authSession, async (req, res) => {
   const permanentDelete = req.body.permanentDelete === '1';
 
   try {
+    // Set credentials lengkap
+    oauth2Client.setCredentials({
+      access_token: req.user.access_token,
+      refresh_token: req.user.refresh_token,
+      token_type: req.user.token_type
+    });
+
     const youtube = google.youtube({ version: 'v3', auth: oauth2Client });
+
     for (const id of selectedIds) {
       if (isOwner) {
         if (permanentDelete) {
           // Hapus permanen
+          console.log(`Menghapus komentar ID: ${id} secara permanen...`);
           await youtube.comments.delete({ id });
         } else {
           // Hide (bisa di-undo)
+          console.log(`Menandai komentar ID: ${id} sebagai tidak pantas...`);
           await youtube.comments.setModerationStatus({
             id,
             moderationStatus: 'rejected'
@@ -429,18 +440,20 @@ app.post('/delete-comments', authSession, async (req, res) => {
         await youtube.comments.markAsSpam({ id });
       }
     }
-    res.render('success',
-      { message: 'Komentar berhasil diproses.',
-         isOwner,
-        permanentDelete,
-        selectedIds: selectedIds.length 
-      }
-    );
+
+    // Render halaman sukses
+    res.render('pages/success', {
+      message: 'Komentar berhasil diproses.',
+      isOwner,
+      permanentDelete,
+      selectedIds: selectedIds.length
+    });
   } catch (err) {
     console.error('Gagal memproses komentar:', err);
     res.status(500).send('Gagal memproses komentar.');
   }
 });
+
 
 
 app.get('/', async (req, res) => {

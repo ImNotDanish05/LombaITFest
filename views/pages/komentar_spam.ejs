@@ -24,19 +24,19 @@
     </label>
     
     <% if (user.isOwner) { %>
-      <div style="margin-top:8px;">
+      <!-- <div style="margin-top:8px;">
         <label>
           <input type="checkbox" name="permanentDelete" value="1"> Hapus Permanen (Tidak bisa di-undo)
         </label>
-      </div>
+      </div> -->
     <% } %>
 
     <ul>
-      <% comments.forEach(function(c) { %>
+      <% comments.forEach(function(comments) { %>
         <li>
           <label>
-            <input type="checkbox" class="comment-checkbox" name="ids" value="<%= c.id %>">
-            <b><%= c.author %>:</b> <%= c.text %>
+            <input type="checkbox" class="comment-checkbox" name="ids" value="<%= comments.commentId %>">
+            <b><%= comments.author %>:</b> <%= comments.text %>
           </label>
         </li>
       <% }); %>
@@ -53,6 +53,12 @@
     const selectAll = document.getElementById('selectAll');
     const checkboxes = document.querySelectorAll('.comment-checkbox');
     const deleteBtn = document.getElementById('deleteBtn');
+    document.getElementById('deleteForm').addEventListener('submit', function(e) {
+  if (document.querySelectorAll('.comment-checkbox:checked').length === 0) {
+    e.preventDefault();
+    alert('Pilih minimal 1 komentar dulu!');
+  }
+});
     function updateDeleteBtn() {
       deleteBtn.disabled = document.querySelectorAll('.comment-checkbox:checked').length === 0;
     }
