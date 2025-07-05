@@ -7,7 +7,6 @@ const axios = require('axios');
 dotenv.config();
 
 const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
-console.log("KEY:", OPENROUTER_API_KEY);
 
 // === Manual Check ===
 function getJudolComment(text) {

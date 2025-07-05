@@ -90,7 +90,26 @@ app.get('/home', (req, res) => {
 });
 
 // Endpoint login
-app.get('/login', (req, res) => {
+app.get('/login', async (req, res) => {
+  // Cek dulu apakah ada session_id di cookies
+  const session_id = req.cookies.session_id;
+  if (session_id) {
+    // Cari session di DB
+    const session = await Sessions.findOne({ session_id });
+    if (session && session.expires_at > Date.now()) {
+      // Cari user juga
+      const user = await Users.findOne({ google_id: session.google_id });
+      if (user) {
+        // Kalau valid, langsung redirect ke dashboard
+        console.log('User sudah login, redirect ke dashboard');
+        console.log('session_id:', session_id);
+        return res.redirect('/dashboard/');
+      }
+    }
+  }
+  console.log('Tidak ada session_id atau session tidak valid, tampilkan halaman login');
+  console.log('session_id:', session_id);
+  // Kalau nggak ada / nggak valid, render login page
   const url = oauth2Client.generateAuthUrl({
     access_type: 'offline',
     prompt: 'consent',
@@ -98,6 +117,7 @@ app.get('/login', (req, res) => {
   });
   res.render('pages/login', { googleLoginUrl: url });
 });
+
 
 app.get('/auth/callback', async (req, res) => {
   const code = req.query.code;
