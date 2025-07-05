@@ -146,38 +146,38 @@ app.get('/auth/callback', async (req, res) => {
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 hari
       httpOnly: true
     });
-    res.redirect('/dashboard/' + user._id); // atau ke route dashboard yang sesuai
+    res.redirect('/dashboard/'); // atau ke route dashboard yang sesuai
   } catch (error) {
     console.error('Error during OAuth callback:', error);
     res.status(500).send('Terjadi kesalahan saat otentikasi.');
   }
 });
 
-// Dashboard dengan id (akses setelah login)
-app.get('/dashboard/:id', authSession, async (req, res) => {
-  try {
-    let userId = req.params.id;
-    if (!userId && req.cookies.user_id) {
-      userId = req.cookies.user_id;
-    }
-    if (!userId) return res.redirect('/');
-    const user = await Users.findById(userId).lean();
-    if (!user) return res.redirect('/');
-    res.render('pages/dashboard', {
-      user: {
-        name: user.username,
-        email: user.email,
-        picture: user.picture
-      }
-    });
-  } catch (error) {
-    res.status(500).send('Gagal mengambil data user.');
-  }
-});
+// // Dashboard dengan id (akses setelah login)
+// app.get('/dashboard/:id', authSession, async (req, res) => {
+//   try {
+//     let userId = req.params.id;
+//     if (!userId && req.cookies.user_id) {
+//       userId = req.cookies.user_id;
+//     }
+//     if (!userId) return res.redirect('/');
+//     const user = await Users.findById(userId).lean();
+//     if (!user) return res.redirect('/');
+//     res.render('pages/dashboard', {
+//       user: {
+//         name: user.username,
+//         email: user.email,
+//         picture: user.picture
+//       }
+//     });
+//   } catch (error) {
+//     res.status(500).send('Gagal mengambil data user.');
+//   }
+// });
 
 // Dashboard tanpa id (akses otomatis via cookie)
 app.get('/dashboard', authSession, async (req, res) => {
-  const userId = req.cookies.user_id;
+  const userId = req.user;
   if (!userId) return res.redirect('/');
   const user = await Users.findById(userId).lean();
   if (!user) {
