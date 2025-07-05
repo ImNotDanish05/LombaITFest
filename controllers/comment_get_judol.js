@@ -9,6 +9,59 @@ dotenv.config();
 const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
 
 // === Manual Check ===
+
+function getJudolComment(text) {
+    if (!text) return false;
+
+    // Normalisasi text
+    const normalizedText = text.normalize("NFKD");
+    const hasCombiningChar = /[\u0300-\u036F]/.test(text);
+    if (text !== normalizedText || hasCombiningChar) {
+        return true;
+    }
+
+    // Hapus tag HTML
+    const cleanText = text.replace(/<[^>]+>/g, ' ');
+    // Split kata dari cleanText, bukan text asli
+    const words = cleanText.split(/\s+/);
+
+    // Deteksi link YouTube (di cleanText)
+    const isYouTubeLink = /youtube\.com|youtu\.be/i.test(cleanText);
+    if (isYouTubeLink) {
+        console.log("Bypass YouTube link:", text);
+        return false;
+    }
+
+    const timestampRegex = /^\d{1,2}:\d{2}(:\d{2})?$/;
+
+    // Cek setiap kata
+    for (const word of words) {
+        if (!word) continue;
+
+        if (timestampRegex.test(word)) continue; // bypass timestamp
+
+        const capitalCount = [...word].filter(c => c >= 'A' && c <= 'Z').length;
+        if (capitalCount > 1) return true;
+
+        const isAllCaps = word === word.toUpperCase();
+        const isAllLower = word === word.toLowerCase();
+        const isCapitalized = /^[A-Z][a-z]+$/.test(word);
+
+        if (!isAllCaps && !isAllLower && !isCapitalized && capitalCount !== 1) return true;
+
+        if (/[^a-zA-Z0-9\s.,!?'"()<>:@#\-:😅😹]/.test(word)) return true;
+    }
+
+    // Cek blocked words
+    const blockedWordsPath = path.join(__dirname, '../config/blockedword.json');
+    const blockedWords = JSON.parse(fs.readFileSync(blockedWordsPath));
+    const lowerText = cleanText.toLowerCase();
+    if (blockedWords.some(word => lowerText.includes(word.toLowerCase()))) return true;
+
+    return false;
+}
+
+// Punya Syauqi
 // function getJudolComment(text) {
 //     if (!text) return false;
 
@@ -40,49 +93,60 @@ const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
 //     return false;
 // }
 
-function getJudolComment(text) {
-    if (!text) return false;
+// function getJudolComment(text) {
+//     if (!text) return false;
 
-    // Normalisasi text
-    const normalizedText = text.normalize("NFKD");
-    const hasCombiningChar = /[\u0300-\u036F]/.test(text);
-    if (text !== normalizedText || hasCombiningChar) return true;
+//     // Normalisasi text
+//     const words = text.split(/\s+/);
+//     const normalizedText = text.normalize("NFKD");
+//     const hasCombiningChar = /[\u0300-\u036F]/.test(text);
+//     if (text !== normalizedText || hasCombiningChar){
+//         return true;
+//     } 
 
-    // Cek blocked words
-    const blockedWordsPath = path.join(__dirname, '../config/blockedword.json');
-    const blockedWords = JSON.parse(fs.readFileSync(blockedWordsPath));
-    const lowerText = text.toLowerCase();
-    if (blockedWords.some(word => lowerText.includes(word.toLowerCase()))) return true;
+//     const cleanText = text.replace(/<[^>]+>/g, ' ');
+//     const isYouTubeLink = /youtube\.com|youtu\.be/i.test(cleanText);
+//     if (isYouTubeLink) {
+//         console.log("Bypass YouTube link:", text);
+//         return false; // Anggap aman
+//     }
 
-    const words = text.split(/\s+/);
+//     const timestampRegex = /^\d{1,2}:\d{2}(:\d{2})?$/;
+    
 
-    // Cek setiap kata
-    for (const word of words) {
-        if (!word) continue;
-        
-        // NEW: deteksi kalau kata itu link
-        const isLink = /^https?:\/\//i.test(word) || /^www\./i.test(word);
+//     // Cek setiap kata
+//     for (const word of words) {
+//         if (!word) continue;
 
-        if (isLink) continue; // aman, lanjut ke kata berikutnya
-        // Hitung jumlah huruf kapital per kata
-        const capitalCount = [...word].filter(c => c >= 'A' && c <= 'Z').length;
-        if (capitalCount > 1) return true;  // ✅ kalau ada >1 kapital → spam
+//         if (timestampRegex.test(word)) continue; // bypass timestamp
 
-        // Cek pola normal
-        const isAllCaps = word === word.toUpperCase();
-        const isAllLower = word === word.toLowerCase();
-        const isCapitalized = /^[A-Z][a-z]+$/.test(word);
+//         // Hitung jumlah huruf kapital per kata
+//         const capitalCount = [...word].filter(c => c >= 'A' && c <= 'Z').length;
+//         if (capitalCount > 1) return true;  // ✅ kalau ada >1 kapital → spam
 
-        // Kalau bentuknya aneh (campur aduk) → spam
-        if (!isAllCaps && !isAllLower && !isCapitalized && capitalCount !== 1) return true;
+//         // Cek pola normal
+//         const isAllCaps = word === word.toUpperCase();
+//         const isAllLower = word === word.toLowerCase();
+//         const isCapitalized = /^[A-Z][a-z]+$/.test(word);
 
-        // Deteksi karakter aneh (tidak whitelist emoji)
-        if (/[^a-zA-Z0-9\s.,!?'"()<>:@#\-]/.test(word)) return true;
-        
-    }
+//         // Kalau bentuknya aneh (campur aduk) → spam
+//         if (!isAllCaps && !isAllLower && !isCapitalized && capitalCount !== 1) return true;
 
-    return false;
-}
+//         // Deteksi karakter aneh (tidak whitelist emoji)
+//         // if (/[^a-zA-Z0-9\s.,!?'"()<>:@#\-]/.test(word)) return true;
+//         if (/[^a-zA-Z0-9\s.,!?'"()<>:@#\-:😅😹]/.test(word)) {
+//             return true;
+//         }
+//     }
+//     // Cek blocked words
+//     const blockedWordsPath = path.join(__dirname, '../config/blockedword.json');
+//     const blockedWords = JSON.parse(fs.readFileSync(blockedWordsPath));
+//     const lowerText = text.toLowerCase();
+//     if (blockedWords.some(word => lowerText.includes(word.toLowerCase()))) return true;
+
+//     return false;
+// }
+
 
 // === AI Check ===
 async function getJudolCommentAi(comments) {
@@ -121,6 +185,7 @@ Contoh: [0, 1, 0]
 
         try {
             const parsed = JSON.parse(cleaned);
+            console.log("✅ AI berhasil parse JSON:", parsed);
             return parsed;
         } catch (jsonErr) {
             console.error("❌ Gagal parse JSON dari AI:\n", cleaned);

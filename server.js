@@ -10,6 +10,7 @@ const authSession  = require('./controllers/authSession');
 const Users = require('./models/Users');
 const LoadData = require('./utils/LoadData');
 const Sessions = require('./models/Sessions');
+const fs = require('fs');
 
 const session = require('express-session');
 const cookieParser = require('cookie-parser');
@@ -231,6 +232,7 @@ app.get('/delete-account', authSession, async (req, res) => {
 // Route POST get-comments
 app.post('/get-comments', authSession, async (req, res) => {
   try {
+    const useAi = req.body.useAiJudol === '1';
     const youtubeUrl = req.body.youtubeUrl;
     const match = getVideoIdFromUrl(youtubeUrl);
     if (!match) return res.status(400).send('Link YouTube tidak valid.');
@@ -245,8 +247,13 @@ app.post('/get-comments', authSession, async (req, res) => {
 
     let allComments = [];
     let nextPageToken = null;
-
+    let count = 0;
+    console.log(`Mengambil komentar untuk video ID: ${videoId}`);
+    console.log('Sebagai:', req.user.username);
+    console.log('Pakai AI Judol Detector: ', useAi);
     do {
+      count++;
+      console.log(`Mengambil batch ${count} komentar...`);
       const response = await youtube.commentThreads.list({
         part: 'snippet',
         videoId,
@@ -268,35 +275,51 @@ app.post('/get-comments', authSession, async (req, res) => {
     // Deteksi spam manual & AI
     // allComments.map itu fungsinya untuk output array boolean (contoh: [true, false, true]) dan itu disimpan di manualResults
     // Jadi manualResults[i] itu isinya true/false apakah komentar ke-i terdeteksi sebagai spam secara manual
+    console.log('Mulai deteksi spam manual...');
     const manualResults = allComments.map(c => getJudolComment(c.text));
+
+
     // notDetectedManually adalah komentar yang tidak terdeteksi sebagai spam secara manual
     const notDetectedManually = allComments.filter(
       (c, i) => !manualResults[i]
     )
     .map(c => c.text);
+
+
     // aiResults adalah hasil dari AI yang akan diisi nanti. Output dari AIini adalah array boolean juga, hanya saja menggunakan 1/0 sebagai output (1 untuk spam, 0 untuk bukan spam)
     // Jadi aiResults[i] itu isinya 1/0 apakah komentar ke-i terdeteksi sebagai spam oleh AI
     // Jika tidak ada komentar yang tidak terdeteksi secara manual, maka aiResults akan kosong
-    let aiResults = [];
-    if (notDetectedManually.length > 0) {
-      aiResults = await getJudolCommentAi(notDetectedManually);
+    console.log(`Komentar yang tidak terdeteksi manual: ${notDetectedManually.length}`);
+    if (useAi){
+      console.log('Mulai deteksi spam dengan AI...');
+      let aiResults = [];
+      if (notDetectedManually.length > 0) {
+        aiResults = await getJudolCommentAi(notDetectedManually);
+      }
+      console.log(`AI selesai mendeteksi spam, hasil: ${aiResults.length} komentar`);
     }
+    
+
 
     // Gabungkan hasil manual & AI
     // spamResults adalah hasil akhir yang akan digunakan untuk menandai komentar sebagai spam atau tidak
     // Jadi spamResults[i] itu isinya 1/0 apakah komentar ke-i terdeteksi sebagai spam
+    console.log('Menggabungkan hasil manual dan AI...');
     let spamResults = [];
     let aiIdx = 0;
     for (let i = 0; i < allComments.length; i++) {
+      console.log(`Memproses komentar ${i + 1}/${allComments.length}`);
       if (manualResults[i]) {
         spamResults.push(1);
       } else {
-        spamResults.push(aiResults[aiIdx++] || 0);
+        if (useAi){
+          spamResults.push(aiResults[aiIdx++] || 0);
+        }
+        else {
+          spamResults.push(0);
+        }
       }
     }
-
-    // Ambil data user dari database
-    const user = await Users.findOne();
 
     // Debugging: tampilkan jumlah komentar dan spam
     // console.log('Semua Komentar:');
@@ -305,7 +328,6 @@ app.post('/get-comments', authSession, async (req, res) => {
     // console.log('notDetectedManually:', notDetectedManually);
     // console.log('aiResults:', aiResults);
     // console.log('spamResults:', spamResults);
-    // const fs = require('fs');
 
     // const debugData = {
     //   semuaKomentar: allComments,
@@ -320,18 +342,33 @@ app.post('/get-comments', authSession, async (req, res) => {
 
 
     // Gabungkan spam ke komentar
-    const commentsWithSpam = allComments.map((c, i) => ({
+    const cleanAllComments = allComments.map(c => ({
+      ...c,
+      text: c.text.replace(/<[^>]+>/g, ' ')
+    }));
+
+    const commentsWithSpam = cleanAllComments.map((c, i) => ({
       ...c, // ...c akan menyebarkan semua properti dari komentar
       isSpam: spamResults[i]
     }));
 
+    // Filter hanya yang isSpam true
+    const onlySpamComments = commentsWithSpam.filter(c => c.isSpam);
+
+    // Debug log tetap semua (atau juga bisa onlySpamComments kalau mau)
+    const debugData = {
+      semuaKomentar: onlySpamComments
+    };
+
+    fs.writeFileSync('debug-log.json', JSON.stringify(debugData, null, 2), 'utf-8');
+
     res.render('pages/dashboard', {
       user: {
-        name: user.username,
-        email: user.email,
-        picture: user.picture
+        name: req.user.username,
+        email: req.user.email,
+        picture: req.user.picture
       },
-      comments: commentsWithSpam
+      comments: onlySpamComments
     });
   } catch (err) {
     console.error('YouTube API error:', err);
