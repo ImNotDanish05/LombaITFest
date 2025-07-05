@@ -200,6 +200,7 @@ app.get('/auth/callback', async (req, res) => {
 // Dashboard tanpa id (akses otomatis via cookie)
 app.get('/dashboard', authSession, async (req, res) => {
   const userId = req.user;
+  console.log('User ID dari authSession:', userId.user_id);
   if (!userId) return res.redirect('/');
   const user = await Users.findById(userId).lean();
   if (!user) {
@@ -218,14 +219,14 @@ app.get('/dashboard', authSession, async (req, res) => {
 // --- HAPUS AKUN: Hapus user dari DB dan hapus cookie ---
 app.get('/delete-account', authSession, async (req, res) => {
   try {
-    const userId = req.cookies.user_id;
+    const userId = req.user.user_id;
     if (userId) {
-      await Users.findByIdAndDelete(userId);
+      await Users.findOneAndDelete({ user_id: userId });
       res.clearCookie('user_id');
     }
     res.redirect('/'); // Atau ke halaman login
   } catch (err) {
-    res.status(500).send('Gagal menghapus akun.');
+    res.status(500).send(err);
   }
 });
 
