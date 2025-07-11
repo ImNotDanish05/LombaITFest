@@ -1,3 +1,5 @@
+const http = require('http');
+const https = require('https');
 require('dotenv').config({ path: './backend/config/.env' }); // Pastikan path ke .env benar
 const express = require('express');
 const cors = require('cors');
@@ -158,7 +160,7 @@ app.get('/auth/callback', async (req, res) => {
     );
     // Set cookie user_id untuk auto-login
     // Disini berarti 7 hari (24 * 60 * 60 * 1000 ms artinya 1 hari)
-    const secureCookie = isProductionHttps(req);
+    const secureCookie = isProductionHttps();
     console.log("Login:", user.username);
     console.log("Secure cookie:", secureCookie);
     res.cookie('session_id', session_id, {
@@ -476,7 +478,19 @@ app.get('/', async (req, res) => {
   res.render('pages/home', { isLoggedIn });
 });
 
-app.listen(process.env.PORT || 3000, () => {
-  console.log(`✅ Server aktif di http://localhost:${process.env.PORT || 3000}`);
+// ytjudolremover.danish05.my.id
+console.log('Https mode:', isProductionHttps());
+if (isProductionHttps()) {
+  const privateKey = fs.readFileSync('/etc/letsencrypt/live/ytjudolremover.danish05.my.id/privkey.pem', 'utf8');
+  const certificate = fs.readFileSync('/etc/letsencrypt/live/ytjudolremover.danish05.my.id/fullchain.pem', 'utf8');
+  const credentials = { key: privateKey, cert: certificate };
+  https.createServer(credentials, app).listen(443, () => {
+    console.log('HTTPS Server running on port 443');
+  });
+} else {
+  http.createServer(app).listen(3000, () => {
+    console.log('HTTP Server running on port 3000');
+    console.log(`✅ Server aktif di http://localhost:${process.env.PORT || 3000}`);
   console.log(`🔐 Login: http://localhost:${process.env.PORT || 3000}/login`);
-});
+  });
+}
