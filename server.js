@@ -47,6 +47,8 @@ app.use('/', require('./routes/index'));
 app.use('/', require('./routes/auth'));
 app.use('/', require('./routes/dashboard'));
 app.use('/', require('./routes/youtubeComments'));
+app.use('/', require('./routes/judolremover'));
+
 
 
 // Jalankan server (HTTPS atau HTTP)
