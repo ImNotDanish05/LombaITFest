@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YTJudolRemover - Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+</head>
+<body>
+
+<!-- Sidebar -->
+<div class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+        <h4 class="text-white mb-0">
+            <i class="bi bi-list-ul me-2"></i>
+            Menu
+        </h4>
+        <button class="btn-close-sidebar" onclick="toggleSidebar()">
+            <i class="bi bi-x-lg"></i>
+        </button>
+    </div>
+    
+    <nav class="sidebar-nav">
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <a class="nav-link sidebar-link active" href="/dashboard">
+                    <i class="bi bi-speedometer2 me-3"></i>
+                    Dashboard
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link sidebar-link" href="/judol-remover">
+                    <i class="bi bi-youtube me-3"></i>
+                    Judol Remover
+                </a>
+            </li>
+            <li class="nav-item mt-4">
+                <div class="sidebar-divider">
+                    <span class="sidebar-section-title">
+                        <i class="bi bi-exclamation-triangle me-2"></i>
+                        Dangerous Area
+                    </span>
+                </div>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link sidebar-link danger-link" href="#" id="deleteAccountLink">
+                        <i class="bi bi-trash3 me-3"></i>
+                        Delete Account
+                </a>
+            </li>
+            <!-- <li class="nav-item">
+                <a class="nav-link sidebar-link danger-link" href="/reset-data">
+                    <i class="bi bi-arrow-clockwise me-3"></i>
+                    Reset All Data
+                </a>
+            </li> -->
+        </ul>
+    </nav>
+</div>
+
+<!-- Sidebar Overlay -->
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+<!-- Header untuk Pengguna yang Sudah Login -->
+<nav class="navbar navbar-expand-lg custom-navbar fixed-top">
+    <div class="container">
+        <!-- Sidebar Toggle Button -->
+        <button class="btn-sidebar-toggle me-3" onclick="toggleSidebar()">
+            <i class="bi bi-list"></i>
+        </button>
+        
+        <a class="navbar-brand fw-bold" href="/dashboard">
+            <img src="/images/logo_app.png" alt="Logo" class="hero-emoji me-2" style="height:3.5rem; width:auto; vertical-align:middle;">
+            YTJudolRemover
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <!-- Hapus menu dashboard, convert, history, template -->
+            <ul class="navbar-nav ms-auto">
+
+                <!-- User Profile Dropdown -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <img src="<%= user.picture || '/images/default-avatar.png' %>" alt="User" class="rounded-circle me-2 user-avatar">
+                        <span class="user-name"><%= user.name || 'Guest' %></span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end user-dropdown" aria-labelledby="userDropdown">
+                        <li><h6 class="dropdown-header">
+                            <div class="d-flex align-items-center">
+                                <img src="<%= user.picture || '/images/default-avatar.png' %>" alt="User" class="rounded-circle me-2" style="width: 40px; height: 40px;">
+                                <div>
+                                    <div class="fw-bold"><%= user.name %></div>
+                                    <small class="text-muted"><%= user.email %></small>
+                                </div>
+                            </div>
+                        </h6></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="/profile">
+                            <i class="bi bi-person me-2"></i>Profile
+                        </a></li>
+                        <li><a class="dropdown-item" href="/settings">
+                            <i class="bi bi-gear me-2"></i>Settings
+                        </a></li>
+                        <li><a class="dropdown-item" href="/subscription">
+                            <i class="bi bi-credit-card me-2"></i>Subscription
+                        </a></li>
+                        <li><a class="dropdown-item" href="/help">
+                            <i class="bi bi-question-circle me-2"></i>Help & Support
+                        </a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item text-danger" href="/logout">
+                            <i class="bi bi-box-arrow-right me-2"></i>Logout
+                        </a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+
+<style>
+/* Sidebar Styles */
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: -280px;
+    width: 280px;
+    height: 100vh;
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    z-index: 1050;
+    transition: all 0.3s ease;
+    box-shadow: 4px 0 15px rgba(0, 0, 0, 0.3);
+    overflow-y: auto;
+}
+
+.sidebar.active {
+    left: 0;
+}
+
+.sidebar-header {
+    padding: 1.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.2);
+}
+
+.btn-close-sidebar {
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+}
+
+.btn-close-sidebar:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: rotate(90deg);
+}
+
+.sidebar-nav {
+    padding: 1.5rem 0;
+}
+
+.sidebar-link {
+    color: rgba(255, 255, 255, 0.8);
+    text-decoration: none;
+    padding: 1rem 1.5rem;
+    display: flex;
+    align-items: center;
+    transition: all 0.3s ease;
+    border-radius: 0;
+    font-weight: 500;
+    position: relative;
+}
+
+.sidebar-link:hover {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateX(5px);
+}
+
+.sidebar-link.active {
+    color: #fff;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    position: relative;
+}
+
+.sidebar-link.active::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: #ffd369;
+}
+
+.sidebar-divider {
+    margin: 1rem 1.5rem;
+    padding: 0.5rem 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.sidebar-section-title {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    display: flex;
+    align-items: center;
+}
+
+.danger-link {
+    color: rgba(255, 107, 107, 0.8);
+}
+
+.danger-link:hover {
+    color: #ff6b6b;
+    background: rgba(255, 107, 107, 0.1);
+}
+
+.sidebar-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1040;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+.sidebar-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.btn-sidebar-toggle {
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.btn-sidebar-toggle:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: scale(1.1);
+}
+
+/* Custom Navbar Styling */
+.custom-navbar {
+    background: rgba(10, 26, 32, 0.95);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+    position: relative;
+    z-index: 1000;
+    transition: all 0.3s ease;
+}
+
+.custom-navbar .navbar-brand {
+    color: #ffffff;
+    font-size: 1.8rem;
+    font-weight: 700;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.custom-navbar .navbar-brand:hover {
+    color: #ffd369;
+    transform: scale(1.05);
+}
+
+.custom-navbar .nav-link {
+    color: #c0c0c0;
+    font-weight: 500;
+    margin-right: 15px;
+    transition: all 0.3s ease;
+    border-radius: 8px;
+    padding: 0.5rem 1rem;
+    text-decoration: none;
+}
+
+.custom-navbar .nav-link:hover,
+.custom-navbar .nav-link.active {
+    color: #ffd369;
+    background: rgba(255, 211, 105, 0.1);
+    transform: translateY(-2px);
+}
+
+.custom-navbar .navbar-toggler {
+    border-color: rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+}
+
+.custom-navbar .navbar-toggler:focus {
+    box-shadow: 0 0 0 0.2rem rgba(255, 211, 105, 0.25);
+}
+
+.custom-navbar .navbar-toggler-icon {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255, 255, 255, 0.55%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+}
+
+.hero-emoji {
+    display: inline-block;
+    animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+    0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+    40% { transform: translateY(-5px); }
+    60% { transform: translateY(-2px); }
+}
+
+/* User Avatar */
+.user-avatar {
+    width: 32px;
+    height: 32px;
+    border: 2px solid #ffd369;
+    transition: all 0.3s ease;
+}
+
+.user-name {
+    font-weight: 500;
+    margin-left: 0.5rem;
+}
+
+/* Notification Badge */
+.notification-badge {
+    font-size: 0.6rem;
+    width: 18px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Dropdown Menus */
+.dropdown-menu {
+    border: none;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.98);
+    backdrop-filter: blur(10px);
+    min-width: 280px;
+    animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.dropdown-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-radius: 8px;
+    margin: 0.5rem;
+    padding: 1rem;
+    border: none;
+}
+
+.dropdown-item {
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    margin: 0.2rem 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.dropdown-item:hover {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    transform: translateX(5px);
+}
+
+.dropdown-item.text-danger:hover {
+    background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
+    color: white;
+}
+
+/* Notification Dropdown Specific */
+.notification-dropdown {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.notification-dropdown .dropdown-item {
+    padding: 1rem;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.notification-dropdown .dropdown-item:last-child {
+    border-bottom: none;
+}
+
+/* User Dropdown Specific */
+.user-dropdown .dropdown-header img {
+    border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .custom-navbar .nav-link {
+        text-align: center;
+        margin-right: 0;
+        margin-bottom: 0.5rem;
+    }
+    
+    .custom-navbar .navbar-brand {
+        font-size: 1.5rem;
+    }
+    
+    .user-name {
+        display: none;
+    }
+    
+    .dropdown-menu {
+        min-width: 250px;
+    }
+    
+    .sidebar {
+        width: 100%;
+        left: -100%;
+    }
+    
+    .sidebar.active {
+        left: 0;
+    }
+}
+
+/* Scroll effect */
+.navbar-scrolled {
+    background: rgba(10, 26, 32, 0.98) !important;
+    backdrop-filter: blur(15px);
+}
+
+/* Hover effects for better UX */
+.nav-link:hover .user-avatar {
+    transform: scale(1.1);
+    box-shadow: 0 0 10px rgba(255, 211, 105, 0.5);
+}
+
+.dropdown-toggle::after {
+    display: none;
+}
+
+/* Sidebar Animation */
+@keyframes slideInLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.sidebar-nav .nav-item {
+    animation: slideInLeft 0.3s ease;
+}
+
+.sidebar-nav .nav-item:nth-child(1) { animation-delay: 0.1s; }
+.sidebar-nav .nav-item:nth-child(2) { animation-delay: 0.2s; }
+.sidebar-nav .nav-item:nth-child(3) { animation-delay: 0.3s; }
+.sidebar-nav .nav-item:nth-child(4) { animation-delay: 0.4s; }
+.sidebar-nav .nav-item:nth-child(5) { animation-delay: 0.5s; }
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+// Sidebar toggle function
+function toggleSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('sidebarOverlay');
+    
+    sidebar.classList.toggle('active');
+    overlay.classList.toggle('active');
+}
+
+// Close sidebar when clicking outside
+document.addEventListener('click', function(e) {
+    const sidebar = document.getElementById('sidebar');
+    const toggleBtn = document.querySelector('.btn-sidebar-toggle');
+    
+    if (!sidebar.contains(e.target) && !toggleBtn.contains(e.target)) {
+        sidebar.classList.remove('active');
+        document.getElementById('sidebarOverlay').classList.remove('active');
+    }
+});
+
+// Add scroll effect to navbar
+window.addEventListener('scroll', function() {
+    const navbar = document.querySelector('.custom-navbar');
+    if (window.scrollY > 50) {
+        navbar.classList.add('navbar-scrolled');
+    } else {
+        navbar.classList.remove('navbar-scrolled');
+    }
+});
+
+// Demo: Update notification count
+function updateNotificationCount() {
+    const badge = document.querySelector('.notification-badge');
+    if (badge) {
+        let count = parseInt(badge.textContent);
+        if (count > 0) {
+            badge.textContent = count - 1;
+            if (count - 1 === 0) {
+                badge.style.display = 'none';
+            }
+        }
+    }
+}
+
+// Demo: Add click event to notification items
+document.querySelectorAll('.notification-dropdown .dropdown-item').forEach(item => {
+    item.addEventListener('click', function(e) {
+        if (!this.classList.contains('text-center')) {
+            e.preventDefault();
+            this.style.opacity = '0.5';
+            updateNotificationCount();
+        }
+    });
+});
+
+// Demo: Add some interactive effects
+document.addEventListener('DOMContentLoaded', function() {
+    // Add subtle animations to dropdown items
+    const dropdownItems = document.querySelectorAll('.dropdown-item');
+    dropdownItems.forEach((item, index) => {
+        item.style.animationDelay = `${index * 0.1}s`;
+    });
+    
+    // Set active sidebar link based on current page
+    const currentPath = window.location.pathname;
+    const sidebarLinks = document.querySelectorAll('.sidebar-link');
+    
+    sidebarLinks.forEach(link => {
+        if (link.getAttribute('href') === currentPath) {
+            link.classList.add('active');
+        }
+    });
+});
+
+// Keyboard shortcut to toggle sidebar
+document.addEventListener('keydown', function(e) {
+    if (e.ctrlKey && e.shiftKey && e.key === 'S') {
+        e.preventDefault();
+        toggleSidebar();
+    }
+});
+
+// Delete account confirmation
+document.getElementById('deleteAccountLink').addEventListener('click', function (e) {
+    e.preventDefault();
+
+    const username = "<%= user.name %>";  // Pastikan `user.name` sudah tersedia dari server
+    const input = prompt(`🚨 Peringatan!\nUntuk menghapus akun secara permanen,\nketik ulang nama lengkap kamu:\n\n"${username}"`);
+
+    if (input === null) return; // User tekan cancel
+
+    if (input.trim() === username) {
+      if (confirm("Apakah kamu yakin ingin menghapus akun secara permanen?")) {
+        // Redirect ke endpoint delete
+        window.location.href = "/delete-account";
+      }
+    } else {
+      alert("❌ Nama tidak cocok. Penghapusan akun dibatalkan.");
+    }
+  });
+</script>
+
+</body>
+</html>
