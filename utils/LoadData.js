@@ -30,7 +30,7 @@ function loadYoutubeCredentials() {
         const token_uri = credentials_youtube_api_web.token_uri;
         const auth_provider_x509_cert_url = credentials_youtube_api_web.auth_provider_x509_cert_url;
         const client_secret = credentials_youtube_api_web.client_secret;
-        const redirect_uris = credentials_youtube_api_web.redirect_uris
+        const redirect_uris = credentials_youtube_api_web.redirect_uris;
         const javascript_origins = credentials_youtube_api_web.javascript_origins;
         console.log(`${prefix} ✔ Berhasil load credentials_youtube_api.json`)
         return {

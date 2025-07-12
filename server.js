@@ -11,7 +11,7 @@ const { getJudolComment, getJudolCommentAi } = require('./controllers/comment_ge
 const {authSession, checkSession} = require('./controllers/authSession');
 const Users = require('./models/Users');
 const Sessions = require('./models/Sessions');
-const LoadData = require('./utils/LoadData');
+const { loadYoutubeCredentials } = require('./utils/LoadData');
 const isProductionHttps = require('./utils/isProductionHttps');
 const checkProtocol = require('./middlewares/checkProtocol');
 const fs = require('fs');
@@ -96,6 +96,8 @@ const oauth2Client = new google.auth.OAuth2(
 app.get('/login', async (req, res) => {
   // Cek dulu apakah ada session_id di cookies
   const user = await checkSession(req);
+  const YC = loadYoutubeCredentials(req);
+  const isHttps = isProductionHttps();
   if (user) {
     console.log('Session valid, redirect ke dashboard');
     return res.redirect('/dashboard/');
@@ -106,7 +108,8 @@ app.get('/login', async (req, res) => {
   const url = oauth2Client.generateAuthUrl({
     access_type: 'offline',
     prompt: 'consent',
-    scope: SCOPES
+    scope: SCOPES,
+    redirect_uri: isHttps ? YC.redirect_uris[1] : YC.redirect_uris[0] // Gunakan redirect yang sesuai dengan protokol
   });
   res.render('pages/login', { googleLoginUrl: url });
 });
