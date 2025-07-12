@@ -142,8 +142,7 @@ app.get('/auth/callback', async (req, res) => {
       },
       { upsert: true, new: true }
     );
-
-
+    
     // Generate session tokens
     const session_id = crypto.randomBytes(32).toString('hex'); // stronger than uuid
     const session_secret = crypto.randomBytes(32).toString('hex');
