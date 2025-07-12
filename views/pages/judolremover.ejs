@@ -1,0 +1,121 @@
+<%- include('../partials/headerlogin', { user: user }) %>  
+
+  <div class="container py-5 main-container">
+    <div class="glass-card">
+      <div class="text-center">
+        <% if (!(typeof comments !== 'undefined' && comments.length > 0)) { %>
+          <h2 class="welcome-text">
+            <i class="bi bi-check-circle-fill"></i> 
+            <span class="typing-animation">Selamat datang, <%= user.name.split(' ')[0] %>!</span>
+          </h2>
+          <img src="<%= user.picture %>" class="profile-img" alt="Foto Profil">
+          <p class="email-text"><strong>Email:</strong> <%= user.email %></p>
+          <button id="showFormBtn" class="animated-btn">
+            <i class="bi bi-youtube"></i> Ambil Komentar dari YouTube
+          </button>
+          <div id="youtubeForm" class="form-container" style="display:none;">
+            <form action="/get-comments" method="POST">
+              <div class="mb-3">
+                <input type="url" name="youtubeUrl" class="form-control" placeholder="Masukkan link YouTube" required>
+              </div>
+              <div class="form-check mb-3">
+                <input class="form-check-input" type="checkbox" name="useAiJudol" value="1" id="useAiJudol">
+                <label class="form-check-label checkbox-label" for="useAiJudol">
+                  Pakai AI Judol Detector
+                </label>
+              </div>
+              <button type="submit" class="submit-btn">
+                <i class="bi bi-search"></i> Dapatkan Komentar
+              </button>
+            </form>
+          </div>
+        <% } %>
+      </div>
+    </div>
+
+    <% if (typeof comments !== 'undefined' && comments.length > 0) { %>
+      <div class="comments-section">
+        <h4 class="text-white mb-4">Daftar Komentar</h4>
+        <div class="spam-alert">
+          🚨 Ditemukan <%= comments.length %> komentar spam
+        </div>
+        <form action="/delete-comments" method="POST">
+          <div class="mb-3 text-start">
+            <input type="checkbox" id="selectAll" class="form-check-input">
+            <label for="selectAll" class="form-check-label checkbox-label ms-2">Pilih Semua</label>
+          </div>
+          <div class="list-group">
+            <% comments.forEach((c, idx) => { %>
+              <div class="list-group-item d-flex justify-content-between align-items-center">
+                <div class="form-check">
+                  <input class="form-check-input comment-checkbox" type="checkbox" name="commentId" value="<%= c.commentId %>" id="comment<%= idx %>">
+                  <label class="form-check-label ms-2" for="comment<%= idx %>"><%= c.text %></label>
+                </div>
+                <% if (c.isSpam) { %>
+                  <span class="badge bg-danger">Spam</span>
+                <% } %>
+              </div>
+            <% }); %>
+          </div>
+          <button type="submit" class="delete-btn mt-3">
+            <i class="bi bi-trash"></i> Hapus Komentar Terpilih
+          </button>
+        </form>
+      </div>
+    <% } %>
+    
+    <!-- Spacer untuk memberikan jarak dengan footer -->
+    <div style="height: 100px;"></div>
+  </div>
+
+  <script>
+    // Create animated particles
+    function createParticles() {
+      const particles = document.getElementById('particles');
+      for (let i = 0; i < 50; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'particle';
+        particle.style.left = Math.random() * 100 + '%';
+        particle.style.top = Math.random() * 100 + '%';
+        particle.style.animationDelay = Math.random() * 6 + 's';
+        particles.appendChild(particle);
+      }
+    }
+
+    // Initialize particles
+    createParticles();
+
+    // Show form button
+    var showFormBtn = document.getElementById('showFormBtn');
+    if (showFormBtn) {
+      showFormBtn.onclick = function() {
+        document.getElementById('youtubeForm').style.display = 'block';
+        this.style.display = 'none';
+      };
+    }
+
+    // Select all checkbox
+    const selectAllCheckbox = document.getElementById('selectAll');
+    if (selectAllCheckbox) {
+      selectAllCheckbox.onclick = function() {
+        const checkboxes = document.querySelectorAll('.comment-checkbox');
+        checkboxes.forEach(cb => cb.checked = this.checked);
+      };
+    }
+
+    // Add entrance animation to elements
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.style.animationDelay = '0s';
+          entry.target.style.animationPlayState = 'running';
+        }
+      });
+    });
+
+    document.querySelectorAll('.glass-card, .comments-section').forEach(el => {
+      observer.observe(el);
+    });
+  </script>
+
+  <%- include('../partials/footer') %>
