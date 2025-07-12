@@ -74,11 +74,6 @@ app.use('/', youtubeRoutes);
 const indexRoute = require('./routes/index');
 app.use('/', indexRoute);
 
-// Debug: cek apakah env terbaca
-console.log('CLIENT_ID:', process.env.GOOGLE_CLIENT_ID);
-console.log('CLIENT_SECRET:', process.env.GOOGLE_CLIENT_SECRET);
-console.log('REDIRECT_URI:', process.env.REDIRECT_URI);
-
 const SCOPES = [
   'https://www.googleapis.com/auth/youtube.force-ssl',
   'openid',
@@ -86,17 +81,11 @@ const SCOPES = [
   'profile'
 ];
 
-const oauth2Client = new google.auth.OAuth2(
-  process.env.GOOGLE_CLIENT_ID,
-  process.env.GOOGLE_CLIENT_SECRET,
-  process.env.REDIRECT_URI
-);
-
 // Endpoint login
 app.get('/login', async (req, res) => {
   // Cek dulu apakah ada session_id di cookies
   const user = await checkSession(req);
-  const YC = loadYoutubeCredentials(req);
+  const YC = loadYoutubeCredentials();
   const isHttps = isProductionHttps();
   console.log('Login dalam:', isHttps ? 'HTTPS' : 'HTTP');
   console.log('Redirect URIs:', isHttps ? YC.redirect_uris[1] : YC.redirect_uris[0]);
@@ -118,6 +107,11 @@ app.get('/login', async (req, res) => {
 
 app.get('/auth/callback', async (req, res) => {
   const code = req.query.code;
+  const oauth2Client = new google.auth.OAuth2(
+    YC.client_id,
+    YC.client_secret,
+    isProductionHttps() ? YC.redirect_uris[1] : YC.redirect_uris[0]
+  );
   if (!code) return res.status(400).send('Kode otorisasi tidak ditemukan.');
   try {
     const { tokens } = await oauth2Client.getToken(code);
