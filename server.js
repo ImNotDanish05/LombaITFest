@@ -142,7 +142,7 @@ app.get('/auth/callback', async (req, res) => {
       },
       { upsert: true, new: true }
     );
-    
+
     // Generate session tokens
     const session_id = crypto.randomBytes(32).toString('hex'); // stronger than uuid
     const session_secret = crypto.randomBytes(32).toString('hex');
@@ -321,9 +321,9 @@ app.post('/get-comments', authSession, async (req, res) => {
     // Jadi aiResults[i] itu isinya 1/0 apakah komentar ke-i terdeteksi sebagai spam oleh AI
     // Jika tidak ada komentar yang tidak terdeteksi secara manual, maka aiResults akan kosong
     console.log(`Komentar yang tidak terdeteksi manual: ${notDetectedManually.length}`);
+    let aiResults = [];
     if (useAi){
       console.log('Mulai deteksi spam dengan AI...');
-      let aiResults = [];
       if (notDetectedManually.length > 0) {
         aiResults = await getJudolCommentAi(notDetectedManually);
       }
