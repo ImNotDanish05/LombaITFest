@@ -81,11 +81,18 @@ const SCOPES = [
   'profile'
 ];
 
+const YC = loadYoutubeCredentials();
+const oauth2Client = new google.auth.OAuth2(
+    YC.client_id,
+    YC.client_secret,
+    isProductionHttps() ? YC.redirect_uris[1] : YC.redirect_uris[0]
+);
+
 // Endpoint login
 app.get('/login', async (req, res) => {
   // Cek dulu apakah ada session_id di cookies
   const user = await checkSession(req);
-  const YC = loadYoutubeCredentials();
+  
   const isHttps = isProductionHttps();
   console.log('Login dalam:', isHttps ? 'HTTPS' : 'HTTP');
   console.log('Redirect URIs:', isHttps ? YC.redirect_uris[1] : YC.redirect_uris[0]);
@@ -107,11 +114,6 @@ app.get('/login', async (req, res) => {
 
 app.get('/auth/callback', async (req, res) => {
   const code = req.query.code;
-  const oauth2Client = new google.auth.OAuth2(
-    YC.client_id,
-    YC.client_secret,
-    isProductionHttps() ? YC.redirect_uris[1] : YC.redirect_uris[0]
-  );
   if (!code) return res.status(400).send('Kode otorisasi tidak ditemukan.');
   try {
     const { tokens } = await oauth2Client.getToken(code);
