@@ -36,12 +36,12 @@ mongoose.connect('mongodb+srv://syauqi:RU5Jch8oORT91cnL@youtubedata.cqgmi5j.mong
   .catch((err) => console.error('Connection error:', err));
 
 // Routes
-app.use('/api/channel', require('./routes/channels'));
-app.use('/api/comments', require('./routes/comments'));
-app.use('/api/logs', require('./routes/logs'));
-app.use('/api/users', require('./routes/users'));
-app.use('/api/videos', require('./routes/videos'));
-app.use('/api/sessions', require('./routes/sessions'));
+// app.use('/api/channel', require('./routes/channels'));
+// app.use('/api/comments', require('./routes/comments'));
+// app.use('/api/logs', require('./routes/logs'));
+// app.use('/api/users', require('./routes/users'));
+// app.use('/api/videos', require('./routes/videos'));
+// app.use('/api/sessions', require('./routes/sessions'));
 app.use('/', require('./routes/youtube'));
 app.use('/', require('./routes/index'));
 app.use('/', require('./routes/auth'));
