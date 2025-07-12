@@ -44,7 +44,10 @@ app.use('/api/videos', require('./routes/videos'));
 app.use('/api/sessions', require('./routes/sessions'));
 app.use('/', require('./routes/youtube'));
 app.use('/', require('./routes/index'));
-app.use('/', require('./routes/customRoutes')); // <- Tambahkan customRoutes di sini
+app.use('/', require('./routes/auth'));
+app.use('/', require('./routes/dashboard'));
+app.use('/', require('./routes/youtubeComments'));
+
 
 // Jalankan server (HTTPS atau HTTP)
 console.log('Https mode:', isProductionHttps());
