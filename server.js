@@ -98,6 +98,8 @@ app.get('/login', async (req, res) => {
   const user = await checkSession(req);
   const YC = loadYoutubeCredentials(req);
   const isHttps = isProductionHttps();
+  console.log('Login dalam:', isHttps ? 'HTTPS' : 'HTTP');
+  console.log('Redirect URIs:', isHttps ? YC.redirect_uris[1] : YC.redirect_uris[0]);
   if (user) {
     console.log('Session valid, redirect ke dashboard');
     return res.redirect('/dashboard/');
