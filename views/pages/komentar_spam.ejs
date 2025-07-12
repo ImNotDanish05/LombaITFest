@@ -2,78 +2,163 @@
 <html>
 <head>
   <title>Komentar Spam</title>
+  <%- include('../partials/headerlogin', { user }) %>
   <style>
-    body { font-family: Arial, sans-serif; }
-    ul { list-style: none; padding-left: 0; }
-    li { margin-bottom: 8px; }
-    #deleteBtn:disabled { background: #ccc; color: #888; }
-    .warning { color: red; font-weight: bold; margin-bottom: 10px; }
+    body {
+      background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460, #2e5e8e);
+      background-size: 400% 400%;
+      animation: animated-gradient 15s ease infinite;
+      font-family: 'Poppins', sans-serif;
+      color: white;
+      margin: 0;
+      padding: 0;
+    }
+
+    @keyframes animated-gradient {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .glass-card {
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(12px);
+      border-radius: 25px;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+      padding: 30px;
+      margin-top: 30px;
+      width: 100%;
+      max-width: 720px;
+    }
+
+    .warning {
+      color: #ffcc00;
+      font-weight: bold;
+      margin-bottom: 10px;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 1.8rem;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .btn-custom-action {
+      background: linear-gradient(45deg, #7f5af0, #e94560);
+      border: none;
+      border-radius: 12px;
+      color: white;
+      font-weight: 500;
+      padding: 12px 25px;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+      cursor: pointer;
+    }
+
+    .btn-custom-action:hover {
+      transform: scale(1.05);
+      box-shadow: 0 6px 20px rgba(233, 69, 96, 0.4);
+    }
+
+    ul {
+      list-style: none;
+      padding-left: 0;
+    }
+
+    li {
+      margin-bottom: 8px;
+    }
+
+    #deleteBtn:disabled {
+      background: #ccc;
+      color: #888;
+      cursor: not-allowed;
+    }
+
+    .container-flex {
+      min-height: 80vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
   </style>
 </head>
 <body>
-  <h1>🚨 Ditemukan <%= comments.length %> komentar spam</h1>
-  
-  <% if (!user.isOwner) { %>
-    <div class="warning">⚠️ Kamu bukan pemilik video ini. Kamu hanya bisa melaporkan komentar sebagai spam, bukan menghapusnya permanent.</div>
-  <% } %>
-  
-  <form method="POST" action="/delete-comments" id="deleteForm">
-    <input type="hidden" name="isOwner" value="<%= user.isOwner ? '1' : '0' %>">
-    <label>
-      <input type="checkbox" id="selectAll"> Pilih Semua
-    </label>
-    
-    <% if (user.isOwner) { %>
-      <!-- <div style="margin-top:8px;">
+  <div class="container-flex">
+    <div class="glass-card">
+      <h1>🚨 Ditemukan <%= comments.length %> komentar spam</h1>
+
+      <% if (!user.isOwner) { %>
+        <div class="warning">
+          ⚠️ Kamu bukan pemilik video ini. Kamu hanya bisa melaporkan komentar sebagai spam, bukan menghapusnya permanent.
+        </div>
+      <% } %>
+
+      <form method="POST" action="/delete-comments" id="deleteForm">
+        <input type="hidden" name="isOwner" value="<%= user.isOwner ? '1' : '0' %>">
+
         <label>
-          <input type="checkbox" name="permanentDelete" value="1"> Hapus Permanen (Tidak bisa di-undo)
+          <input type="checkbox" id="selectAll"> Pilih Semua
         </label>
-      </div> -->
-    <% } %>
 
-    <ul>
-      <% comments.forEach(function(comments) { %>
-        <li>
-          <label>
-            <input type="checkbox" class="comment-checkbox" name="ids" value="<%= comments.commentId %>">
-            <b><%= comments.author %>:</b> <%= comments.text %>
-          </label>
-        </li>
-      <% }); %>
-    </ul>
-    
-    <% if (user.isOwner) { %>
-      <button type="submit" id="deleteBtn" disabled>Hapus Komentar Terpilih</button>
-    <% } else { %>
-      <button type="submit" id="deleteBtn" disabled>Report sebagai Spam</button>
-    <% } %>
-  </form>
+        <ul class="mt-3">
+          <% comments.forEach(function(comment) { %>
+            <li>
+              <label>
+                <input type="checkbox" class="comment-checkbox" name="ids" value="<%= comment.commentId %>">
+                <b><%= comment.author %>:</b> <%= comment.text %>
+              </label>
+            </li>
+          <% }); %>
+        </ul>
 
+        <div class="text-center mt-4">
+          <% if (user.isOwner) { %>
+            <button type="submit" id="deleteBtn" class="btn-custom-action" disabled>Hapus Komentar Terpilih</button>
+          <% } else { %>
+            <button type="submit" id="deleteBtn" class="btn-custom-action" disabled>Report sebagai Spam</button>
+          <% } %>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- SCRIPT checkbox logic -->
   <script>
     const selectAll = document.getElementById('selectAll');
     const checkboxes = document.querySelectorAll('.comment-checkbox');
     const deleteBtn = document.getElementById('deleteBtn');
+
     document.getElementById('deleteForm').addEventListener('submit', function(e) {
-  if (document.querySelectorAll('.comment-checkbox:checked').length === 0) {
-    e.preventDefault();
-    alert('Pilih minimal 1 komentar dulu!');
-  }
-});
+      if (document.querySelectorAll('.comment-checkbox:checked').length === 0) {
+        e.preventDefault();
+        alert('Pilih minimal 1 komentar dulu!');
+      }
+    });
+
     function updateDeleteBtn() {
       deleteBtn.disabled = document.querySelectorAll('.comment-checkbox:checked').length === 0;
     }
+
     selectAll.addEventListener('change', function() {
       checkboxes.forEach(cb => cb.checked = selectAll.checked);
       updateDeleteBtn();
     });
+
     checkboxes.forEach(cb => {
       cb.addEventListener('change', function() {
         updateDeleteBtn();
         if (!this.checked) selectAll.checked = false;
-        else if (document.querySelectorAll('.comment-checkbox:checked').length === checkboxes.length) selectAll.checked = true;
+        else if (document.querySelectorAll('.comment-checkbox:checked').length === checkboxes.length)
+          selectAll.checked = true;
       });
     });
+
     updateDeleteBtn();
   </script>
 </body>
+<%- include('../partials/footer') %>
 </html>

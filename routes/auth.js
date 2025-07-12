@@ -104,7 +104,7 @@ router.get('/delete-account', require('../controllers/authSession').authSession,
       res.clearCookie('session_id');
       res.clearCookie('session_secret');
     }
-    res.redirect('/');
+    res.sendStatus(200);
   } catch (err) {
     res.status(500).send(err);
   }

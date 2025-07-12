@@ -1,23 +1,138 @@
 <%- include('../partials/headerlogin', { user }) %>
-<div class="container py-5">
+
+<style>
+  /* --- 1. Background & Font Dasar --- */
+  body {
+    background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460, #2e5e8e);
+    background-size: 400% 400%;
+    animation: animated-gradient 15s ease infinite;
+    font-family: 'Poppins', sans-serif; /* Opsional: Gunakan font yang lebih modern */
+  }
+
+  @keyframes animated-gradient {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+  
+  /* --- 2. Kartu Kaca (Glass Card) --- */
+  .glass-card {
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(12px);
+    border-radius: 25px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+    color: white;
+    padding: 2rem;
+    max-width: 600px;
+    margin: 0 auto;
+    animation: fadeInUp 0.8s ease-out forwards;
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  @keyframes fadeInUp {
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .welcome-text {
+    font-weight: 600;
+    color: #f0f0f0;
+    margin-bottom: 2rem;
+  }
+
+  /* --- 3. Styling Form --- */
+  .form-control-custom {
+    background-color: rgba(0, 0, 0, 0.25);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    color: white;
+    padding: 12px 15px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+  }
+
+  .form-control-custom::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+  }
+
+  .form-control-custom:focus {
+    background-color: rgba(0, 0, 0, 0.3);
+    color: white;
+    border-color: #7f5af0;
+    box-shadow: 0 0 15px rgba(127, 90, 240, 0.3);
+  }
+
+  /* --- 4. Custom Checkbox --- */
+  .form-check-input-custom {
+    background-color: rgba(0, 0, 0, 0.25);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    cursor: pointer;
+  }
+
+  .form-check-input-custom:checked {
+    background-color: #7f5af0;
+    border-color: #7f5af0;
+  }
+
+  .form-check-input-custom:focus {
+    box-shadow: 0 0 10px rgba(127, 90, 240, 0.4);
+  }
+  
+  .checkbox-label {
+    cursor: pointer;
+    color: #e0e0e0;
+  }
+  
+  /* --- 5. Tombol Aksi (CTA Button) --- */
+  .submit-btn {
+    width: 100%;
+    background: linear-gradient(45deg, #7f5af0, #e94560);
+    border: none;
+    border-radius: 12px;
+    color: white;
+    font-weight: 500;
+    padding: 12px 25px;
+    font-size: 1.1rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  }
+
+  .submit-btn:hover {
+    transform: scale(1.03);
+    box-shadow: 0 6px 20px rgba(233, 69, 96, 0.4);
+  }
+
+</style>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<div class="container py-5 d-flex align-items-center justify-content-center" style="min-height: 90vh;">
   <div class="glass-card text-center">
     <h2 class="welcome-text">
-      <i class="bi bi-check-circle-fill"></i>
-      <span class="typing-animation">Selamat datang, <%= user.name.split(' ')[0] %>!</span>
+      <i class="bi bi-youtube"></i> Masukkan Tautan Video YouTube
     </h2>
-    <img src="<%= user.picture %>" class="profile-img" alt="Foto Profil">
-    <p class="email-text"><strong>Email:</strong> <%= user.email %></p>
-    <a href="/judolremover" class="animated-btn">
-      <i class="bi bi-youtube"></i> Ambil Komentar dari YouTube
-    </a>
+    <form action="/get-comments" method="POST" class="form-container mt-4">
+      <div class="mb-4">
+        <input type="url" name="youtubeUrl" class="form-control form-control-lg form-control-custom" placeholder="Contoh: https://www.youtube.com/watch?v=dQw4w9WgXcQ" required>
+      </div>
+      <div class="form-check mb-4 text-start d-flex align-items-center">
+        <input class="form-check-input form-check-input-custom me-2" type="checkbox" name="useAiJudol" value="1" id="useAiJudol" checked>
+        <label class="form-check-label checkbox-label" for="useAiJudol">
+          Gunakan AI untuk mendeteksi spam
+        </label>
+      </div>
+      <div class="d-grid">
+         <button type="submit" class="btn submit-btn">
+          <i class="bi bi-search me-2"></i> Dapatkan Komentar
+        </button>
+      </div>
+    </form>
   </div>
-
-  <% if (typeof comments !== 'undefined' && comments.length > 0) { %>
-    <div class="comments-section">
-      <h4 class="text-white mb-4">Daftar Komentar</h4>
-      <div class="spam-alert">🚨 Ditemukan <%= comments.length %> komentar spam</div>
-      <!-- form penghapusan komentar -->
-    </div>
-  <% } %>
 </div>
 <%- include('../partials/footer') %>
