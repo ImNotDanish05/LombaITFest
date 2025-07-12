@@ -1,0 +1,23 @@
+<%- include('../partials/headerlogin', { user }) %>
+<div class="container py-5">
+  <div class="glass-card text-center">
+    <h2 class="welcome-text">
+      <i class="bi bi-check-circle-fill"></i>
+      <span class="typing-animation">Selamat datang, <%= user.name.split(' ')[0] %>!</span>
+    </h2>
+    <img src="<%= user.picture %>" class="profile-img" alt="Foto Profil">
+    <p class="email-text"><strong>Email:</strong> <%= user.email %></p>
+    <a href="/judolremover" class="animated-btn">
+      <i class="bi bi-youtube"></i> Ambil Komentar dari YouTube
+    </a>
+  </div>
+
+  <% if (typeof comments !== 'undefined' && comments.length > 0) { %>
+    <div class="comments-section">
+      <h4 class="text-white mb-4">Daftar Komentar</h4>
+      <div class="spam-alert">🚨 Ditemukan <%= comments.length %> komentar spam</div>
+      <!-- form penghapusan komentar -->
+    </div>
+  <% } %>
+</div>
+<%- include('../partials/footer') %>
