@@ -1,3 +1,5 @@
+const http = require('http');
+const https = require('https');
 require('dotenv').config({ path: './backend/config/.env' }); // Pastikan path ke .env benar
 const express = require('express');
 const cors = require('cors');
@@ -6,19 +8,23 @@ const path = require('path');
 const { google } = require('googleapis');
 const { getVideoIdFromUrl } = require('./controllers/youtube/index');
 const { getJudolComment, getJudolCommentAi } = require('./controllers/comment_get_judol');
-const authSession  = require('./controllers/authSession');
+const {authSession, checkSession} = require('./controllers/authSession');
 const Users = require('./models/Users');
-const LoadData = require('./utils/LoadData');
 const Sessions = require('./models/Sessions');
+const { loadYoutubeCredentials } = require('./utils/LoadData');
+const isProductionHttps = require('./utils/isProductionHttps');
+const checkProtocol = require('./middlewares/checkProtocol');
 const fs = require('fs');
 
 const session = require('express-session');
 const cookieParser = require('cookie-parser');
 const { v4: uuidv4 } = require('uuid');
+const crypto = require('crypto');
 const mongoose = require('mongoose');
 
 const app = express();
 
+app.use(checkProtocol);
 app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -68,11 +74,6 @@ app.use('/', youtubeRoutes);
 const indexRoute = require('./routes/index');
 app.use('/', indexRoute);
 
-// Debug: cek apakah env terbaca
-console.log('CLIENT_ID:', process.env.GOOGLE_CLIENT_ID);
-console.log('CLIENT_SECRET:', process.env.GOOGLE_CLIENT_SECRET);
-console.log('REDIRECT_URI:', process.env.REDIRECT_URI);
-
 const SCOPES = [
   'https://www.googleapis.com/auth/youtube.force-ssl',
   'openid',
@@ -80,51 +81,40 @@ const SCOPES = [
   'profile'
 ];
 
+const YC = loadYoutubeCredentials();
 const oauth2Client = new google.auth.OAuth2(
-  process.env.GOOGLE_CLIENT_ID,
-  process.env.GOOGLE_CLIENT_SECRET,
-  process.env.REDIRECT_URI
+    YC.client_id,
+    YC.client_secret,
+    isProductionHttps() ? YC.redirect_uris[1] : YC.redirect_uris[0]
 );
-
-//route home
-app.get('/home', (req, res) => {
-  res.render('pages/home');
-});
 
 // Endpoint login
 app.get('/login', async (req, res) => {
   // Cek dulu apakah ada session_id di cookies
-  const session_id = req.cookies.session_id;
-  if (session_id) {
-    // Cari session di DB
-    const session = await Sessions.findOne({ session_id });
-    if (session && session.expires_at > Date.now()) {
-      // Cari user juga
-      const user = await Users.findOne({ google_id: session.google_id });
-      if (user) {
-        // Kalau valid, langsung redirect ke dashboard
-        console.log('User sudah login, redirect ke dashboard');
-        console.log('session_id:', session_id);
-        return res.redirect('/dashboard/');
-      }
-    }
+  const user = await checkSession(req);
+  
+  const isHttps = isProductionHttps();
+  console.log('Login dalam:', isHttps ? 'HTTPS' : 'HTTP');
+  console.log('Redirect URIs:', isHttps ? YC.redirect_uris[1] : YC.redirect_uris[0]);
+  if (user) {
+    console.log('Session valid, redirect ke dashboard');
+    return res.redirect('/dashboard/');
   }
   console.log('Tidak ada session_id atau session tidak valid, tampilkan halaman login');
-  console.log('session_id:', session_id);
+  console.log('session_id:', req.cookies.session_id);
   // Kalau nggak ada / nggak valid, render login page
   const url = oauth2Client.generateAuthUrl({
     access_type: 'offline',
     prompt: 'consent',
-    scope: SCOPES
+    scope: SCOPES,
+    redirect_uri: isHttps ? YC.redirect_uris[1] : YC.redirect_uris[0] // Gunakan redirect yang sesuai dengan protokol
   });
   res.render('pages/login', { googleLoginUrl: url });
 });
 
-
 app.get('/auth/callback', async (req, res) => {
   const code = req.query.code;
   if (!code) return res.status(400).send('Kode otorisasi tidak ditemukan.');
-
   try {
     const { tokens } = await oauth2Client.getToken(code);
     oauth2Client.setCredentials(tokens);
@@ -152,21 +142,36 @@ app.get('/auth/callback', async (req, res) => {
       },
       { upsert: true, new: true }
     );
-    const session_id = uuidv4();
+    
+    // Generate session tokens
+    const session_id = crypto.randomBytes(32).toString('hex'); // stronger than uuid
+    const session_secret = crypto.randomBytes(32).toString('hex');
+    const user_agent = req.headers['user-agent'] || 'unknown';
     const session = await Sessions.findOneAndUpdate(
       { google_id: userinfo.data.id },
       {
         google_id: userinfo.data.id,
         session_id: session_id, // Simpan access token sebagai session_id
+        session_secret: session_secret,
+        user_agent: user_agent, // Simpan user agent untuk keamanan tambahan
         expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 hari
       },
       { upsert: true, new: true }
     );
     // Set cookie user_id untuk auto-login
     // Disini berarti 7 hari (24 * 60 * 60 * 1000 ms artinya 1 hari)
+    const secureCookie = isProductionHttps();
+    console.log("Login:", user.username);
+    console.log("Secure cookie:", secureCookie);
     res.cookie('session_id', session_id, {
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 hari
-      httpOnly: true
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+      httpOnly: true,
+      secure: secureCookie, // Aktifkan secure jika server sudah menggunakan HTTPS
+    });
+    res.cookie('session_secret', session_secret, {
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+      httpOnly: true,
+      secure: secureCookie, // Aktifkan secure jika server sudah menggunakan HTTPS
     });
     res.redirect('/dashboard/'); // atau ke route dashboard yang sesuai
   } catch (error) {
@@ -204,7 +209,8 @@ app.get('/dashboard', authSession, async (req, res) => {
   if (!userId) return res.redirect('/');
   const user = await Users.findById(userId).lean();
   if (!user) {
-    res.clearCookie('user_id');
+    res.clearCookie('session_id');
+    res.clearCookie('session_secret');
     return res.redirect('/');
   }
   res.render('pages/dashboard', {
@@ -222,7 +228,9 @@ app.get('/delete-account', authSession, async (req, res) => {
     const userId = req.user.user_id;
     if (userId) {
       await Users.findOneAndDelete({ user_id: userId });
-      res.clearCookie('user_id');
+      await Sessions.findOneAndDelete({ session_id: req.cookies.session_id });
+      res.clearCookie('session_id');
+      res.clearCookie('session_secret');
     }
     res.redirect('/'); // Atau ke halaman login
   } catch (err) {
@@ -470,7 +478,19 @@ app.get('/', async (req, res) => {
   res.render('pages/home', { isLoggedIn });
 });
 
-app.listen(process.env.PORT || 3000, () => {
-  console.log(`✅ Server aktif di http://localhost:${process.env.PORT || 3000}`);
+// ytjudolremover.danish05.my.id
+console.log('Https mode:', isProductionHttps());
+if (isProductionHttps()) {
+  const privateKey = fs.readFileSync('/etc/letsencrypt/live/ytjudolremover.danish05.my.id/privkey.pem', 'utf8');
+  const certificate = fs.readFileSync('/etc/letsencrypt/live/ytjudolremover.danish05.my.id/fullchain.pem', 'utf8');
+  const credentials = { key: privateKey, cert: certificate };
+  https.createServer(credentials, app).listen(443, () => {
+    console.log('HTTPS Server running on port 443');
+  });
+} else {
+  http.createServer(app).listen(3000, () => {
+    console.log('HTTP Server running on port 3000');
+    console.log(`✅ Server aktif di http://localhost:${process.env.PORT || 3000}`);
   console.log(`🔐 Login: http://localhost:${process.env.PORT || 3000}/login`);
-});
+  });
+}
