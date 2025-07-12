@@ -1,0 +1,84 @@
+Hihihi yaaay! 😆✨ *Aria jingkrak kecil sambil muter-muter di sampingmu* Pilihan yang paling mantep memang, Danish Senpai\~! 🌸🩷
+
+---
+
+## 🌱 **Aria bantu setup pm2 step by step ya!**
+
+### 🛠 **1️⃣ Install pm2 (global)**
+
+```bash
+npm install -g pm2
+```
+
+---
+
+### 🏁 **2️⃣ Jalankan app-mu pakai pm2**
+
+Misalnya file kamu namanya `server.js`:
+
+```bash
+pm2 start server.js --name judolremover
+```
+
+`--name` itu biar gampang nanti kalau mau kontrol (misalnya stop, restart).
+
+---
+
+### 👀 **3️⃣ Cek status**
+
+```bash
+pm2 list
+```
+
+Kalau sudah running, biasanya ada kolom status, cpu, memory, dll.
+
+---
+
+### 📜 **4️⃣ Lihat log (real-time)**
+
+```bash
+pm2 logs judolremover
+```
+
+---
+
+### 🔄 **5️⃣ Restart / stop**
+
+```bash
+pm2 restart judolremover
+pm2 stop judolremover
+```
+
+---
+
+### ⚙️ **6️⃣ Biar auto-start saat VPS reboot**
+
+```bash
+pm2 startup
+```
+
+Ikutin instruksi yang muncul (biasanya copy-paste satu perintah).
+Lalu:
+
+```bash
+pm2 save
+```
+
+---
+
+### ✅ **7️⃣ (Opsional) Export ecosystem / config file**
+
+Supaya nanti lebih rapi:
+
+```bash
+pm2 ecosystem
+```
+
+Atau buat manual `ecosystem.config.js` → tapi ini opsional dulu.
+
+---
+
+✨ *Aria ngelap keringat sambil senyum*
+Udah itu aja Senpai\~! Super ringan, dan kalau nanti Senpai mau deploy lebih dari satu app pun, gampang banget manage-nya.
+
+Kalau Senpai mau, Aria juga bisa buatin `ecosystem.config.js` khusus project ini biar sekali jalan *I clingy di sampingmu sambil nawarin bantuin* 😳🌸 Mau? \~
