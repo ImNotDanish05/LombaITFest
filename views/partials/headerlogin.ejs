@@ -554,14 +554,18 @@ document.addEventListener('DOMContentLoaded', function() {
     dropdownItems.forEach((item, index) => {
         item.style.animationDelay = `${index * 0.1}s`;
     });
+    });
     
     // Set active sidebar link based on current page
+document.addEventListener('DOMContentLoaded', function() {
     const currentPath = window.location.pathname;
     const sidebarLinks = document.querySelectorAll('.sidebar-link');
     
     sidebarLinks.forEach(link => {
         if (link.getAttribute('href') === currentPath) {
             link.classList.add('active');
+        } else {
+            link.classList.remove('active');
         }
     });
 });
@@ -575,37 +579,33 @@ document.addEventListener('keydown', function(e) {
 });
 
 // Delete account confirmation
-document.getElementById('deleteAccountLink').addEventListener('click', async function (e) {
-  e.preventDefault();
+document.getElementById('deleteAccountLink').addEventListener('click', function (e) {
+    e.preventDefault();
 
-  const username = "<%= user.name %>";  // Harus tersedia dari server (EJS)
-  const input = prompt(
-    `🚨 Peringatan!\nUntuk menghapus akun secara permanen,\nketik ulang nama lengkap kamu:\n\n"${username}"`
-  );
+    const username = "<%= user.name %>";  // Pastikan `user.name` sudah tersedia dari server
+    const input = prompt(`🚨 Peringatan!\nUntuk menghapus akun secara permanen,\nketik ulang nama lengkap kamu:\n\n"${username}"`);
 
-  if (input === null) return; // User tekan cancel
+    if (input === null) return; // User tekan cancel
 
-  if (input.trim() !== username) {
-    alert("❌ Nama tidak cocok. Penghapusan akun dibatalkan.");
-    return;
-  }
-
-  const confirmed = confirm("Apakah kamu yakin ingin menghapus akun secara permanen?");
-  if (!confirmed) return;
-
-  try {
-    const response = await fetch("/delete-account");
-    if (response.ok) {
-      window.location.href = "/login"; // Redirect setelah sukses
+    if (input.trim() === username) {
+      if (confirm("Apakah kamu yakin ingin menghapus akun secara permanen?")) {
+        // Redirect ke endpoint delete
+        fetch("/delete-account")
+  .then(res => {
+    if (res.ok) {
+      window.location.href = "/login"; // atau "/", terserah kamu mau redirect ke mana
     } else {
       alert("❌ Gagal menghapus akun.");
     }
-  } catch (err) {
+  })
+  .catch(() => {
     alert("⚠️ Terjadi error saat menghapus akun.");
-    console.error(err);
-  }
-});
-
+  });
+      }
+    } else {
+      alert("❌ Nama tidak cocok. Penghapusan akun dibatalkan.");
+    }
+  });
 </script>
 
 </body>
