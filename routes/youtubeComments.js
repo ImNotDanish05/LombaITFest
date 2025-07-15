@@ -53,6 +53,8 @@ router.post('/get-comments', authSession, async (req, res) => {
         pageToken: nextPageToken || ''
       });
 
+      if (!response?.data?.items) break;
+
       const commentsBatch = response.data.items.map(item => ({
         text: item.snippet.topLevelComment.snippet.textDisplay,
         commentId: item.snippet.topLevelComment.id
@@ -101,7 +103,7 @@ router.post('/get-comments', authSession, async (req, res) => {
         name: req.user.username,
         email: req.user.email,
         picture: req.user.picture,
-        isOwner: isOwner // false, tapi tetap dikirim ke tampilan
+        isOwner: isOwner
       },
       comments: onlySpamComments
     });
