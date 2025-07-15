@@ -113,4 +113,54 @@ router.post('/get-comments', authSession, async (req, res) => {
   }
 });
 
+// router.post('/delete-comments', authSession, async (req, res) => {
+//   let selectedIds = req.body.ids;
+//   if (!selectedIds) return res.redirect('back');
+//   if (typeof selectedIds === 'string') selectedIds = [selectedIds];
+
+//   const isOwner = req.body.isOwner === '1';
+//   const permanentDelete = req.body.permanentDelete === '1';
+
+//   try {
+//     const credentials = loadYoutubeCredentials();
+//     const oauth2Client = new google.auth.OAuth2(
+//       credentials.client_id,
+//       credentials.client_secret,
+//       isProductionHttps() ? credentials.redirect_uris[1] : credentials.redirect_uris[0]
+//     );
+//     oauth2Client.setCredentials({
+//       access_token: req.user.access_token,
+//       refresh_token: req.user.refresh_token,
+//     });
+
+//     const youtube = google.youtube({ version: 'v3', auth: oauth2Client });
+
+//     for (const id of selectedIds) {
+//       if (isOwner) {
+//         if (permanentDelete) {
+//           await youtube.comments.delete({ id });
+//         } else {
+//           await youtube.comments.setModerationStatus({
+//             id,
+//             moderationStatus: 'rejected'
+//           });
+//         }
+//       } else {
+//         await youtube.comments.markAsSpam({ id });
+//       }
+//     }
+
+//     res.render('pages/success', {
+//       message: 'Komentar berhasil diproses.',
+//       isOwner,
+//       permanentDelete,
+//       selectedIds: selectedIds.length
+//     });
+//   } catch (err) {
+//     console.error('Gagal memproses komentar:', err);
+//     res.status(500).send('Gagal memproses komentar.');
+//   }
+// });
+
+
 module.exports = router;
