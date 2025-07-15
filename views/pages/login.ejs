@@ -170,14 +170,12 @@
     }
 
     .form-check-input {
-      transition: all 0.3s ease;
       cursor: pointer;
     }
 
     .form-check-input:checked {
       background-color: #0f2027;
       border-color: #0f2027;
-      animation: checkPulse 0.3s ease;
     }
 
     @keyframes checkPulse {
@@ -209,7 +207,6 @@
     /* Button animations */
     #loginButton {
       transition: all 0.4s ease;
-      animation: fadeInUp 0.6s ease-out 1s both;
       position: relative;
       overflow: hidden;
       font-weight: 600;
@@ -301,9 +298,6 @@
     }
 
     /* Success animation when both checkboxes are checked */
-    .form-check.checked {
-      animation: successPulse 0.5s ease;
-    }
 
     @keyframes successPulse {
       0% { transform: scale(1); }
