@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Creator: CorelDRAW -->
+<svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="100mm" height="100mm" version="1.1" style="shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd"
+viewBox="0 0 10000 10000"
+ xmlns:xlink="http://www.w3.org/1999/xlink"
+ xmlns:xodm="http://www.corel.com/coreldraw/odm/2003">
+ <defs>
+  <font id="FontID0" horiz-adv-x="625" font-variant="normal" style="fill-rule:nonzero" font-weight="500">
+	<font-face 
+		font-family="Minecraft">
+		<font-face-src>
+			<font-face-name name="Minecraft"/>
+		</font-face-src>
+	</font-face>
+   <missing-glyph><path d="M0 0z"/></missing-glyph>
+   <glyph unicode="7" horiz-adv-x="562" d="M187.503 0l-62.5036 0 0 62.5036 0 62.4954 0 62.5036 0 62.4954 0 62.5036 0 62.4954 62.5036 0 62.4954 0 0 -62.4954 0 -62.5036 0 -62.4954 0 -62.5036 0 -62.4954 0 -62.5036 -62.4954 0zm62.4954 374.997l0 62.5036 0 62.4954 62.5036 0 62.4954 0 0 -62.4954 0 -62.5036 -62.4954 0 -62.5036 0zm124.999 124.999l0 62.5036 0 62.5036 -62.4954 0 -62.5036 0 -62.4954 0 -62.5036 0 0 -62.5036 0 -62.5036 -62.4954 0 -62.5036 0 0 62.5036 0 62.5036 0 62.4954 0 62.5036 62.5036 0 62.4954 0 62.5036 0 62.4954 0 62.5036 0 62.4954 0 62.5036 0 62.4954 0 0 -62.5036 0 -62.4954 0 -62.5036 0 -62.5036 -62.4954 0 -62.5036 0z"/>
+  </font>
+  <style type="text/css">
+   <![CDATA[
+    @font-face { font-family:"Minecraft";font-variant:normal;font-weight:500;src:url("#FontID0") format(svg)}
+    .str1 {stroke:red;stroke-width:300;stroke-miterlimit:22.9256}
+    .str0 {stroke:white;stroke-width:20;stroke-miterlimit:22.9256}
+    .fil3 {fill:none}
+    .fil2 {fill:black}
+    .fil0 {fill:#7D7D7D}
+    .fil4 {fill:red}
+    .fil1 {fill:white}
+    .fnt0 {font-weight:500;font-size:1220.57px;font-family:'Minecraft'}
+   ]]>
+  </style>
+ </defs>
+ <g id="Layer_x0020_1">
+  <metadata id="CorelCorpID_0Corel-Layer"/>
+  <polygon class="fil0" points="1808.22,6322.65 2249.19,6763.63 8228.35,6763.63 8228.35,3196.42 7835.71,2803.78 1796.12,2803.78 "/>
+  <rect class="fil0" transform="matrix(0.707107 -0.707107 0.707107 0.707107 5449.38 6567.66)" width="881.44" height="881.44"/>
+  <rect class="fil1 str0" x="1796.12" y="2803.78" width="6036.55" height="3497.76"/>
+  <rect class="fil1" transform="matrix(0.707107 -0.707107 0.707107 0.707107 5032.04 6094.17)" width="881.44" height="881.44"/>
+  <g id="_2111589601040">
+   <text x="4276.13" y="4999.47"  class="fil2 fnt0">777</text>
+   <circle class="fil3 str1" transform="matrix(0.984689 0.174323 -0.174323 0.984689 5273.01 4453.65)" r="1328.31"/>
+   <rect class="fil4" transform="matrix(0.766045 0.642787 -0.642787 0.766045 4363.25 3574.27)" width="2651.51" height="403.33"/>
+  </g>
+ </g>
+</svg>
