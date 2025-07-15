@@ -22,19 +22,20 @@
 
   /* 2. Card */
   .glass-card {
-    background: rgba(255, 255, 255, 0.08);
-    backdrop-filter: blur(12px);
-    border-radius: 25px;
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-    color: white;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-  }
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(12px);
+  border-radius: 25px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 8px 32px 0 rgba(0, 201, 167, 0.4), 0 0 20px rgba(58, 134, 255, 0.3);
+  color: white;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
 
-  .glass-card:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 16px 40px 0 rgba(0, 0, 0, 0.45);
-  }
+.glass-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 16px 40px rgba(58, 134, 255, 0.5), 0 0 30px rgba(0, 201, 167, 0.4);
+}
+
 
   /* 3. Animation */
   .animate-fade-in {
@@ -51,12 +52,32 @@
 
   /* 4. Profile Image */
   .profile-img-container {
-    display: inline-block;
-    padding: 5px;
-    background: linear-gradient(45deg, #e94560, #7f5af0);
-    border-radius: 50%;
-    margin-bottom: 1.5rem;
+  display: inline-block;
+  padding: 5px;
+  border-radius: 50%;
+  margin-bottom: 1.5rem;
+  background: linear-gradient(
+    120deg,
+    #00c9a7,
+    #3a86ff,
+    #00c9a7,
+    #3a86ff,
+    #00c9a7
+  );
+  background-size: 500% 500%;
+  animation: moveGradient 3s linear infinite;
+}
+
+
+@keyframes moveGradient {
+  0% {
+    background-position: 0% 50%;
   }
+  100% {
+    background-position: 100% 50%;
+  }
+}
+  
 
   .profile-img {
     width: 100px;
@@ -105,19 +126,41 @@
 
   /* 6. Button */
   .btn-custom-action {
-    background: linear-gradient(45deg, #7f5af0, #e94560);
-    border: none;
-    border-radius: 12px;
-    color: white;
-    font-weight: 500;
-    padding: 12px 25px;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  background: linear-gradient(
+    120deg,
+    #FF1E1E,
+    #9F0000,
+    rgba(0, 0, 0, 0.2),
+    #9F0000,
+    #FF1E1E
+  );
+  background-size: 300% 100%;
+  animation: animate-bg 5s ease infinite;
+  border: none;
+  border-radius: 12px;
+  color: white;
+  font-weight: 500;
+  padding: 12px 25px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+@keyframes animate-bg {
+  0% {
+    background-position: 0% 50%;
   }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
 
   .btn-custom-action:hover {
     transform: scale(1.05);
-    box-shadow: 0 6px 20px rgba(233, 69, 96, 0.4);
+    box-shadow: 0 6px 20px rgba(255, 0, 0, 0.5);
   }
 
   /* 7. Comments Section */
@@ -134,7 +177,11 @@
   }
 </style>
 
-<!-- Content Start -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+
 <div class="container py-5 d-flex flex-column align-items-center justify-content-center min-vh-100">
   <div class="glass-card text-center animate-fade-in p-4 p-md-5" style="transform: translateY(20px);">
     <div class="profile-img-container shadow-lg">
