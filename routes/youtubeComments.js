@@ -5,16 +5,23 @@ const fs = require('fs');
 const { getVideoIdFromUrl } = require('../controllers/youtube/index');
 const { getJudolComment, getJudolCommentAi } = require('../controllers/comment_get_judol');
 const { authSession } = require('../controllers/authSession');
+const { loadYoutubeCredentials } = require('../utils/LoadData');
+const isProductionHttps = require('../utils/isProductionHttps');
 
 router.post('/get-comments', authSession, async (req, res) => {
   try {
     const useAi = req.body.useAiJudol === '1';
     const youtubeUrl = req.body.youtubeUrl;
+    const credentials = loadYoutubeCredentials();
     const match = getVideoIdFromUrl(youtubeUrl);
     if (!match) return res.status(400).send('Link YouTube tidak valid.');
     const videoId = match;
 
-    const oauth2Client = new google.auth.OAuth2();
+    const oauth2Client = new google.auth.OAuth2(
+      credentials.client_id,
+      credentials.client_secret,
+      isProductionHttps() ? credentials.redirect_uris[1] : credentials.redirect_uris[0]
+    );
     oauth2Client.setCredentials({
       access_token: req.user.access_token,
       refresh_token: req.user.refresh_token
