@@ -1,12 +1,17 @@
 <%- include('../partials/headerlogin', { user }) %>
 
+<!-- Font & Bootstrap Icons -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+
 <style>
-  /* --- 1. Background & Font Dasar --- */
+  /* 1. Background Animated Gradient */
   body {
     background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460, #2e5e8e);
     background-size: 400% 400%;
     animation: animated-gradient 15s ease infinite;
-    font-family: 'Poppins', sans-serif; /* Opsional: Gunakan font yang lebih modern */
+    font-family: 'Poppins', sans-serif;
   }
 
   @keyframes animated-gradient {
@@ -15,7 +20,7 @@
     100% { background-position: 0% 50%; }
   }
 
-  /* --- 2. Kartu Kaca (Glass Card) yang Ditingkatkan --- */
+  /* 2. Card */
   .glass-card {
   background: rgba(255, 255, 255, 0.08);
   backdrop-filter: blur(12px);
@@ -32,7 +37,7 @@
 }
 
 
-  /* --- 3. Animasi & Elemen Profil --- */
+  /* 3. Animation */
   .animate-fade-in {
     animation: fadeInUp 0.8s ease-out forwards;
     opacity: 0;
@@ -45,6 +50,7 @@
     }
   }
 
+  /* 4. Profile Image */
   .profile-img-container {
   display: inline-block;
   padding: 5px;
@@ -78,22 +84,22 @@
     height: 100px;
     object-fit: cover;
     border-radius: 50%;
-    border: 3px solid #1a1a2e; /* Warna solid yang cocok dengan background */
+    border: 3px solid #1a1a2e;
   }
 
-  /* --- 4. Tipografi & Teks --- */
+  /* 5. Text Styling */
   .welcome-text {
     font-weight: 600;
     font-size: 2rem;
     color: #f0f0f0;
   }
-  
+
   .typing-animation {
     display: inline-block;
     animation: typing 2s steps(25, end), blink .75s step-end infinite;
     white-space: nowrap;
     overflow: hidden;
-    border-right: .15em solid #7f5af0; /* Warna kursor ketik */
+    border-right: .15em solid #7f5af0;
     max-width: 100%;
   }
 
@@ -106,7 +112,7 @@
     from, to { border-color: transparent }
     50% { border-color: #7f5af0; }
   }
-  
+
   .email-text {
     background: rgba(0, 0, 0, 0.2);
     padding: 8px 15px;
@@ -118,7 +124,7 @@
     color: #c0c0c0;
   }
 
-  /* --- 5. Tombol Aksi (CTA Button) --- */
+  /* 6. Button */
   .btn-custom-action {
   background: linear-gradient(
     120deg,
@@ -156,15 +162,15 @@
     transform: scale(1.05);
     box-shadow: 0 6px 20px rgba(255, 0, 0, 0.5);
   }
-  
-  /* --- 6. Bagian Komentar --- */
+
+  /* 7. Comments Section */
   .comments-section {
     width: 100%;
     max-width: 700px;
   }
-  
+
   .spam-alert {
-    background: rgba(217, 83, 79, 0.2); /* Warna merah transparan */
+    background: rgba(217, 83, 79, 0.2);
     border: 1px solid rgba(217, 83, 79, 0.5);
     color: white;
     border-radius: 15px;
@@ -175,27 +181,27 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
 
-<div id="particles-js"></div>
+
 <div class="container py-5 d-flex flex-column align-items-center justify-content-center min-vh-100">
   <div class="glass-card text-center animate-fade-in p-4 p-md-5" style="transform: translateY(20px);">
     <div class="profile-img-container shadow-lg">
-      <img src="<%= user.picture %>" class="profile-img" alt="Foto Profil">
+      <img src="<%= user.picture || '/images/default-profile.png' %>" class="profile-img" alt="Foto Profil">
     </div>
-    
+
     <h2 class="welcome-text mb-3">
       <span class="typing-animation">Welcome, <%= user.name.split(' ')[0] %>!</span>
     </h2>
-    
+
     <p class="email-text mb-4">
       <i class="bi bi-envelope-fill"></i>
       <span><%= user.email %></span>
     </p>
-    
-<div class="d-grid"> 
-    <a href="/judolremover" class="btn btn-custom-action btn-lg shadow-sm">
-      <i class="bi bi-youtube me-2"></i> Fetch YouTube Comments
-    </a>
-</div>
+
+    <div class="d-grid">
+      <a href="/judolremover" class="btn btn-custom-action btn-lg shadow-sm">
+        <i class="bi bi-youtube me-2"></i> Fetch YouTube Comments
+      </a>
+    </div>
   </div>
 
   <% if (typeof comments !== 'undefined' && comments.length > 0) { %>
@@ -205,9 +211,10 @@
         <div class="spam-alert alert text-center">
           🚨 <strong><%= comments.length %></strong> spam comments found
         </div>
-        </div>
+      </div>
     </div>
   <% } %>
 </div>
+<!-- Content End -->
 
 <%- include('../partials/footer') %>
