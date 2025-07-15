@@ -1,0 +1,84 @@
+<%- include('../partials/headerlogin', { user }) %>
+
+<style>
+  body {
+    background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+    background-size: 400% 400%;
+    animation: gradientBG 10s ease infinite;
+    font-family: 'Poppins', sans-serif;
+    color: #f0f0f0;
+  }
+
+  @keyframes gradientBG {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+
+  .card {
+    max-width: 700px;
+    margin: 60px auto;
+    padding: 2.5rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 20px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 0 30px rgba(0, 255, 255, 0.2), 0 0 10px rgba(127, 90, 240, 0.3);
+    text-align: center;
+  }
+
+  .logo {
+    font-size: 2.5rem;
+    color: #00ffe5;
+    font-weight: bold;
+    margin-bottom: 20px;
+    text-shadow: 0 0 10px #00ffe5;
+  }
+
+  .desc {
+    font-size: 1.1rem;
+    line-height: 1.8;
+  }
+
+  .highlight {
+    color: #7f5af0;
+    font-weight: 600;
+  }
+
+  .back-btn, .link-btn {
+    display: inline-block;
+    margin-top: 2rem;
+    padding: 10px 25px;
+    background: #7f5af0;
+    color: #fff;
+    border-radius: 12px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 0 10px #7f5af0;
+  }
+
+  .back-btn:hover, .link-btn:hover {
+    background: #9a73f8;
+    box-shadow: 0 0 15px #9a73f8;
+    transform: scale(1.05);
+  }
+</style>
+
+<div class="card">
+  <div class="logo">💬 NovaClean</div>
+  <div class="desc">
+    <span class="highlight">NovaClean</span> adalah website pendeteksi dan penghapus <span class="highlight">komentar spam judi online</span> pada YouTube secara otomatis.
+    <br><br>
+    Dikembangkan oleh <span class="highlight">tiga orang mahasiswa</span> sebagai bentuk kepedulian terhadap kualitas dan keamanan ruang digital, NovaClean bertujuan menciptakan lingkungan internet yang bersih dari komentar promosi ilegal.
+    <br><br>
+    Dengan kombinasi <span class="highlight">tampilan futuristik bertema neon</span> dan <span class="highlight">kecerdasan buatan</span>, NovaClean menyajikan pengalaman modern dalam menjaga konten.
+    <br><br>
+    Baca lebih lanjut mengenai:
+    <br>
+    <a href="/terms" class="link-btn">📜 Terms & Conditions</a>
+    <a href="/privacy" class="link-btn ms-2">🔒 Privacy Policy</a>
+  </div>
+  <a href="/dashboard" class="back-btn">← Kembali ke Dashboard</a>
+</div>
+
+<%- include('../partials/footer') %>
