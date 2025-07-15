@@ -17,19 +17,27 @@
   
   /* --- 2. Kartu Kaca (Glass Card) --- */
   .glass-card {
-    background: rgba(255, 255, 255, 0.08);
-    backdrop-filter: blur(12px);
-    border-radius: 25px;
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-    color: white;
-    padding: 2rem;
-    max-width: 600px;
-    margin: 0 auto;
-    animation: fadeInUp 0.8s ease-out forwards;
-    opacity: 0;
-    transform: translateY(20px);
-  }
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(12px);
+  border-radius: 25px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow:
+    0 8px 32px rgba(0, 201, 167, 0.35),
+    0 0 20px rgba(58, 134, 255, 0.3),
+    0 0 10px rgba(0, 201, 167, 0.2);
+  color: white;
+  padding: 2rem;
+  max-width: 600px;
+  margin: 0 auto;
+  animation: fadeInUp 0.8s ease-out forwards;
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.glass-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 16px 40px rgba(58, 134, 255, 0.5), 0 0 30px rgba(0, 201, 167, 0.4);
+}
 
   @keyframes fadeInUp {
     to {
@@ -90,17 +98,36 @@
   /* --- 5. Tombol Aksi (CTA Button) --- */
   .submit-btn {
     width: 100%;
-    background: linear-gradient(45deg, #7f5af0, #e94560);
-    border: none;
-    border-radius: 12px;
-    color: white;
-    font-weight: 500;
-    padding: 12px 25px;
-    font-size: 1.1rem;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    background: linear-gradient(
+    120deg,
+    #FF1E1E,
+    #9F0000,
+    rgba(0, 0, 0, 0.2),
+    #9F0000,
+    #FF1E1E
+  );
+    background-size: 300% 100%;
+  animation: animate-bg 5s ease infinite;
+  border: none;
+  border-radius: 12px;
+  color: white;
+  font-weight: 500;
+  padding: 12px 25px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
   }
 
+  @keyframes animate-bg {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
   .submit-btn:hover {
     transform: scale(1.03);
     box-shadow: 0 6px 20px rgba(233, 69, 96, 0.4);
