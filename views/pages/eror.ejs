@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title><%= title %></title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background: #1a1a2e;
+      color: #fff;
+      text-align: center;
+      padding: 5rem;
+    }
+    .error-box {
+      background: #e94560;
+      padding: 2rem;
+      border-radius: 1rem;
+      display: inline-block;
+    }
+  </style>
+</head>
+<body>
+  <div class="error-box">
+    <h1>Error <%= error.code %></h1>
+    <p><%= error.message %></p>
+    <a href="<%= user ? '/dashboard' : '/' %>" style="color: #7f5af0;">
+  ← Kembali ke <%= user ? 'Dashboard' : 'Beranda' %>
+    </a>
+  </div>
+</body>
+</html>

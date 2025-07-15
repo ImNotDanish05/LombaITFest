@@ -12,6 +12,7 @@ const fs = require('fs');
 const session = require('express-session');
 const cookieParser = require('cookie-parser');
 const checkProtocol = require('./middlewares/checkProtocol');
+const { checkSession, authSession } = require('./controllers/authSession');
 const isProductionHttps = require('./utils/isProductionHttps');
 
 const app = express();
@@ -40,6 +41,20 @@ app.use('/', require('./routes/dashboard'));
 app.use('/', require('./routes/youtubeComments'));
 app.use('/', require('./routes/judol'));
 app.use('/', require('./routes/home'));
+
+// Handle 404 (Route not found)
+app.use(async (req, res) => {
+  const user = await checkSession(req);
+
+  res.status(404).render('pages/eror', {
+    title: '404 - Halaman Tidak Ditemukan',
+    error: {
+      code: 404,
+      message: `Halaman ${req.originalUrl} tidak ditemukan`
+    },
+    user:user
+  });
+});
 
 
 // Fungsi async untuk connect MongoDB dan start server
