@@ -22,14 +22,21 @@ router.post('/get-comments', authSession, async (req, res) => {
 
     const youtube = google.youtube({ version: 'v3', auth: oauth2Client });
 
-    const channelResponse = await youtube.channels.list({ part: 'id,snippet', mine: true });
-    const userChannelId = channelResponse.data.items[0].id;
+    // HANYA AMBIL VIDEO INFO (tidak perlu channel user)
+    const videoResponse = await youtube.videos.list({
+      part: 'snippet',
+      id: videoId
+    });
 
-    const videoResponse = await youtube.videos.list({ part: 'snippet', id: videoId });
-    const videoChannelId = videoResponse.data.items[0].snippet.channelId;
+    const videoItem = videoResponse?.data?.items?.[0];
+    if (!videoItem) {
+      return res.status(404).send('Video tidak ditemukan.');
+    }
 
-    const isOwner = userChannelId === videoChannelId;
+    // Kita tidak cek kepemilikan channel lagi
+    const isOwner = false;
 
+    // 🔄 AMBIL KOMENTAR
     let allComments = [], nextPageToken = null;
     do {
       const response = await youtube.commentThreads.list({
@@ -78,6 +85,7 @@ router.post('/get-comments', authSession, async (req, res) => {
 
     const onlySpamComments = commentsWithSpam.filter(c => c.isSpam);
 
+    // Simpan debug log
     const debugData = { semuaKomentar: onlySpamComments };
     fs.writeFileSync('debug-log.json', JSON.stringify(debugData, null, 2), 'utf-8');
 
@@ -86,58 +94,13 @@ router.post('/get-comments', authSession, async (req, res) => {
         name: req.user.username,
         email: req.user.email,
         picture: req.user.picture,
-        isOwner: isOwner
+        isOwner: isOwner // false, tapi tetap dikirim ke tampilan
       },
       comments: onlySpamComments
     });
   } catch (err) {
     console.error('YouTube API error:', err);
     res.status(500).send('Gagal mengambil komentar.');
-  }
-});
-
-router.post('/delete-comments', authSession, async (req, res) => {
-  let selectedIds = req.body.ids;
-  if (!selectedIds) return res.redirect('back');
-  if (typeof selectedIds === 'string') selectedIds = [selectedIds];
-
-  const isOwner = req.body.isOwner === '1';
-  const permanentDelete = req.body.permanentDelete === '1';
-
-  try {
-    const oauth2Client = new google.auth.OAuth2();
-    oauth2Client.setCredentials({
-      access_token: req.user.access_token,
-      refresh_token: req.user.refresh_token,
-      token_type: req.user.token_type
-    });
-
-    const youtube = google.youtube({ version: 'v3', auth: oauth2Client });
-
-    for (const id of selectedIds) {
-      if (isOwner) {
-        if (permanentDelete) {
-          await youtube.comments.delete({ id });
-        } else {
-          await youtube.comments.setModerationStatus({
-            id,
-            moderationStatus: 'rejected'
-          });
-        }
-      } else {
-        await youtube.comments.markAsSpam({ id });
-      }
-    }
-
-    res.render('pages/success', {
-      message: 'Komentar berhasil diproses.',
-      isOwner,
-      permanentDelete,
-      selectedIds: selectedIds.length
-    });
-  } catch (err) {
-    console.error('Gagal memproses komentar:', err);
-    res.status(500).send('Gagal memproses komentar.');
   }
 });
 
