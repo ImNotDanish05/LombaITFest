@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { google } = require('googleapis');
 const crypto = require('crypto');
-const { checkSession } = require('../controllers/authSession');
+const { checkSession, authSession } = require('../controllers/authSession');
 const Users = require('../models/Users');
 const Sessions = require('../models/Sessions');
 const isProductionHttps = require('../utils/isProductionHttps');
@@ -20,62 +20,82 @@ const SCOPES = [
   'openid', 'email', 'profile'
 ];
 
+// ======================
+// Login Page
+// ======================
 router.get('/login', async (req, res) => {
-  const user = await checkSession(req);
-  if (user) return res.redirect('/dashboard/');
-  const url = oauth2Client.generateAuthUrl({
-    access_type: 'offline',
-    prompt: 'consent',
-    scope: SCOPES,
-    redirect_uri: isProductionHttps() ? YC.redirect_uris[1] : YC.redirect_uris[0]
-  });
-  res.render('pages/login', { googleLoginUrl: url });
+  try {
+    const user = await checkSession(req);
+    if (user) return res.redirect('/dashboard/');
+
+    const url = oauth2Client.generateAuthUrl({
+      access_type: 'offline',
+      prompt: 'consent',
+      scope: SCOPES,
+      redirect_uri: isProductionHttps() ? YC.redirect_uris[1] : YC.redirect_uris[0]
+    });
+
+    res.render('pages/login', { googleLoginUrl: url });
+  } catch (err) {
+    console.error('Login Page Error:', err);
+    res.status(500).send('Terjadi kesalahan saat membuka halaman login.');
+  }
 });
 
+// ======================
+// OAuth Callback
+// ======================
 router.get('/auth/callback', async (req, res) => {
   const code = req.query.code;
   if (!code) return res.status(400).send('Kode otorisasi tidak ditemukan.');
+
   try {
+    // 1. Ambil token dari Google
     const { tokens } = await oauth2Client.getToken(code);
     oauth2Client.setCredentials(tokens);
-    const oauth2 = google.oauth2({ version: 'v2', auth: oauth2Client });
-    const userinfo = await oauth2.userinfo.get();
 
+    // 2. Ambil informasi user
+    const oauth2 = google.oauth2({ version: 'v2', auth: oauth2Client });
+    const { data: userinfo } = await oauth2.userinfo.get();
+
+    // 3. Simpan atau update user di database
     const user = await Users.findOneAndUpdate(
-      { google_id: userinfo.data.id },
+      { google_id: userinfo.id },
       {
-        google_id: userinfo.data.id,
-        email: userinfo.data.email,
-        username: userinfo.data.name,
-        picture: userinfo.data.picture,
+        google_id: userinfo.id,
+        email: userinfo.email,
+        username: userinfo.name,
+        picture: userinfo.picture,
         role: 'user',
         access_token: tokens.access_token,
         refresh_token: tokens.refresh_token,
         expiry: new Date(tokens.expiry_date),
         scope: Array.isArray(tokens.scope) ? tokens.scope : (tokens.scope ? tokens.scope.split(' ') : []),
         token_type: tokens.token_type,
-        user_id: userinfo.data.id,
+        user_id: userinfo.id,
         created_at: new Date()
       },
       { upsert: true, new: true }
     );
 
+    // 4. Buat session baru
     const session_id = crypto.randomBytes(32).toString('hex');
     const session_secret = crypto.randomBytes(32).toString('hex');
     const user_agent = req.headers['user-agent'] || 'unknown';
 
     await Sessions.findOneAndUpdate(
-      { google_id: userinfo.data.id },
+      { google_id: userinfo.id },
       {
-        google_id: userinfo.data.id,
+        google_id: userinfo.id,
         session_id,
         session_secret,
         user_agent,
-        expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+        expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // 7 hari
       },
       { upsert: true, new: true }
     );
 
+    // 5. Set cookie
     const secureCookie = isProductionHttps();
     res.cookie('session_id', session_id, {
       maxAge: 7 * 24 * 60 * 60 * 1000,
@@ -95,18 +115,23 @@ router.get('/auth/callback', async (req, res) => {
   }
 });
 
-router.get('/delete-account', require('../controllers/authSession').authSession, async (req, res) => {
+// ======================
+// Delete Account
+// ======================
+router.get('/delete-account', authSession, async (req, res) => {
   try {
     const userId = req.user.user_id;
     if (userId) {
       await Users.findOneAndDelete({ user_id: userId });
       await Sessions.findOneAndDelete({ session_id: req.cookies.session_id });
+
       res.clearCookie('session_id');
       res.clearCookie('session_secret');
     }
     res.sendStatus(200);
   } catch (err) {
-    res.status(500).send(err);
+    console.error('Error saat hapus akun:', err);
+    res.status(500).send('Terjadi kesalahan saat menghapus akun.');
   }
 });
 
