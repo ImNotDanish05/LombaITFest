@@ -15,6 +15,7 @@ const checkProtocol = require('./middlewares/checkProtocol');
 const { checkSession, authSession } = require('./controllers/authSession');
 const isProductionHttps = require('./utils/isProductionHttps');
 
+
 const app = express();
 
 // Middleware
@@ -41,6 +42,7 @@ app.use('/', require('./routes/dashboard'));
 app.use('/', require('./routes/youtubeComments'));
 app.use('/', require('./routes/judol'));
 app.use('/', require('./routes/home'));
+app.use('/', require('./routes/success'));
 
 // Handle 404 (Route not found)
 app.use(async (req, res) => {
