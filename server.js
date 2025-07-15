@@ -39,6 +39,8 @@ app.use('/', require('./routes/auth'));
 app.use('/', require('./routes/dashboard'));
 app.use('/', require('./routes/youtubeComments'));
 app.use('/', require('./routes/judol'));
+app.use('/', require('./routes/home'));
+
 
 // Fungsi async untuk connect MongoDB dan start server
 const startServer = async () => {
