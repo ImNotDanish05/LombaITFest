@@ -14,6 +14,7 @@ const cookieParser = require('cookie-parser');
 const checkProtocol = require('./middlewares/checkProtocol');
 const { checkSession, authSession } = require('./controllers/authSession');
 const isProductionHttps = require('./utils/isProductionHttps');
+const youtubeCommentsRouter = require('./routes/youtubeComments');
 
 
 const app = express();

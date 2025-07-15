@@ -5,16 +5,23 @@ const fs = require('fs');
 const { getVideoIdFromUrl } = require('../controllers/youtube/index');
 const { getJudolComment, getJudolCommentAi } = require('../controllers/comment_get_judol');
 const { authSession } = require('../controllers/authSession');
+const { loadYoutubeCredentials } = require('../utils/LoadData');
+const isProductionHttps = require('../utils/isProductionHttps');
 
 router.post('/get-comments', authSession, async (req, res) => {
   try {
     const useAi = req.body.useAiJudol === '1';
     const youtubeUrl = req.body.youtubeUrl;
+    const credentials = loadYoutubeCredentials();
     const match = getVideoIdFromUrl(youtubeUrl);
     if (!match) return res.status(400).send('Link YouTube tidak valid.');
     const videoId = match;
 
-    const oauth2Client = new google.auth.OAuth2();
+    const oauth2Client = new google.auth.OAuth2(
+      credentials.client_id,
+      credentials.client_secret,
+      isProductionHttps() ? credentials.redirect_uris[1] : credentials.redirect_uris[0]
+    );
     oauth2Client.setCredentials({
       access_token: req.user.access_token,
       refresh_token: req.user.refresh_token
@@ -45,6 +52,8 @@ router.post('/get-comments', authSession, async (req, res) => {
         maxResults: 100,
         pageToken: nextPageToken || ''
       });
+
+      if (!response?.data?.items) break;
 
       const commentsBatch = response.data.items.map(item => ({
         text: item.snippet.topLevelComment.snippet.textDisplay,
@@ -94,7 +103,7 @@ router.post('/get-comments', authSession, async (req, res) => {
         name: req.user.username,
         email: req.user.email,
         picture: req.user.picture,
-        isOwner: isOwner // false, tapi tetap dikirim ke tampilan
+        isOwner: isOwner
       },
       comments: onlySpamComments
     });
@@ -103,5 +112,55 @@ router.post('/get-comments', authSession, async (req, res) => {
     res.status(500).send('Gagal mengambil komentar.');
   }
 });
+
+// router.post('/delete-comments', authSession, async (req, res) => {
+//   let selectedIds = req.body.ids;
+//   if (!selectedIds) return res.redirect('back');
+//   if (typeof selectedIds === 'string') selectedIds = [selectedIds];
+
+//   const isOwner = req.body.isOwner === '1';
+//   const permanentDelete = req.body.permanentDelete === '1';
+
+//   try {
+//     const credentials = loadYoutubeCredentials();
+//     const oauth2Client = new google.auth.OAuth2(
+//       credentials.client_id,
+//       credentials.client_secret,
+//       isProductionHttps() ? credentials.redirect_uris[1] : credentials.redirect_uris[0]
+//     );
+//     oauth2Client.setCredentials({
+//       access_token: req.user.access_token,
+//       refresh_token: req.user.refresh_token,
+//     });
+
+//     const youtube = google.youtube({ version: 'v3', auth: oauth2Client });
+
+//     for (const id of selectedIds) {
+//       if (isOwner) {
+//         if (permanentDelete) {
+//           await youtube.comments.delete({ id });
+//         } else {
+//           await youtube.comments.setModerationStatus({
+//             id,
+//             moderationStatus: 'rejected'
+//           });
+//         }
+//       } else {
+//         await youtube.comments.markAsSpam({ id });
+//       }
+//     }
+
+//     res.render('pages/success', {
+//       message: 'Komentar berhasil diproses.',
+//       isOwner,
+//       permanentDelete,
+//       selectedIds: selectedIds.length
+//     });
+//   } catch (err) {
+//     console.error('Gagal memproses komentar:', err);
+//     res.status(500).send('Gagal memproses komentar.');
+//   }
+// });
+
 
 module.exports = router;
