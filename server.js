@@ -1,3 +1,4 @@
+
 const http = require('http');
 const https = require('https');
 require('dotenv').config({ path: './backend/config/.env' });
@@ -15,13 +16,14 @@ const isProductionHttps = require('./utils/isProductionHttps');
 
 const app = express();
 
-// Middleware setup
+// Middleware
 app.use(checkProtocol);
 app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+app.use('/uploads', express.static(path.join(__dirname, 'uploads'))); // ⬅️ Tambahan untuk akses foto
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 app.use(session({
@@ -30,18 +32,7 @@ app.use(session({
   saveUninitialized: true
 }));
 
-// MongoDB connection
-mongoose.connect('mongodb+srv://syauqi:RU5Jch8oORT91cnL@youtubedata.cqgmi5j.mongodb.net/dbKontenJudol')
-  .then(() => console.log('MongoDB Atlas connected'))
-  .catch((err) => console.error('Connection error:', err));
-
 // Routes
-// app.use('/api/channel', require('./routes/channels'));
-// app.use('/api/comments', require('./routes/comments'));
-// app.use('/api/logs', require('./routes/logs'));
-// app.use('/api/users', require('./routes/users'));
-// app.use('/api/videos', require('./routes/videos'));
-// app.use('/api/sessions', require('./routes/sessions'));
 app.use('/', require('./routes/youtube'));
 app.use('/', require('./routes/index'));
 app.use('/', require('./routes/auth'));
@@ -49,21 +40,35 @@ app.use('/', require('./routes/dashboard'));
 app.use('/', require('./routes/youtubeComments'));
 app.use('/', require('./routes/judol'));
 
+// Fungsi async untuk connect MongoDB dan start server
+const startServer = async () => {
+  try {
+    // ✅ MongoDB Connect
+    await mongoose.connect('mongodb+srv://syauqi:RU5Jch8oORT91cnL@youtubedata.cqgmi5j.mongodb.net/dbKontenJudol');
+    console.log('✅ MongoDB Atlas connected');
 
+    // ✅ Start Server (HTTPS atau HTTP)
+    console.log('Https mode:', isProductionHttps());
 
-// Jalankan server (HTTPS atau HTTP)
-console.log('Https mode:', isProductionHttps());
-if (isProductionHttps()) {
-  const privateKey = fs.readFileSync('/etc/letsencrypt/live/ytjudolremover.danish05.my.id/privkey.pem', 'utf8');
-  const certificate = fs.readFileSync('/etc/letsencrypt/live/ytjudolremover.danish05.my.id/fullchain.pem', 'utf8');
-  const credentials = { key: privateKey, cert: certificate };
-  https.createServer(credentials, app).listen(443, () => {
-    console.log('HTTPS Server running on port 443');
-  });
-} else {
-  http.createServer(app).listen(3000, () => {
-    console.log('HTTP Server running on port 3000');
-    console.log(`✅ Server aktif di http://localhost:${process.env.PORT || 3000}`);
-    console.log(`🔐 Login: http://localhost:${process.env.PORT || 3000}/login`);
-  });
-}
+    if (isProductionHttps()) {
+      const privateKey = fs.readFileSync('/etc/letsencrypt/live/ytjudolremover.danish05.my.id/privkey.pem', 'utf8');
+      const certificate = fs.readFileSync('/etc/letsencrypt/live/ytjudolremover.danish05.my.id/fullchain.pem', 'utf8');
+      const credentials = { key: privateKey, cert: certificate };
+
+      https.createServer(credentials, app).listen(443, () => {
+        console.log('🔐 HTTPS Server running on port 443');
+      });
+    } else {
+      const port = process.env.PORT || 3000;
+      http.createServer(app).listen(port, () => {
+        console.log(`🌐 HTTP Server running on http://localhost:${port}`);
+        console.log(`🔐 Login: http://localhost:${port}/login`);
+      });
+    }
+  } catch (error) {
+    console.error('❌ Gagal memulai server:', error);
+    process.exit(1); // keluar dengan error
+  }
+};
+
+startServer();
