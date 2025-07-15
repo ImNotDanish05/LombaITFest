@@ -1,12 +1,12 @@
 <%- include('../partials/headerlogin', { user }) %>
 
 <style>
-  /* --- 1. Background & Font Dasar --- */
+  /* === 1. BACKGROUND === */
   body {
     background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460, #2e5e8e);
     background-size: 400% 400%;
     animation: animated-gradient 15s ease infinite;
-    font-family: 'Poppins', sans-serif; /* Opsional: Gunakan font yang lebih modern */
+    font-family: 'Poppins', sans-serif;
   }
 
   @keyframes animated-gradient {
@@ -14,30 +14,30 @@
     50% { background-position: 100% 50%; }
     100% { background-position: 0% 50%; }
   }
-  
-  /* --- 2. Kartu Kaca (Glass Card) --- */
-  .glass-card {
-  background: rgba(255, 255, 255, 0.08);
-  backdrop-filter: blur(12px);
-  border-radius: 25px;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  box-shadow:
-    0 8px 32px rgba(0, 201, 167, 0.35),
-    0 0 20px rgba(58, 134, 255, 0.3),
-    0 0 10px rgba(0, 201, 167, 0.2);
-  color: white;
-  padding: 2rem;
-  max-width: 600px;
-  margin: 0 auto;
-  animation: fadeInUp 0.8s ease-out forwards;
-  opacity: 0;
-  transform: translateY(20px);
-}
 
-.glass-card:hover {
-  transform: translateY(-8px);
-  box-shadow: 0 16px 40px rgba(58, 134, 255, 0.5), 0 0 30px rgba(0, 201, 167, 0.4);
-}
+  /* === 2. GLASS CARD === */
+  .glass-card {
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(12px);
+    border-radius: 25px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow: 0 8px 32px rgba(0, 201, 167, 0.35),
+                0 0 20px rgba(58, 134, 255, 0.3),
+                0 0 10px rgba(0, 201, 167, 0.2);
+    color: white;
+    padding: 2rem;
+    max-width: 600px;
+    margin: 0 auto;
+    animation: fadeInUp 0.8s ease-out forwards;
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  .glass-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 16px 40px rgba(58, 134, 255, 0.5),
+                0 0 30px rgba(0, 201, 167, 0.4);
+  }
 
   @keyframes fadeInUp {
     to {
@@ -52,7 +52,7 @@
     margin-bottom: 2rem;
   }
 
-  /* --- 3. Styling Form --- */
+  /* === 3. FORM === */
   .form-control-custom {
     background-color: rgba(0, 0, 0, 0.25);
     border: 1px solid rgba(255, 255, 255, 0.2);
@@ -74,7 +74,7 @@
     box-shadow: 0 0 15px rgba(127, 90, 240, 0.3);
   }
 
-  /* --- 4. Custom Checkbox --- */
+  /* === 4. CUSTOM CHECKBOX === */
   .form-check-input-custom {
     background-color: rgba(0, 0, 0, 0.25);
     border: 1px solid rgba(255, 255, 255, 0.3);
@@ -89,64 +89,142 @@
   .form-check-input-custom:focus {
     box-shadow: 0 0 10px rgba(127, 90, 240, 0.4);
   }
-  
+
   .checkbox-label {
     cursor: pointer;
     color: #e0e0e0;
   }
-  
-  /* --- 5. Tombol Aksi (CTA Button) --- */
+
+  /* === 5. SUBMIT BUTTON === */
   .submit-btn {
     width: 100%;
-    background: linear-gradient(
-    120deg,
-    #FF1E1E,
-    #9F0000,
-    rgba(0, 0, 0, 0.2),
-    #9F0000,
-    #FF1E1E
-  );
+    background: linear-gradient(120deg, #FF1E1E, #9F0000, rgba(0, 0, 0, 0.2), #9F0000, #FF1E1E);
     background-size: 300% 100%;
-  animation: animate-bg 5s ease infinite;
-  border: none;
-  border-radius: 12px;
-  color: white;
-  font-weight: 500;
-  padding: 12px 25px;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    animation: animate-bg 5s ease infinite;
+    border: none;
+    border-radius: 12px;
+    color: white;
+    font-weight: 500;
+    padding: 12px 25px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
   }
 
   @keyframes animate-bg {
-  0% {
-    background-position: 0% 50%;
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
   }
-  50% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0% 50%;
-  }
-}
+
   .submit-btn:hover {
     transform: scale(1.03);
     box-shadow: 0 6px 20px rgba(233, 69, 96, 0.4);
   }
 
+  /* === 6. FUTURISTIC LOADER === */
+  #loadingOverlay {
+    display: none;
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    z-index: 9999;
+    justify-content: center;
+    align-items: center;
+    animation: fadeOverlay 0.3s ease-in-out forwards;
+    flex-direction: column;
+  }
+
+  @keyframes fadeOverlay {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  .neon-loader {
+    text-align: center;
+    color: #fff;
+    font-family: 'Poppins', sans-serif;
+  }
+
+  .neon-icon {
+    font-size: 3rem;
+    color: #00f2ff;
+    animation: pulseIcon 1.5s infinite ease-in-out;
+    text-shadow: 0 0 15px #00f2ff, 0 0 30px #00f2ff;
+  }
+
+  @keyframes pulseIcon {
+    0%, 100% {
+      transform: scale(1);
+      opacity: 0.8;
+    }
+    50% {
+      transform: scale(1.2);
+      opacity: 1;
+    }
+  }
+
+  .loader-text {
+    font-size: 1.4rem;
+    font-weight: 500;
+    margin-bottom: 1rem;
+    letter-spacing: 1px;
+    background: linear-gradient(90deg, #7f5af0, #00f2ff, #7f5af0);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: glowText 2s linear infinite;
+  }
+
+  @keyframes glowText {
+    0% { background-position: 0% 50%; }
+    100% { background-position: 100% 50%; }
+  }
+
+  .neon-dots {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+  }
+
+  .neon-dots .dot {
+    width: 14px;
+    height: 14px;
+    background: #00f2ff;
+    border-radius: 50%;
+    animation: bounce 0.8s infinite ease-in-out alternate;
+    box-shadow: 0 0 10px #00f2ff, 0 0 20px #00f2ff;
+  }
+
+  .neon-dots .dot:nth-child(2) { animation-delay: 0.2s; }
+  .neon-dots .dot:nth-child(3) { animation-delay: 0.4s; }
+  
+  @keyframes bounce {
+    from {
+      transform: translateY(0);
+      opacity: 0.5;
+    }
+    to {
+      transform: translateY(-12px);
+      opacity: 1;
+    }
+  }
 </style>
 
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!-- Fonts & Icons -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
 
+<!-- ✅ FORM SECTION -->
 <div class="container py-5 d-flex align-items-center justify-content-center" style="min-height: 90vh;">
   <div class="glass-card text-center">
     <h2 class="welcome-text">
       <i class="bi bi-youtube"></i> Masukkan Tautan Video YouTube
     </h2>
-    <form action="/get-comments" method="POST" class="form-container mt-4">
+    <form id="commentForm" action="/get-comments" method="POST" class="form-container mt-4">
       <div class="mb-4">
-        <input type="url" name="youtubeUrl" class="form-control form-control-lg form-control-custom" placeholder="Contoh: https://www.youtube.com/watch?v=dQw4w9WgXcQ" required>
+        <input type="url" name="youtubeUrl" class="form-control form-control-lg form-control-custom"
+          placeholder="Contoh: https://www.youtube.com/watch?v=dQw4w9WgXcQ" required>
       </div>
       <div class="form-check mb-4 text-start d-flex align-items-center">
         <input class="form-check-input form-check-input-custom me-2" type="checkbox" name="useAiJudol" value="1" id="useAiJudol" checked>
@@ -155,11 +233,39 @@
         </label>
       </div>
       <div class="d-grid">
-         <button type="submit" class="btn submit-btn">
+        <button type="submit" class="btn submit-btn">
           <i class="bi bi-search me-2"></i> Dapatkan Komentar
         </button>
       </div>
     </form>
   </div>
 </div>
+
+<!-- ✅ LOADING OVERLAY -->
+<div id="loadingOverlay">
+  <div class="neon-loader">
+    <i class="bi bi-chat-dots-fill neon-icon mb-3"></i>
+    <span class="loader-text">Mengambil Komentar...</span>
+    <div class="neon-dots mt-2">
+      <div class="dot"></div>
+      <div class="dot"></div>
+      <div class="dot"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ✅ SCRIPT -->
+<script>
+  const form = document.getElementById('commentForm');
+  const overlay = document.getElementById('loadingOverlay');
+
+  form.addEventListener('submit', function () {
+    overlay.style.display = 'flex';
+  });
+
+  window.addEventListener('pageshow', function () {
+    overlay.style.display = 'none';
+  });
+</script>
+
 <%- include('../partials/footer') %>
