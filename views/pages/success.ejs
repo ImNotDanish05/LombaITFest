@@ -1,31 +1,107 @@
 <!DOCTYPE html>
-<html>
+<html lang="id">
 <head>
+  <meta charset="UTF-8" />
   <title>Berhasil 🎉</title>
   <style>
-    body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; }
-    .success { color: green; font-size: 1.5em; margin-bottom: 20px; }
-    .info { margin: 10px 0; }
-    a { display: inline-block; margin-top: 20px; color: blue; text-decoration: none; }
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460, #2e5e8e);
+      background-size: 400% 400%;
+      animation: animated-gradient 15s ease infinite;
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      color: white;
+    }
+
+    @keyframes animated-gradient {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .main-content {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+
+    .glass-card {
+      width: 100%;
+      max-width: 600px;
+      padding: 2rem 2.5rem;
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(12px);
+      border-radius: 25px;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      box-shadow: 0 8px 32px rgba(0, 201, 167, 0.4), 0 0 20px rgba(58, 134, 255, 0.3);
+      text-align: center;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .glass-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 16px 40px rgba(58, 134, 255, 0.5), 0 0 30px rgba(0, 201, 167, 0.4);
+    }
+
+    .success {
+      font-size: 1.8em;
+      color: #7CFC00;
+      margin-bottom: 20px;
+      font-weight: 600;
+    }
+
+    .info {
+      margin: 10px 0;
+      font-size: 1rem;
+    }
+
+    a {
+      display: inline-block;
+      margin-top: 25px;
+      text-decoration: none;
+      color: #7f5af0;
+      font-weight: 500;
+      border-bottom: 1px dotted #7f5af0;
+      transition: all 0.3s ease;
+    }
+
+    a:hover {
+      color: #e94560;
+      border-bottom: 1px solid #e94560;
+    }
   </style>
 </head>
 <body>
-  <div class="success">✅ <%= message %></div>
+  <!-- Include headerlogin di dalam body -->
 
-  <div class="info">
-    <strong>Total komentar diproses:</strong> <%= selectedIds %>
+  <div class="main-content">
+    <div class="glass-card">
+      <div class="success">✅ <%= message %></div>
+
+      <div class="info">
+        <strong>Total komentar diproses:</strong> <%= selectedIds %>
+      </div>
+
+      <% if (isOwner) { %>
+        <div class="info">
+          Mode: <%= permanentDelete ? 'Hapus Permanen (Tidak bisa di-undo)' : 'Sembunyikan (Bisa di-undo)' %>
+        </div>
+      <% } else { %>
+        <div class="info">
+          Kamu bukan pemilik video, komentar hanya dilaporkan sebagai spam.
+        </div>
+      <% } %>
+
+      <a href="/dashboard">⬅️ Kembali ke Dashboard</a>
+    </div>
   </div>
 
-  <% if (isOwner) { %>
-    <div class="info">
-      Mode: <%= permanentDelete ? 'Hapus Permanen (Tidak bisa di-undo)' : 'Sembunyikan (Bisa di-undo)' %>
-    </div>
-  <% } else { %>
-    <div class="info">
-      Kamu bukan pemilik video, komentar hanya dilaporkan sebagai spam.
-    </div>
-  <% } %>
-
-  <a href="/dashboard">⬅️ Kembali ke Dashboard</a>
+  <!-- Footer tetap di bawah -->
 </body>
 </html>

@@ -20,17 +20,34 @@
       100% { background-position: 0% 50%; }
     }
 
+    .container-flex {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      box-sizing: border-box;
+    }
+
     .glass-card {
+      width: 100%;
+      max-width: 700px;
       background: rgba(255, 255, 255, 0.08);
       backdrop-filter: blur(12px);
       border-radius: 25px;
       border: 1px solid rgba(255, 255, 255, 0.15);
-      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-      padding: 30px;
-      margin-top: 30px;
-      width: 100%;
-      max-width: 720px;
+      box-shadow: 0 8px 32px rgba(0, 201, 167, 0.4), 0 0 20px rgba(58, 134, 255, 0.3);
+      color: white;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      padding: 2rem 2.5rem;
+      box-sizing: border-box;
     }
+
+    .glass-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 16px 40px rgba(58, 134, 255, 0.5), 0 0 30px rgba(0, 201, 167, 0.4);
+    }
+
 
     .warning {
       color: #ffcc00;
@@ -46,21 +63,42 @@
     }
 
     .btn-custom-action {
-      background: linear-gradient(45deg, #7f5af0, #e94560);
-      border: none;
-      border-radius: 12px;
-      color: white;
-      font-weight: 500;
-      padding: 12px 25px;
-      transition: all 0.3s ease;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-      cursor: pointer;
-    }
+      background: linear-gradient(
+      120deg,
+      #FF1E1E,
+      #9F0000,
+      rgba(0, 0, 0, 0.2),
+      #9F0000,
+      #FF1E1E
+    );
+    background-size: 300% 100%;
+    animation: animate-bg 5s ease infinite;
+    border: none;
+    border-radius: 12px;
+    color: white;
+    font-weight: 500;
+    padding: 12px 25px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
 
-    .btn-custom-action:hover {
-      transform: scale(1.05);
-      box-shadow: 0 6px 20px rgba(233, 69, 96, 0.4);
-    }
+@keyframes animate-bg {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+
+  .btn-custom-action:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 20px rgba(255, 0, 0, 0.5);
+  }
 
     ul {
       list-style: none;
