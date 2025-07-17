@@ -43,6 +43,29 @@ router.get('/login', async (req, res) => {
 });
 
 // ======================
+// Logout
+// ======================
+router.get('/logout', async (req, res) => {
+  try {
+    const session_id = req.cookies.session_id;
+    if (session_id) {
+      await Sessions.findOneAndDelete({ session_id }); // hapus sesi di DB
+    }
+
+    // Hapus cookie di browser
+    res.clearCookie('session_id');
+    res.clearCookie('session_secret');
+
+    // Redirect ke halaman login
+    res.redirect('/login');
+  } catch (err) {
+    console.error('Error saat logout:', err);
+    res.status(500).send('Terjadi kesalahan saat logout.');
+  }
+});
+
+
+// ======================
 // OAuth Callback
 // ======================
 router.get('/auth/callback', async (req, res) => {
@@ -114,6 +137,20 @@ router.get('/auth/callback', async (req, res) => {
     res.status(500).send('Terjadi kesalahan saat otentikasi.');
   }
 });
+
+// ======================
+// Profile Page
+// ======================
+router.get('/profile', authSession, async (req, res) => {
+  try {
+    const user = req.user; // dari middleware authSession
+    res.render('pages/profile', { user });
+  } catch (err) {
+    console.error('Error saat membuka halaman profile:', err);
+    res.status(500).send('Gagal memuat halaman profile.');
+  }
+});
+
 
 // ======================
 // Delete Account

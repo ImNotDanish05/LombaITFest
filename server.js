@@ -42,6 +42,9 @@ app.use('/', require('./routes/dashboard'));
 app.use('/', require('./routes/youtubeComments'));
 app.use('/', require('./routes/judol'));
 app.use('/', require('./routes/home'));
+app.use('/', require('./routes/success'));
+app.use('/', require('./routes/auth'));
+
 
 // Handle 404 (Route not found)
 app.use(async (req, res) => {

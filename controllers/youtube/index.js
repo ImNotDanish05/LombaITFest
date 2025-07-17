@@ -3,6 +3,7 @@ const path = require('path');
 const { google } = require('googleapis');
 const LoadData = require('../../utils/LoadData');
 const { getJudolComment } = require('../comment_get_judol');
+const isProductionHttps = require('../../utils/isProductionHttps');
 
 const TOKEN_PATH = path.join(__dirname, 'user_token.json');
 const BLOCKED_WORDS_PATH = path.join(__dirname, 'blockedword.json');
@@ -17,7 +18,7 @@ const SCOPES = [
 const YTdata = LoadData.loadYoutubeCredentials();
 const client_id = YTdata.client_id;
 const client_secret = YTdata.client_secret;
-const redirect_uri = YTdata.redirect_uris[0] || process.env.REDIRECT_URI;
+const redirect_uri = isProductionHttps() ? YTdata.redirect_uris[1] : YTdata.redirect_uris[0];
 
 if (!client_id || !client_secret || !redirect_uri) {
   console.error('Pastikan GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, dan REDIRECT_URI sudah diatur di .env');

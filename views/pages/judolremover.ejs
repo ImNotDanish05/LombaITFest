@@ -227,7 +227,7 @@
           placeholder="Contoh: https://www.youtube.com/watch?v=dQw4w9WgXcQ" required>
       </div>
       <div class="form-check mb-4 text-start d-flex align-items-center">
-        <input class="form-check-input form-check-input-custom me-2" type="checkbox" name="useAiJudol" value="1" id="useAiJudol" checked>
+        <input class="form-check-input form-check-input-custom me-2" type="checkbox" name="useAiJudol" value="1" id="useAiJudol" <%= isProductionHttps == 1 ? 'checked' : '' %>>
         <label class="form-check-label checkbox-label" for="useAiJudol">
           Gunakan AI untuk mendeteksi spam
         </label>
