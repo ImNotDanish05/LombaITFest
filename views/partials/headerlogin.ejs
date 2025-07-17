@@ -86,7 +86,7 @@
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                         <img src="<%= user.picture || '/images/default-avatar.png' %>" alt="User" class="rounded-circle me-2 user-avatar">
-                        <span class="user-name"><%= user.name || 'Guest' %></span>
+                        <span class="user-name"><%= user?.username || user?.name || 'guest' %> </span>
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end user-dropdown" aria-labelledby="userDropdown">
                         <li><h6 class="dropdown-header">
