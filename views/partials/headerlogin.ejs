@@ -112,7 +112,7 @@
                             <i class="bi bi-question-circle me-2"></i>Help & Support
                         </a></li>
                         <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item text-danger" href="/logout">
+                        <li><a class="dropdown-item text-danger" href="/logout" id="logoutBtn">
                             <i class="bi bi-box-arrow-right me-2"></i>Logout
                         </a></li>
                     </ul>
@@ -578,6 +578,14 @@ document.addEventListener('keydown', function(e) {
         toggleSidebar();
     }
 });
+
+// Logout confirmation
+document.getElementById('logoutBtn').addEventListener('click', function (e) {
+    const confirmLogout = confirm("⚠️ Apakah kamu yakin ingin keluar?");
+    if (!confirmLogout) {
+      e.preventDefault(); // Batal logout
+    }
+  });
 
 // Delete account confirmation
 document.getElementById('deleteAccountLink').addEventListener('click', function (e) {

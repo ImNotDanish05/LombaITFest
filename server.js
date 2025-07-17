@@ -43,6 +43,16 @@ app.use('/', require('./routes/youtubeComments'));
 app.use('/', require('./routes/judol'));
 app.use('/', require('./routes/home'));
 app.use('/', require('./routes/success'));
+app.use('/', require('./routes/auth'));
+
+//profile route
+app.get('/profile', authSession, (req, res) => {
+  res.render('pages/profile', {
+    title: 'Profil Pengguna',
+    user: req.user
+  });
+});
+
 
 // Handle 404 (Route not found)
 app.use(async (req, res) => {
