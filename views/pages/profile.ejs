@@ -57,7 +57,7 @@
 
     .glass-card p {
       margin: 12px 0;
-      font-size: 1.3rem;
+      font-size: clamp(1rem, 2.5vw, 1.3rem);
     }
 
     .glass-card img {
@@ -68,6 +68,28 @@
       width: 130px;
       height: 130px;
       object-fit: cover;
+    }
+
+    .info-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      margin: 12px 0;
+      font-size: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .label {
+      font-weight: bold;
+      color: #90ee90;
+      min-width: 80px;
+    }
+
+    .value {
+      color: white;
+      flex: 1;
+      word-break: break-word;
+      text-align: right;
     }
   </style>
 </head>
@@ -80,8 +102,14 @@
   <div class="main-content">
     <div class="glass-card">
       <h2>Profil Pengguna</h2>
-      <p><strong>Nama:</strong> <%= user.username %></p>
-      <p><strong>Email:</strong> <%= user.email %></p>
+        <div class="info-row">
+          <span class="label">Nama:</span>
+          <span class="value"><%= user.username %></span>
+        </div>
+        <div class="info-row">
+          <span class="label">Email:</span>
+          <span class="value"><%= user.email %></span>
+        </div>
       <img src="<%= user.picture %>" alt="Foto Profil" />
     </div>
   </div>
