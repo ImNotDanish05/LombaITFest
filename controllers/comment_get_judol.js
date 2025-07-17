@@ -3,10 +3,20 @@ const fs = require('fs');
 const path = require('path');
 const express = require('express');
 const dotenv = require('dotenv');
-const axios = require('axios');
+// const axios = require('axios'); // Hapus ini jika tidak digunakan lagi untuk API lain
 dotenv.config();
 
-const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
+// --- Tambahkan ini untuk Gemini API ---
+const { GoogleGenerativeAI } = require('@google/generative-ai');
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+
+// Inisialisasi model Gemini Pro
+// Pastikan GEMINI_API_KEY tersedia di file .env Anda
+const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
+const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+// ------------------------------------
+
+//const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY; // Tetap ada jika Anda masih menggunakannya untuk hal lain
 
 // === Manual Check ===
 
@@ -49,8 +59,6 @@ function getJudolComment(text) {
 
         if (!isAllCaps && !isAllLower && !isCapitalized && capitalCount !== 1) return true;
 
-        // if (/[^a-zA-Z0-9\s.,!?'"()<>:@#\-:😅😹]/.test(word)) return true;
-
         // Cara lebih aman untuk deteksi karakter aneh
         if (/[\u0000-\u001F\u007F-\u009F]/.test(word)) {
             return true; // ada karakter kontrol → spam
@@ -66,144 +74,57 @@ function getJudolComment(text) {
     return false;
 }
 
-// Punya Syauqi
-// function getJudolComment(text) {
-//     if (!text) return false;
 
-//     const normalizedText = text.normalize("NFKD");
-//     const hasCombiningChar = /[\u0300-\u036F]/.test(text);
-//     if (text !== normalizedText || hasCombiningChar) return true;
-
-//     const blockedWordsPath = path.join(__dirname, '../config/blockedword.json');
-//     const blockedWords = JSON.parse(fs.readFileSync(blockedWordsPath));
-//     const lowerText = text.toLowerCase();
-//     if (blockedWords.some(word => lowerText.includes(word.toLowerCase()))) return true;
-
-//     const words = text.split(/\s+/);
-//     for (const word of words) {
-//         if (!word) continue;
-
-//         const capitalCount = [...word].filter(c => c >= 'A' && c <= 'Z').length;
-//         if (capitalCount > 1 && capitalCount <= 3) return true;
-
-//         const isAllCaps = word === word.toUpperCase();
-//         const isAllLower = word === word.toLowerCase();
-//         const isCapitalized = /^[A-Z][a-z]+$/.test(word);
-
-//         if (!isAllCaps && !isAllLower && !isCapitalized) return true;
-
-//         if (/[^a-zA-Z0-9\s.,!?'"()<>:@#\-]/.test(word)) return true;
-//     }
-
-//     return false;
-// }
-
-// function getJudolComment(text) {
-//     if (!text) return false;
-
-//     // Normalisasi text
-//     const words = text.split(/\s+/);
-//     const normalizedText = text.normalize("NFKD");
-//     const hasCombiningChar = /[\u0300-\u036F]/.test(text);
-//     if (text !== normalizedText || hasCombiningChar){
-//         return true;
-//     } 
-
-//     const cleanText = text.replace(/<[^>]+>/g, ' ');
-//     const isYouTubeLink = /youtube\.com|youtu\.be/i.test(cleanText);
-//     if (isYouTubeLink) {
-//         console.log("Bypass YouTube link:", text);
-//         return false; // Anggap aman
-//     }
-
-//     const timestampRegex = /^\d{1,2}:\d{2}(:\d{2})?$/;
-    
-
-//     // Cek setiap kata
-//     for (const word of words) {
-//         if (!word) continue;
-
-//         if (timestampRegex.test(word)) continue; // bypass timestamp
-
-//         // Hitung jumlah huruf kapital per kata
-//         const capitalCount = [...word].filter(c => c >= 'A' && c <= 'Z').length;
-//         if (capitalCount > 1) return true;  // ✅ kalau ada >1 kapital → spam
-
-//         // Cek pola normal
-//         const isAllCaps = word === word.toUpperCase();
-//         const isAllLower = word === word.toLowerCase();
-//         const isCapitalized = /^[A-Z][a-z]+$/.test(word);
-
-//         // Kalau bentuknya aneh (campur aduk) → spam
-//         if (!isAllCaps && !isAllLower && !isCapitalized && capitalCount !== 1) return true;
-
-//         // Deteksi karakter aneh (tidak whitelist emoji)
-//         // if (/[^a-zA-Z0-9\s.,!?'"()<>:@#\-]/.test(word)) return true;
-//         if (/[^a-zA-Z0-9\s.,!?'"()<>:@#\-:😅😹]/.test(word)) {
-//             return true;
-//         }
-//     }
-//     // Cek blocked words
-//     const blockedWordsPath = path.join(__dirname, '../config/blockedword.json');
-//     const blockedWords = JSON.parse(fs.readFileSync(blockedWordsPath));
-//     const lowerText = text.toLowerCase();
-//     if (blockedWords.some(word => lowerText.includes(word.toLowerCase()))) return true;
-
-//     return false;
-// }
-
-
-// === AI Check ===
+// === AI Check (Menggunakan Gemini) ===
 async function getJudolCommentAi(comments) {
     if (!comments || comments.length === 0) return [];
 
     const prompt = comments.map((text, i) => `${i + 1}. ${text}`).join('\n');
 
+    // Prompt yang disesuaikan untuk Gemini
     const systemPrompt = `
-Kamu adalah filter pendeteksi komentar spam di YouTube. Tugasmu adalah menandai komentar yang mengandung promosi terselubung, judi, slot, pinjaman, atau sejenisnya.
+Anda adalah filter pendeteksi komentar spam di YouTube. Tugas Anda adalah menandai komentar yang mengandung promosi terselubung, judi online (termasuk slot, kasino, poker, dll.), pinjaman ilegal, penipuan, atau sejenisnya. Anda harus sangat ketat dalam deteksi.
 
-Berikan jawaban dalam format array JSON yang hanya berisi 1 atau 0, sesuai urutan komentar:
-Contoh: [0, 1, 0]
+Berikan jawaban hanya dalam format array JSON yang berisi angka 1 (jika komentar adalah spam) atau 0 (jika bukan spam), sesuai urutan komentar yang diberikan.
+Contoh format output: [0, 1, 0, 1, 0]
+
+Daftar komentar untuk dianalisis:
 `;
 
     try {
-        const response = await axios.post(
-            "https://openrouter.ai/api/v1/chat/completions",
-            {
-                model: "mistralai/mistral-small-3.2-24b-instruct",
-                messages: [
-                    { role: "system", content: systemPrompt.trim() },
-                    { role: "user", content: prompt }
-                ],
-                temperature: 0.2,
-            },
-            {
-                headers: {
-                    "Authorization": `Bearer ${OPENROUTER_API_KEY}`,
-                    "Content-Type": "application/json"
-                }
-            }
-        );
+        const result = await model.generateContent([
+            { text: systemPrompt.trim() + '\n' + prompt }
+        ]);
+        const response = await result.response;
+        const text = response.text(); // Ambil teks respons dari Gemini
 
-        const raw = response.data.choices[0].message.content.trim();
-        const cleaned = raw.replace(/```json|```/g, '').trim();
+        // Hapus backticks atau format lain yang mungkin ditambahkan oleh model
+        const cleaned = text.replace(/```json|```/g, '').trim();
 
         try {
             const parsed = JSON.parse(cleaned);
-            console.log("✅ AI berhasil parse JSON:", parsed);
-            return parsed;
+            // Validasi sederhana: pastikan hasilnya array angka 0 atau 1
+            if (Array.isArray(parsed) && parsed.every(item => item === 0 || item === 1)) {
+                console.log("✅ AI berhasil parse JSON:", parsed);
+                return parsed;
+            } else {
+                console.error("❌ Respons JSON dari AI tidak valid atau formatnya salah:\n", cleaned);
+                return comments.map(() => 0); // fallback: dianggap aman semua
+            }
         } catch (jsonErr) {
-            console.error("❌ Gagal parse JSON dari AI:\n", cleaned);
+            console.error("❌ Gagal parse JSON dari AI:\n", cleaned, "Error:", jsonErr.message);
             return comments.map(() => 0); // fallback: dianggap aman semua
         }
 
     } catch (error) {
-        console.error("❌ Error AI:", error.message);
-        return comments.map(() => 0);
+        console.error("❌ Error memanggil Gemini API:", error.message);
+        // Terkadang error bisa jadi objek, pastikan untuk log lebih detail
+        if (error.response && error.response.data) {
+            console.error("Detail Error:", error.response.data);
+        }
+        return comments.map(() => 0); // fallback: dianggap aman semua
     }
 }
-
-
 
 
 // Eksekusi contoh hanya jika file ini dijalankan langsung
@@ -241,12 +162,18 @@ if (require.main === module) {
             return;
         }
 
-        console.log(`\n🧠 Mengecek ${notDetectedManually.length} komentar lewat AI...\n`);
+        console.log(`\n🧠 Mengecek ${notDetectedManually.length} komentar lewat AI (Gemini)...`);
         const hasilAi = await getJudolCommentAi(notDetectedManually);
 
+        if (hasilAi.length !== notDetectedManually.length) {
+            console.warn("⚠️ Perhatian: Jumlah respons AI tidak sesuai dengan jumlah komentar yang dikirim.");
+            // Mungkin perlu penanganan error lebih lanjut di sini, atau coba lagi
+        }
+
         hasilAi.forEach((hasil, i) => {
+            const comment = notDetectedManually[i];
             const status = hasil ? 1 : 0;
-            console.log(`🔍 AI check for: "${notDetectedManually[i]}" → ${status}`);
+            console.log(`🔍 AI (Gemini) check for: "${comment}" → ${status}`);
         });
     })();
 }
