@@ -97,7 +97,7 @@ Daftar komentar untuk dianalisis:
         ]);
         const response = await result.response;
         const text = response.text(); // Ambil teks respons dari Gemini
-
+        console.log("AI Response:", text);
         // Hapus backticks atau format lain yang mungkin ditambahkan oleh model
         const cleaned = text.replace(/```json|```/g, '').trim();
 
