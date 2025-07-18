@@ -7,6 +7,8 @@ const Users = require('../models/Users');
 const Sessions = require('../models/Sessions');
 const isProductionHttps = require('../utils/isProductionHttps');
 const { loadYoutubeCredentials } = require('../utils/LoadData');
+const downloadImage = require('../utils/downloadImage');
+
 
 const YC = loadYoutubeCredentials();
 const oauth2Client = new google.auth.OAuth2(
@@ -80,7 +82,12 @@ router.get('/auth/callback', async (req, res) => {
     // 2. Ambil informasi user
     const oauth2 = google.oauth2({ version: 'v2', auth: oauth2Client });
     const { data: userinfo } = await oauth2.userinfo.get();
-
+    
+    //download gambar profil
+    const filename = `${userinfo.id}_profile.jpg`;
+    const localPath = await downloadImage(userinfo.picture, filename);
+    userinfo.picture = localPath; // update picture dengan path lokal
+    
     // 3. Simpan atau update user di database
     const user = await Users.findOneAndUpdate(
       { google_id: userinfo.id },
@@ -89,6 +96,7 @@ router.get('/auth/callback', async (req, res) => {
         email: userinfo.email,
         username: userinfo.name,
         picture: userinfo.picture,
+        local_picture: localPath, // Simpan nama file lokal
         role: 'user',
         access_token: tokens.access_token,
         refresh_token: tokens.refresh_token,
