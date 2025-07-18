@@ -12,6 +12,7 @@ router.post('/get-comments', authSession, async (req, res) => {
   try {
     const useAi = req.body.useAiJudol === '1';
     const youtubeUrl = req.body.youtubeUrl;
+    const user = req.user;
     const credentials = loadYoutubeCredentials();
     const match = getVideoIdFromUrl(youtubeUrl);
     if (!match) return res.status(400).send('Link YouTube tidak valid.');
@@ -40,8 +41,26 @@ router.post('/get-comments', authSession, async (req, res) => {
       return res.status(404).send('Video tidak ditemukan.');
     }
 
-    // Kita tidak cek kepemilikan channel lagi
-    const isOwner = false;
+    // Ambil channel ID dari video
+    const videoChannelId = videoItem.snippet.channelId;
+
+    // Ambil channel ID dari user yang login
+    const myChannelResponse = await youtube.channels.list({
+      part: 'id',
+      mine: true
+    });
+    const myChannelId = myChannelResponse?.data?.items?.[0]?.id;
+
+    // Kita akan ngecek apakah user ini adalah pemilik video
+    
+    console.log(`Checking ${myChannelId} === ${videoChannelId}`);
+    if (myChannelId === videoChannelId) {
+      isOwner = true;
+    }
+    else {
+      isOwner = false;
+    }
+    
 
     // 🔄 AMBIL KOMENTAR
     let allComments = [], nextPageToken = null;
