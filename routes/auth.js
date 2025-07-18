@@ -7,6 +7,8 @@ const Users = require('../models/Users');
 const Sessions = require('../models/Sessions');
 const isProductionHttps = require('../utils/isProductionHttps');
 const { loadYoutubeCredentials } = require('../utils/LoadData');
+const downloadImage = require('../utils/downloadImage');
+
 
 const YC = loadYoutubeCredentials();
 const oauth2Client = new google.auth.OAuth2(
@@ -43,6 +45,29 @@ router.get('/login', async (req, res) => {
 });
 
 // ======================
+// Logout
+// ======================
+router.get('/logout', async (req, res) => {
+  try {
+    const session_id = req.cookies.session_id;
+    if (session_id) {
+      await Sessions.findOneAndDelete({ session_id }); // hapus sesi di DB
+    }
+
+    // Hapus cookie di browser
+    res.clearCookie('session_id');
+    res.clearCookie('session_secret');
+
+    // Redirect ke halaman login
+    res.redirect('/login');
+  } catch (err) {
+    console.error('Error saat logout:', err);
+    res.status(500).send('Terjadi kesalahan saat logout.');
+  }
+});
+
+
+// ======================
 // OAuth Callback
 // ======================
 router.get('/auth/callback', async (req, res) => {
@@ -57,7 +82,12 @@ router.get('/auth/callback', async (req, res) => {
     // 2. Ambil informasi user
     const oauth2 = google.oauth2({ version: 'v2', auth: oauth2Client });
     const { data: userinfo } = await oauth2.userinfo.get();
-
+    
+    //download gambar profil
+    const filename = `${userinfo.id}_profile.jpg`;
+    const localPath = await downloadImage(userinfo.picture, filename);
+    userinfo.picture = localPath; // update picture dengan path lokal
+    
     // 3. Simpan atau update user di database
     const user = await Users.findOneAndUpdate(
       { google_id: userinfo.id },
@@ -66,6 +96,7 @@ router.get('/auth/callback', async (req, res) => {
         email: userinfo.email,
         username: userinfo.name,
         picture: userinfo.picture,
+        local_picture: localPath, // Simpan nama file lokal
         role: 'user',
         access_token: tokens.access_token,
         refresh_token: tokens.refresh_token,
@@ -114,6 +145,20 @@ router.get('/auth/callback', async (req, res) => {
     res.status(500).send('Terjadi kesalahan saat otentikasi.');
   }
 });
+
+// ======================
+// Profile Page
+// ======================
+router.get('/profile', authSession, async (req, res) => {
+  try {
+    const user = req.user; // dari middleware authSession
+    res.render('pages/profile', { user });
+  } catch (err) {
+    console.error('Error saat membuka halaman profile:', err);
+    res.status(500).send('Gagal memuat halaman profile.');
+  }
+});
+
 
 // ======================
 // Delete Account

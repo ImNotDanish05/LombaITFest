@@ -31,4 +31,14 @@ router.get('/Credits', (req, res) => {
     }
 });
 
+//FAQ
+router.get('/penjelasannamadanlogo', (req, res) => {
+    try {
+        res.render('pages/penjelasannamadanlogo'); 
+    } catch (error) {
+        console.error('Error rendering Credits:', error);
+        res.status(500).send('Something went wrong!');
+    }
+});
+
 module.exports = router;
