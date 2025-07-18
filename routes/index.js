@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const { checkSession, authSession } = require('../controllers/authSession');
 
 // Terms and Conditions
 router.get('/TermsAndConditions', async (req, res) => {
@@ -32,9 +33,14 @@ router.get('/Credits', (req, res) => {
 });
 
 // Penjelasan Nama dan Logo
-router.get('/penjelasannamadanlogo', (req, res) => {
+router.get('/penjelasannamadanlogo', async (req, res) => {
     try {
-        res.render('pages/penjelasannamadanlogo'); 
+        const user = await checkSession(req);
+        res.render('pages/penjelasannamadanlogo'
+        , {
+            user: user || null // Pastikan user tidak undefined
+        }
+        ); 
     } catch (error) {
         console.error('Error rendering Credits:', error);
         res.status(500).send('Something went wrong!');
