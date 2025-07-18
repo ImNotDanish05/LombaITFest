@@ -31,12 +31,32 @@ router.get('/Credits', (req, res) => {
     }
 });
 
-//FAQ
+// Penjelasan Nama dan Logo
 router.get('/penjelasannamadanlogo', (req, res) => {
     try {
         res.render('pages/penjelasannamadanlogo'); 
     } catch (error) {
         console.error('Error rendering Credits:', error);
+        res.status(500).send('Something went wrong!');
+    }
+});
+
+// faq
+router.get('/faq', (req, res) => {
+    try {
+        res.render('pages/faq'); 
+    } catch (error) {
+        console.error('Error rendering Credits:', error);
+        res.status(500).send('Something went wrong!');
+    }
+});
+
+// Tutorial
+router.get('/tutorial', (req, res) => {
+    try {
+        res.render('pages/tutorial'); 
+    } catch (error) {
+        console.error('Error rendering tutorial:', error);
         res.status(500).send('Something went wrong!');
     }
 });
