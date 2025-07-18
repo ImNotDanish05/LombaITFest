@@ -10,13 +10,14 @@ dotenv.config();
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 
-// Inisialisasi model Gemini Pro
+// Inisialisasi model Gemini 1.5 Flash
 // Pastikan GEMINI_API_KEY tersedia di file .env Anda
 const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
+// BARIS INI YANG BERUBAH:
 const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 // ------------------------------------
 
-//const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY; // Tetap ada jika Anda masih menggunakannya untuk hal lain
+const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY; // Tetap ada jika Anda masih menggunakannya untuk hal lain
 
 // === Manual Check ===
 
@@ -97,7 +98,7 @@ Daftar komentar untuk dianalisis:
         ]);
         const response = await result.response;
         const text = response.text(); // Ambil teks respons dari Gemini
-        console.log("AI Response:", text);
+
         // Hapus backticks atau format lain yang mungkin ditambahkan oleh model
         const cleaned = text.replace(/```json|```/g, '').trim();
 
@@ -162,7 +163,7 @@ if (require.main === module) {
             return;
         }
 
-        console.log(`\n🧠 Mengecek ${notDetectedManually.length} komentar lewat AI (Gemini)...`);
+        console.log(`\n🧠 Mengecek ${notDetectedManually.length} komentar lewat AI (Gemini 1.5 Flash)...`);
         const hasilAi = await getJudolCommentAi(notDetectedManually);
 
         if (hasilAi.length !== notDetectedManually.length) {
@@ -173,7 +174,7 @@ if (require.main === module) {
         hasilAi.forEach((hasil, i) => {
             const comment = notDetectedManually[i];
             const status = hasil ? 1 : 0;
-            console.log(`🔍 AI (Gemini) check for: "${comment}" → ${status}`);
+            console.log(`🔍 AI (Gemini 1.5 Flash) check for: "${comment}" → ${status}`);
         });
     })();
 }
