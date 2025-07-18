@@ -1,182 +1,167 @@
-const LoadData = require('../utils/LoadData');
 const fs = require('fs');
 const path = require('path');
-const express = require('express');
-const dotenv = require('dotenv');
-// const axios = require('axios'); // Hapus ini jika tidak digunakan lagi untuk API lain
-dotenv.config();
+require('dotenv').config();
 
-// --- Tambahkan ini untuk Gemini API ---
+if (typeof fetch === 'undefined') {
+  global.fetch = (...args) => import('node-fetch').then(({ default: fetch }) => fetch(...args));
+}
+
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+if (!GEMINI_API_KEY) console.error('❌ GEMINI_API_KEY tidak ditemukan di .env');
 
-// Inisialisasi model Gemini 1.5 Flash
-// Pastikan GEMINI_API_KEY tersedia di file .env Anda
 const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
-// BARIS INI YANG BERUBAH:
-const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-// ------------------------------------
+const MODEL_NAME = 'gemini-2.5-flash';
 
-const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY; // Tetap ada jika Anda masih menggunakannya untuk hal lain
+// Load blocked words (manual filter)
+const blockedWordsPath = path.join(__dirname, '../config/blockedword.json');
+let blockedWords = [];
+try { blockedWords = JSON.parse(fs.readFileSync(blockedWordsPath, 'utf8')); }
+catch (e) { console.error('⚠ blockedword.json:', e.message); blockedWords = []; }
 
-// === Manual Check ===
-
+/* ========================================================== */
+/* =============== Manual Detection Function =============== */
+/* ========================================================== */
 function getJudolComment(text) {
-    if (!text) return false;
+  if (!text) return false;
+  const normalizedText = text.normalize('NFKD');
+  if (text !== normalizedText || /[\u0300-\u036F]/.test(text)) return true;
 
-    // Normalisasi text
-    const normalizedText = text.normalize("NFKD");
-    const hasCombiningChar = /[\u0300-\u036F]/.test(text);
-    if (text !== normalizedText || hasCombiningChar) {
-        return true;
-    }
+  const cleanText = text.replace(/<[^>]+>/g, ' ');
+  if (/youtube\.com|youtu\.be/i.test(cleanText)) return false;
 
-    // Hapus tag HTML
-    const cleanText = text.replace(/<[^>]+>/g, ' ');
-    // Split kata dari cleanText, bukan text asli
-    const words = cleanText.split(/\s+/);
+  const words = cleanText.split(/\s+/);
+  const timestampRegex = /^\d{1,2}:\d{2}(:\d{2})?$/;
+  for (const w of words) {
+    if (!w) continue;
+    if (timestampRegex.test(w)) continue;
+    const caps = [...w].filter(c => c >= 'A' && c <= 'Z').length;
+    if (caps > 1) return true;
+    const allCaps = w === w.toUpperCase();
+    const allLower = w === w.toLowerCase();
+    const capWord = /^[A-Z][a-z]+$/.test(w);
+    if (!allCaps && !allLower && !capWord && caps !== 1) return true;
+    if (/[\u0000-\u001F\u007F-\u009F]/.test(w)) return true;
+  }
 
-    // Deteksi link YouTube (di cleanText)
-    const isYouTubeLink = /youtube\.com|youtu\.be/i.test(cleanText);
-    if (isYouTubeLink) {
-        console.log("Bypass YouTube link:", text);
-        return false;
-    }
+  const lower = cleanText.toLowerCase();
+  if (blockedWords.some(bw => lower.includes(String(bw).toLowerCase()))) return true;
 
-    const timestampRegex = /^\d{1,2}:\d{2}(:\d{2})?$/;
-
-    // Cek setiap kata
-    for (const word of words) {
-        if (!word) continue;
-
-        if (timestampRegex.test(word)) continue; // bypass timestamp
-
-        const capitalCount = [...word].filter(c => c >= 'A' && c <= 'Z').length;
-        if (capitalCount > 1) return true;
-
-        const isAllCaps = word === word.toUpperCase();
-        const isAllLower = word === word.toLowerCase();
-        const isCapitalized = /^[A-Z][a-z]+$/.test(word);
-
-        if (!isAllCaps && !isAllLower && !isCapitalized && capitalCount !== 1) return true;
-
-        // Cara lebih aman untuk deteksi karakter aneh
-        if (/[\u0000-\u001F\u007F-\u009F]/.test(word)) {
-            return true; // ada karakter kontrol → spam
-        }
-    }
-
-    // Cek blocked words
-    const blockedWordsPath = path.join(__dirname, '../config/blockedword.json');
-    const blockedWords = JSON.parse(fs.readFileSync(blockedWordsPath));
-    const lowerText = cleanText.toLowerCase();
-    if (blockedWords.some(word => lowerText.includes(word.toLowerCase()))) return true;
-
-    return false;
+  return false;
 }
 
-
-// === AI Check (Menggunakan Gemini) ===
+/* ========================================================== */
+/* ================== AI Detection (Gemini) ================= */
+/* ========================================================== */
 async function getJudolCommentAi(comments) {
-    if (!comments || comments.length === 0) return [];
+  if (!Array.isArray(comments) || comments.length === 0) return [];
+  if (!GEMINI_API_KEY) {
+    console.error('❌ GEMINI_API_KEY tidak tersedia. Fallback semua 0.');
+    return comments.map(() => 0);
+  }
 
-    const prompt = comments.map((text, i) => `${i + 1}. ${text}`).join('\n');
+  const BATCH_SIZE = 100;
+  const out = [];
+  for (let i = 0; i < comments.length; i += BATCH_SIZE) {
+    const batch = comments.slice(i, i + BATCH_SIZE);
+    const labels = await classifyBatchRecursive(batch, 20000);
+    out.push(...labels);
+  }
 
-    // Prompt yang disesuaikan untuk Gemini
-    const systemPrompt = `
-Anda adalah filter pendeteksi komentar spam di YouTube. Tugas Anda adalah menandai komentar yang mengandung promosi terselubung, judi online (termasuk slot, kasino, poker, dll.), pinjaman ilegal, penipuan, atau sejenisnya. Anda harus sangat ketat dalam deteksi.
-
-Berikan jawaban hanya dalam format array JSON yang berisi angka 1 (jika komentar adalah spam) atau 0 (jika bukan spam), sesuai urutan komentar yang diberikan.
-Contoh format output: [0, 1, 0, 1, 0]
-
-Daftar komentar untuk dianalisis:
-`;
-
-    try {
-        const result = await model.generateContent([
-            { text: systemPrompt.trim() + '\n' + prompt }
-        ]);
-        const response = await result.response;
-        const text = response.text(); // Ambil teks respons dari Gemini
-
-        // Hapus backticks atau format lain yang mungkin ditambahkan oleh model
-        const cleaned = text.replace(/```json|```/g, '').trim();
-
-        try {
-            const parsed = JSON.parse(cleaned);
-            // Validasi sederhana: pastikan hasilnya array angka 0 atau 1
-            if (Array.isArray(parsed) && parsed.every(item => item === 0 || item === 1)) {
-                console.log("✅ AI berhasil parse JSON:", parsed);
-                return parsed;
-            } else {
-                console.error("❌ Respons JSON dari AI tidak valid atau formatnya salah:\n", cleaned);
-                return comments.map(() => 0); // fallback: dianggap aman semua
-            }
-        } catch (jsonErr) {
-            console.error("❌ Gagal parse JSON dari AI:\n", cleaned, "Error:", jsonErr.message);
-            return comments.map(() => 0); // fallback: dianggap aman semua
-        }
-
-    } catch (error) {
-        console.error("❌ Error memanggil Gemini API:", error.message);
-        // Terkadang error bisa jadi objek, pastikan untuk log lebih detail
-        if (error.response && error.response.data) {
-            console.error("Detail Error:", error.response.data);
-        }
-        return comments.map(() => 0); // fallback: dianggap aman semua
-    }
+  while (out.length < comments.length) out.push(0);
+  if (out.length > comments.length) out.length = comments.length;
+  return out;
 }
 
+async function classifyBatchRecursive(batchComments, timeoutMs) {
+  if (batchComments.length === 1) {
+    const single = await classifySingle(batchComments[0], timeoutMs / 2);
+    return [single];
+  }
+  try {
+    const labels = await classifyBatchOnce(batchComments, timeoutMs);
+    return labels;
+  } catch (err) {
+    console.warn(`⚠ Batch gagal (${batchComments.length}): ${err.message}. Split...`);
+    const mid = Math.floor(batchComments.length / 2);
+    const left = await classifyBatchRecursive(batchComments.slice(0, mid), timeoutMs);
+    const right = await classifyBatchRecursive(batchComments.slice(mid), timeoutMs);
+    return [...left, ...right];
+  }
+}
 
-// Eksekusi contoh hanya jika file ini dijalankan langsung
-if (require.main === module) {
-    const comments = [
-        "Keren banget videonya!",
-        "A̷P̷N̷S̷L̷O̷T̷ GACOR BANGET!",
-        "Main slot di situs xxx gacor",
-        "Suka banget sama kontennya",
-        "Mantap WD tiap malam bro",
-        "Aku main judi online untung cuyyy, ke web judol.com",
-        "Gimana cara menang judi slot?",
-        "Aku suka main judi, ada yang mau join?",
-        "Video kamu keren banget, pengen belajar bareng deh :D",
-        "Aku baru menang judi online, seneng banget!",
-        "Add roblox gw dong kak",
-        "Minecraft add aku dong di essentials"
-    ];
+async function classifyBatchOnce(batchComments, timeoutMs) {
+  const prompt = buildBatchPrompt(batchComments);
+  const raw = await callGeminiWithTimeout(prompt, timeoutMs);
+  let labels = parseAiLabels(raw, batchComments.length);
 
-    (async () => {
-        const notDetectedManually = [];
+  if (labels.length !== batchComments.length) {
+    console.warn(`⚠ Panjang hasil AI tidak sesuai (${labels.length} vs ${batchComments.length}). Pad/potong.`);
+    while (labels.length < batchComments.length) labels.push(0);
+    if (labels.length > batchComments.length) labels.length = batchComments.length;
+  }
+  return labels;
+}
 
-        for (const comment of comments) {
-            const isSpamManual = getJudolComment(comment);
-            const status = isSpamManual ? 1 : 0;
-            console.log(`🧪 Manual check for: "${comment}" → ${status}`);
+async function classifySingle(commentText, timeoutMs = 8000) {
+  const prompt = buildSinglePrompt(commentText);
+  try {
+    const raw = await callGeminiWithTimeout(prompt, timeoutMs);
+    const m = raw.match(/[01]/);
+    return m ? Number(m[0]) : 0;
+  } catch {
+    return 0;
+  }
+}
 
-            if (!isSpamManual) {
-                notDetectedManually.push(comment);
-            }
-        }
+function buildBatchPrompt(batch) {
+  return `
+Anda adalah filter pendeteksi komentar SPAM judi online/pinjaman ilegal.
+0 = bukan spam
+1 = spam
+Jawab hanya array JSON: [0,1,0,...] dengan ${batch.length} elemen.
 
-        if (notDetectedManually.length === 0) {
-            console.log("✅ Semua komentar berhasil terdeteksi manual sebagai spam.");
-            return;
-        }
+Komentar:
+${batch.map((c, i) => `${i + 1}. ${sanitizeComment(c, 150)}`).join('\n')}
+`.trim();
+}
 
-        console.log(`\n🧠 Mengecek ${notDetectedManually.length} komentar lewat AI (Gemini 1.5 Flash)...`);
-        const hasilAi = await getJudolCommentAi(notDetectedManually);
+function buildSinglePrompt(comment) {
+  return `Balas 1 jika SPAM judi/pinjaman ilegal, selain itu 0. Komentar: ${sanitizeComment(comment, 150)}`;
+}
 
-        if (hasilAi.length !== notDetectedManually.length) {
-            console.warn("⚠️ Perhatian: Jumlah respons AI tidak sesuai dengan jumlah komentar yang dikirim.");
-            // Mungkin perlu penanganan error lebih lanjut di sini, atau coba lagi
-        }
+async function callGeminiWithTimeout(prompt, timeoutMs) {
+  const model = genAI.getGenerativeModel({ model: MODEL_NAME });
+  const sdkPromise = (async () => {
+    const result = await model.generateContent({
+      contents: [{ role: 'user', parts: [{ text: prompt }] }],
+    });
+    return result.response.text();
+  })();
+  const timeoutPromise = new Promise((_, reject) =>
+    setTimeout(() => reject(new Error(`Gemini timeout >${timeoutMs}ms`)), timeoutMs)
+  );
+  return Promise.race([sdkPromise, timeoutPromise]);
+}
 
-        hasilAi.forEach((hasil, i) => {
-            const comment = notDetectedManually[i];
-            const status = hasil ? 1 : 0;
-            console.log(`🔍 AI (Gemini 1.5 Flash) check for: "${comment}" → ${status}`);
-        });
-    })();
+function parseAiLabels(raw, expectedLen) {
+  if (!raw) return [];
+  const arrMatch = raw.match(/\[[^\]]*\]/);
+  if (arrMatch) {
+    try {
+      const arr = JSON.parse(arrMatch[0]);
+      return arr.map(v => (Number(v) === 1 ? 1 : 0));
+    } catch {}
+  }
+  const salvage = raw.match(/[01]/g);
+  if (salvage) {
+    return salvage.slice(0, expectedLen).map(n => (n === '1' ? 1 : 0));
+  }
+  return [];
+}
+
+function sanitizeComment(text, maxLen = 200) {
+  return String(text || '').replace(/\s+/g, ' ').slice(0, maxLen);
 }
 
 module.exports = { getJudolComment, getJudolCommentAi };
