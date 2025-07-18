@@ -13,6 +13,5 @@
     "googleapis": "^150.0.1",
     "mongoose": "^8.16.1",
     "uuid": "^11.1.0"
-  },
-  "type": "module"
+  }
 }
