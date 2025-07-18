@@ -13,7 +13,7 @@ const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 // Inisialisasi model Gemini Pro
 // Pastikan GEMINI_API_KEY tersedia di file .env Anda
 const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
-const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 // ------------------------------------
 
 //const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY; // Tetap ada jika Anda masih menggunakannya untuk hal lain
