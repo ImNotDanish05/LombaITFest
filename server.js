@@ -25,7 +25,6 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
-app.use('/uploads', express.static(path.join(__dirname, 'uploads'))); // ⬅️ Tambahan untuk akses foto
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 app.use(session({
@@ -44,6 +43,7 @@ app.use('/', require('./routes/judol'));
 app.use('/', require('./routes/home'));
 app.use('/', require('./routes/success'));
 app.use('/', require('./routes/auth'));
+app.use('/uploads', express.static(path.join(__dirname, 'public', 'uploads')));
 
 
 // Handle 404 (Route not found)
@@ -65,7 +65,7 @@ app.use(async (req, res) => {
 const startServer = async () => {
   try {
     // ✅ MongoDB Connect
-    await mongoose.connect('mongodb+srv://syauqi:RU5Jch8oORT91cnL@youtubedata.cqgmi5j.mongodb.net/dbKontenJudol');
+    await mongoose.connect('mongodb+srv://public:58YKS9JqPZQZecma@youtubedata.cqgmi5j.mongodb.net/dbKontenJudol');
     console.log('✅ MongoDB Atlas connected');
 
     // ✅ Start Server (HTTPS atau HTTP)

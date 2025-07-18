@@ -5,6 +5,7 @@ const usersSchema = new mongoose.Schema({
     email : {type: String, required: true},
     username : {type: String, required: true},
     picture : {type: String}, // <-- Tambahkan ini!
+    local_picture : {type: String}, // <-- Tambahkan ini!
     role : {type: String, required: true},
     access_token : {type: String, required: true},
     refresh_token : {type: String, required: true},

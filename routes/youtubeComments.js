@@ -39,12 +39,8 @@ if (process.env.NODE_ENV !== 'production') {
 /* ------------------------------------------------------------------ */
 router.post('/get-comments', authSession, async (req, res) => {
   try {
-    /* ---------------- Input ---------------- */
-    const useAi = req.body.useAiJudol === '1' || req.body.useAiJudol === true;
-    const showAll = req.body.showAll === '1' || req.query.showAll === '1'; // optional toggle
-    const youtubeUrl = req.body.youtubeUrl?.trim();
-    if (!youtubeUrl) return res.status(400).send('❌ URL YouTube kosong.');
-
+    const useAi = req.body.useAiJudol === '1';
+    const youtubeUrl = req.body.youtubeUrl;
     const credentials = loadYoutubeCredentials();
 
     /* ---------------- Validasi URL → Video ID ---------------- */
@@ -82,9 +78,8 @@ router.post('/get-comments', authSession, async (req, res) => {
     const videoItem = videoResponse?.data?.items?.[0];
     if (!videoItem) return res.status(404).send('❌ Video tidak ditemukan.');
 
-    /* ---------------- Ambil Komentar (pagination) ---------------- */
-    let allComments = [];
-    let nextPageToken = null;
+    // Kita tidak cek kepemilikan channel lagi
+    const isOwner = false;
 
     do {
       const response = await youtube.commentThreads.list({

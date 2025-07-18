@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const { checkSession, authSession } = require('../controllers/authSession');
 
 // Terms and Conditions
 router.get('/TermsAndConditions', async (req, res) => {
@@ -31,12 +32,37 @@ router.get('/Credits', (req, res) => {
     }
 });
 
-//FAQ
-router.get('/penjelasannamadanlogo', (req, res) => {
+// Penjelasan Nama dan Logo
+router.get('/penjelasannamadanlogo', async (req, res) => {
     try {
-        res.render('pages/penjelasannamadanlogo'); 
+        const user = await checkSession(req);
+        res.render('pages/penjelasannamadanlogo'
+        , {
+            user: user || null // Pastikan user tidak undefined
+        }
+        ); 
     } catch (error) {
         console.error('Error rendering Credits:', error);
+        res.status(500).send('Something went wrong!');
+    }
+});
+
+// faq
+router.get('/faq', (req, res) => {
+    try {
+        res.render('pages/faq'); 
+    } catch (error) {
+        console.error('Error rendering Credits:', error);
+        res.status(500).send('Something went wrong!');
+    }
+});
+
+// Tutorial
+router.get('/tutorial', (req, res) => {
+    try {
+        res.render('pages/tutorial'); 
+    } catch (error) {
+        console.error('Error rendering tutorial:', error);
         res.status(500).send('Something went wrong!');
     }
 });
