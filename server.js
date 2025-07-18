@@ -1,7 +1,7 @@
 
 const http = require('http');
 const https = require('https');
-require('dotenv').config({ path: './.env' });
+//require('dotenv').config({ path: './.env' });
 
 const express = require('express');
 const cors = require('cors');
@@ -65,7 +65,7 @@ app.use(async (req, res) => {
 const startServer = async () => {
   try {
     // ✅ MongoDB Connect
-    await mongoose.connect('mongodb+srv://public:58YKS9JqPZQZecma@youtubedata.cqgmi5j.mongodb.net/dbKontenJudol');
+    await mongoose.connect('mongodb+srv://syauqi:RU5Jch8oORT91cnL@youtubedata.cqgmi5j.mongodb.net/dbKontenJudol');
     console.log('✅ MongoDB Atlas connected');
 
     // ✅ Start Server (HTTPS atau HTTP)
