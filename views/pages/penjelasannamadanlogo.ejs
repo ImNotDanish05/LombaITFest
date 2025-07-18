@@ -75,9 +75,13 @@
     <br><br>
     Baca lebih lanjut mengenai:
     <br>
-    <a href="/terms" class="link-btn">📜 Terms & Conditions</a>
-    <a href="/privacy" class="link-btn ms-2">🔒 Privacy Policy</a>
+    <a href="/TermsAndConditions" class="link-btn">📜 Terms & Conditions</a>
+    <a href="/PrivacyPolicy" class="link-btn ms-2">🔒 Privacy Policy</a>
   </div>
+  <% if (user) {%>
   <a href="/dashboard" class="back-btn">← Kembali ke Dashboard</a>
+  <% } else {%>
+  <a href="/" class="back-btn">← Kembali ke Homepage</a>
+  <% }%>
 </div>
 

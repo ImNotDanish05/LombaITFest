@@ -1,7 +1,7 @@
 
 const http = require('http');
 const https = require('https');
-//require('dotenv').config({ path: './.env' });
+require('dotenv').config({ path: './backend/config/.env' });
 
 const express = require('express');
 const cors = require('cors');
@@ -25,6 +25,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+app.use('/uploads', express.static(path.join(__dirname, 'uploads'))); // ⬅️ Tambahan untuk akses foto
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 app.use(session({
@@ -43,7 +44,6 @@ app.use('/', require('./routes/judol'));
 app.use('/', require('./routes/home'));
 app.use('/', require('./routes/success'));
 app.use('/', require('./routes/auth'));
-app.use('/uploads', express.static(path.join(__dirname, 'public', 'uploads')));
 
 
 // Handle 404 (Route not found)

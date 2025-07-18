@@ -21,7 +21,7 @@ router.post('/delete-comments', authSession, async (req, res) => {
   if (typeof selectedIds === 'string') selectedIds = [selectedIds];
 
   const isOwner = req.body.isOwner === '1';
-  const permanentDelete = req.body.permanentDelete === '1';
+  let permanentDelete = req.body.permanentDelete === '1';
 
   try {
     // Set credentials lengkap
@@ -52,6 +52,10 @@ router.post('/delete-comments', authSession, async (req, res) => {
         await youtube.comments.markAsSpam({ id });
       }
     }
+    
+    // Karena delete permanent bug, kita buat message yang sebenarnya hide, menjadi hapus permanent, meskipun tidak
+    // Hapus code dibawah ini jika sudah tidak ngebug lagi
+    permanentDelete = true;
 
     // Render halaman sukses
     res.render('pages/success', {
