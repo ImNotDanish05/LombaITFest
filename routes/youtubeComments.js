@@ -340,7 +340,7 @@ router.post('/youtube/moderate-comments', authSession, async (req, res) => {
 
 /* ------------------------------------------------------------------ */
 /* OPTIONAL DEBUG: GET /youtube/debug-comment/:id                     */
-/* Aktifkan dengan DEBUG_JUDOL_LOG=1                                   */
+/* Aktifkan dengan DEBUG_JUDOL_LOG=1                                  */
 /* ------------------------------------------------------------------ */
 if (process.env.DEBUG_JUDOL_LOG === '1') {
   router.get('/youtube/debug-comment/:id', authSession, async (req, res) => {
