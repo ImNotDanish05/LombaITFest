@@ -2,7 +2,7 @@
  * routes/youtubeComments.js
  * ------------------------------------------------------------
  * Ambil komentar YouTube & filter spam (Manual-only / AI-only).
- * Tentukan apakah user adalah pemilik video → tentukan izin hapus / moderasi.
+ * Tentukan apakah user adalah pemilik video → izin hapus / moderasi.
  */
 
 const express = require('express');
@@ -41,7 +41,6 @@ router.post('/get-comments', authSession, async (req, res) => {
     const youtubeUrl = req.body.youtubeUrl?.trim();
     if (!youtubeUrl) return res.status(400).send('❌ URL YouTube kosong.');
 
-    /* --- Validasi videoId --- */
     const videoId = getVideoIdFromUrl(youtubeUrl);
     if (!videoId) return res.status(400).send('❌ Link YouTube tidak valid.');
 
@@ -56,31 +55,40 @@ router.post('/get-comments', authSession, async (req, res) => {
       access_token: req.user.access_token,
       refresh_token: req.user.refresh_token,
     });
-    try { await oauth2Client.getAccessToken(); }
-    catch (refreshError) {
-      console.warn('⚠ Refresh token...', refreshError?.message);
-      const tokens = await oauth2Client.refreshAccessToken();
-      oauth2Client.setCredentials(tokens.credentials);
+
+    try {
+      await oauth2Client.getAccessToken();
+    } catch (refreshError) {
+      console.warn('⚠ Refresh token (get-comments) gagal:', refreshError?.message);
+      if (oauth2Client.credentials.refresh_token) {
+        const tokens = await oauth2Client.refreshAccessToken();
+        oauth2Client.setCredentials(tokens.credentials);
+      }
     }
+
+    if (process.env.DEBUG_JUDOL_LOG === '1') {
+      console.log('[get-comments] token scopes:', oauth2Client.credentials.scope);
+    }
+
     const youtube = google.youtube({ version: 'v3', auth: oauth2Client });
 
-    /* --- Ambil channel milik user login (cached di session) --- */
+    /* --- Channel user (cache) --- */
     let userChannelId = req.session?.userChannelId;
     if (!userChannelId) {
       const chanResp = await youtube.channels.list({ part: 'id', mine: true });
       userChannelId = chanResp?.data?.items?.[0]?.id || null;
-      if (req.session) req.session.userChannelId = userChannelId; // cache
-      console.log('[youtubeComments] userChannelId:', userChannelId);
+      if (req.session) req.session.userChannelId = userChannelId;
+      console.log('[get-comments] userChannelId:', userChannelId);
     }
 
-    /* --- Ambil info video --- */
+    /* --- Info video --- */
     const videoResp = await youtube.videos.list({ part: 'snippet', id: videoId });
     const videoItem = videoResp?.data?.items?.[0];
     if (!videoItem) return res.status(404).send('❌ Video tidak ditemukan.');
     const videoChannelId = videoItem.snippet.channelId;
 
     const isOwner = userChannelId && videoChannelId && userChannelId === videoChannelId;
-    console.log(`[youtubeComments] isOwner? ${isOwner} (user: ${userChannelId} vs video: ${videoChannelId})`);
+    console.log(`[get-comments] isOwner? ${isOwner} (user: ${userChannelId} vs video: ${videoChannelId})`);
 
     /* --- Ambil komentar (pagination) --- */
     let allComments = [];
@@ -92,20 +100,22 @@ router.post('/get-comments', authSession, async (req, res) => {
         maxResults: 100,
         pageToken: nextPageToken || '',
       });
+
       const items = response?.data?.items;
       if (!items || !items.length) break;
 
       const commentsBatch = items.map((item) => ({
         text: item.snippet.topLevelComment.snippet.textDisplay,
-        commentId: item.snippet.topLevelComment.id,
+        commentId: item.snippet.topLevelComment.id, // ID komentar (bukan thread id)
         author: item.snippet.topLevelComment.snippet.authorDisplayName,
         publishedAt: item.snippet.topLevelComment.snippet.publishedAt,
       }));
+
       allComments = allComments.concat(commentsBatch);
       nextPageToken = response.data.nextPageToken;
     } while (nextPageToken);
 
-    /* --- Bersihkan teks untuk display --- */
+    /* --- Bersihkan untuk display --- */
     allComments = allComments.map((c) => ({
       ...c,
       text: sanitizeDisplayText(c.text),
@@ -123,23 +133,17 @@ router.post('/get-comments', authSession, async (req, res) => {
       });
     }
 
-    /* ==========================================================
-       MODE FILTER
-    ========================================================== */
+    /* --- Filtering --- */
     let spamLabels;
     if (useAi) {
-      // AI-only: manual diabaikan
       spamLabels = await getJudolCommentAi(allComments.map((c) => c.text));
     } else {
-      // Manual-only
       spamLabels = allComments.map((c) => (getJudolComment(c.text) ? 1 : 0));
     }
 
-    // sinkron panjang (safety)
     while (spamLabels.length < allComments.length) spamLabels.push(0);
     if (spamLabels.length > allComments.length) spamLabels.length = allComments.length;
 
-    /* --- Gabungkan & filter hanya spam --- */
     const commentsWithSpam = allComments.map((c, i) => ({
       ...c,
       isSpam: spamLabels[i] === 1,
@@ -150,10 +154,11 @@ router.post('/get-comments', authSession, async (req, res) => {
     const stats = {
       total: allComments.length,
       spam: spamOnly.length,
-      ratio: allComments.length ? ((spamOnly.length / allComments.length) * 100).toFixed(2) : 0,
+      ratio: allComments.length
+        ? ((spamOnly.length / allComments.length) * 100).toFixed(2)
+        : 0,
     };
 
-    /* --- Render: kirim isOwner untuk UI kontrol hapus/report --- */
     res.render('pages/komentar_spam', {
       user: safeUser(req.user),
       comments: spamOnly,
@@ -161,40 +166,37 @@ router.post('/get-comments', authSession, async (req, res) => {
       videoTitle: videoItem.snippet.title,
       videoId,
       useAi,
-      isOwner, // penting!
+      isOwner,
     });
 
-    /* --- Debug log optional --- */
     debugLog({
       videoId,
       isOwner,
       useAi,
       total: allComments.length,
       spam: spamOnly.length,
-      spamSamples: spamOnly.slice(0, 10).map((c) => ({ id: c.commentId, text: c.text })),
+      commentIdsSample: spamOnly.slice(0, 5).map((c) => c.commentId),
     });
-
   } catch (err) {
-    console.error('YouTube API error:', err);
+    console.error('YouTube API error (get-comments):', err);
     res.status(500).send('❌ Gagal mengambil komentar.');
   }
 });
 
 /* ------------------------------------------------------------------ */
 /* POST /youtube/moderate-comments                                    */
-/* Pemilik video: hapus / reject / markSpam langsung lewat YouTube API*/
-/* Bukan pemilik: simpan report lokal                                 */
 /* ------------------------------------------------------------------ */
 router.post('/youtube/moderate-comments', authSession, async (req, res) => {
   try {
     const { action, videoId } = req.body;
     let ids = req.body.ids;
     if (!ids) {
-      return res.status(400).json({ success: false, message: 'Tidak ada komentar yang dipilih.' });
+      return res
+        .status(400)
+        .json({ success: false, message: 'Tidak ada komentar yang dipilih.' });
     }
     if (typeof ids === 'string') ids = [ids];
 
-    /* --- OAuth --- */
     const credentials = loadYoutubeCredentials();
     const oauth2Client = new google.auth.OAuth2(
       credentials.client_id,
@@ -205,59 +207,130 @@ router.post('/youtube/moderate-comments', authSession, async (req, res) => {
       access_token: req.user.access_token,
       refresh_token: req.user.refresh_token,
     });
+
+    try {
+      await oauth2Client.getAccessToken();
+    } catch (refreshError) {
+      console.warn('⚠ Refresh token (moderate) gagal:', refreshError?.message);
+      if (oauth2Client.credentials.refresh_token) {
+        const tokens = await oauth2Client.refreshAccessToken();
+        oauth2Client.setCredentials(tokens.credentials);
+      }
+    }
+
+    if (process.env.DEBUG_JUDOL_LOG === '1') {
+      console.log('[moderate] token scopes:', oauth2Client.credentials.scope);
+    }
+
     const youtube = google.youtube({ version: 'v3', auth: oauth2Client });
 
-    /* --- Dapatkan channel user & channel video --- */
+    // Ownership check ulang
     const userChannelId = await getUserChannelId(youtube, req);
     const videoChannelId = await getVideoChannelId(youtube, videoId);
-    const isOwner = userChannelId && videoChannelId && userChannelId === videoChannelId;
+    const isOwner =
+      userChannelId && videoChannelId && userChannelId === videoChannelId;
 
     if (!isOwner) {
-      // Simpan laporan (non-owner)
+      // Hanya boleh REPORT
+      if (action !== 'report') {
+        return res
+          .status(403)
+          .json({ success: false, message: 'Bukan pemilik video.' });
+      }
       saveReportsLocal(req.user, videoId, ids);
       return res.json({
         success: true,
         message: 'Komentar dilaporkan. Pemilik channel dapat menindaklanjuti.',
         reported: ids.length,
+        action: 'report',
       });
     }
 
-    /* --- Pemilik: aksi moderasi --- */
-const results = await Promise.allSettled(
-  ids.map(async (id) => {
-    console.log('Menghapus comment ID:', id); // ✅ Log ID komentar
+    const allowedOwnerActions = new Set(['delete', 'reject', 'spam']);
+    if (!allowedOwnerActions.has(action)) {
+      return res
+        .status(400)
+        .json({ success: false, message: 'Action tidak valid.' });
+    }
+
+    // (Opsional) verifikasi ID sebelum eksekusi (aktifkan dengan VERIFY_DELETE_ID=1)
+    if (process.env.VERIFY_DELETE_ID === '1') {
+      console.log('[moderate] Verifikasi ID komentar (sample max 10)...');
+      const sample = ids.slice(0, 10);
+      try {
+        const verifyResp = await youtube.comments.list({
+          part: 'snippet',
+          id: sample.join(','),
+          maxResults: sample.length,
+        });
+        const returned = (verifyResp.data.items || []).map((i) => i.id);
+        console.log('[moderate] verify returned:', returned);
+      } catch (verErr) {
+        console.warn('Verifikasi ID gagal:', verErr.message);
+      }
+    }
+
+    let failedCount = 0;
+    const failures = [];
 
     if (action === 'delete') {
-      return youtube.comments.delete({ id });
+      for (const id of ids) {
+        try {
+          await youtube.comments.delete({ id });
+          console.log(`🗑️ Deleted comment: ${id}`);
+        } catch (err) {
+          failedCount++;
+          const r = extractYouTubeReason(err);
+            console.error(`❌ Delete gagal (${id}):`, r || err.message);
+          failures.push({ id, reason: r || err.message });
+        }
+      }
     } else if (action === 'reject') {
-      return youtube.comments.setModerationStatus({
-        id,
-        moderationStatus: 'rejected',
-      });
-    } else {
-      return youtube.comments.markAsSpam({ id });
+      for (const id of ids) {
+        try {
+          await youtube.comments.setModerationStatus({
+            id,
+            moderationStatus: 'rejected',
+          });
+          console.log(`🚫 Rejected comment: ${id}`);
+        } catch (err) {
+          failedCount++;
+          const r = extractYouTubeReason(err);
+          console.error(`❌ Reject gagal (${id}):`, r || err.message);
+          failures.push({ id, reason: r || err.message });
+        }
+      }
+    } else if (action === 'spam') {
+      for (const id of ids) {
+        try {
+          await youtube.comments.markAsSpam({ id });
+          console.log(`⚑ Marked as spam: ${id}`);
+        } catch (err) {
+          failedCount++;
+          const r = extractYouTubeReason(err);
+          console.error(`❌ Mark spam gagal (${id}):`, r || err.message);
+          failures.push({ id, reason: r || err.message });
+        }
+      }
     }
-  })
-);
 
-// Cek jika ada yang gagal
-const failed = results.filter(r => r.status === 'rejected');
-if (failed.length) {
-  console.error('❌ Gagal hapus komentar:', failed);
-}
-
-return res.json({
-  success: failed.length === 0,
-  message: failed.length === 0
-    ? 'Komentar berhasil dimoderasi.'
-    : 'Beberapa komentar gagal dihapus.',
-  count: ids.length,
-  action: action || 'spam',
-});
-
+    const success = failedCount === 0;
+    return res.json({
+      success,
+      message: success
+        ? `Komentar berhasil dimoderasi.`
+        : `Beberapa komentar gagal diproses.`,
+      action,
+      totalRequested: ids.length,
+      totalSuccess: ids.length - failedCount,
+      totalFailed: failedCount,
+      failures,
+    });
   } catch (err) {
-    console.error('Gagal moderasi komentar:', err);
-    return res.status(500).json({ success: false, message: 'Gagal memproses komentar.' });
+    console.error('Gagal moderasi komentar (fatal):', err);
+    return res
+      .status(500)
+      .json({ success: false, message: 'Gagal memproses komentar.' });
   }
 });
 
@@ -268,7 +341,11 @@ module.exports = router;
 /* ================================================================== */
 
 function safeUser(u = {}) {
-  return { name: u.username || u.name || 'User', email: u.email || '', picture: u.picture || '' };
+  return {
+    name: u.username || u.name || 'User',
+    email: u.email || '',
+    picture: u.picture || '',
+  };
 }
 
 function sanitizeDisplayText(htmlText) {
@@ -278,7 +355,6 @@ function sanitizeDisplayText(htmlText) {
   return decoded.replace(/\s+/g, ' ').trim();
 }
 
-/* Cache channel ID user di session */
 async function getUserChannelId(youtube, req) {
   if (req.session?.userChannelId) return req.session.userChannelId;
   const resp = await youtube.channels.list({ part: 'id', mine: true });
@@ -287,7 +363,6 @@ async function getUserChannelId(youtube, req) {
   return id;
 }
 
-/* Ambil channel ID pemilik video */
 async function getVideoChannelId(youtube, videoId) {
   if (!videoId) return null;
   const resp = await youtube.videos.list({ part: 'snippet', id: videoId });
@@ -295,7 +370,6 @@ async function getVideoChannelId(youtube, videoId) {
   return item?.snippet?.channelId || null;
 }
 
-/* Simpan laporan user (non-owner) ke file log */
 function saveReportsLocal(user, videoId, commentIds) {
   try {
     const dir = path.join(__dirname, '../logs');
@@ -304,7 +378,11 @@ function saveReportsLocal(user, videoId, commentIds) {
 
     let existing = [];
     if (fs.existsSync(file)) {
-      try { existing = JSON.parse(fs.readFileSync(file, 'utf8')); } catch { existing = []; }
+      try {
+        existing = JSON.parse(fs.readFileSync(file, 'utf8'));
+      } catch {
+        existing = [];
+      }
     }
 
     existing.push({
@@ -320,7 +398,6 @@ function saveReportsLocal(user, videoId, commentIds) {
   }
 }
 
-/* Debug log optional */
 function debugLog(data) {
   if (process.env.DEBUG_JUDOL_LOG !== '1') return;
   try {
@@ -333,4 +410,20 @@ function debugLog(data) {
   } catch (e) {
     console.warn('Gagal simpan debug log:', e.message);
   }
+}
+
+function extractYouTubeReason(err) {
+  try {
+    if (err && err.errors && err.errors[0] && err.errors[0].reason) {
+      return err.errors[0].reason;
+    }
+    if (err && err.response && err.response.data && err.response.data.error) {
+      const errData = err.response.data.error;
+      if (Array.isArray(errData.errors) && errData.errors[0]?.reason) {
+        return errData.errors[0].reason;
+      }
+      return errData.message;
+    }
+  } catch (_) {}
+  return null;
 }
