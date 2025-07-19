@@ -43,6 +43,7 @@ app.use('/', require('./routes/judol'));
 app.use('/', require('./routes/home'));
 app.use('/', require('./routes/success'));
 app.use('/', require('./routes/auth'));
+app.use('/', require('./routes/youtubeComments'));
 app.use('/uploads', express.static(path.join(__dirname, 'public', 'uploads')));
 
 

@@ -2,7 +2,7 @@
  * routes/youtubeComments.js
  * ------------------------------------------------------------
  * Ambil komentar YouTube & filter spam (Manual-only / AI-only).
- * Tentukan apakah user adalah pemilik video → tentukan izin hapus.
+ * Tentukan apakah user adalah pemilik video → tentukan izin hapus / moderasi.
  */
 
 const express = require('express');
@@ -127,7 +127,6 @@ router.post('/get-comments', authSession, async (req, res) => {
        MODE FILTER
     ========================================================== */
     let spamLabels;
-
     if (useAi) {
       // AI-only: manual diabaikan
       spamLabels = await getJudolCommentAi(allComments.map((c) => c.text));
@@ -136,7 +135,7 @@ router.post('/get-comments', authSession, async (req, res) => {
       spamLabels = allComments.map((c) => (getJudolComment(c.text) ? 1 : 0));
     }
 
-    // sinkron panjang
+    // sinkron panjang (safety)
     while (spamLabels.length < allComments.length) spamLabels.push(0);
     if (spamLabels.length > allComments.length) spamLabels.length = allComments.length;
 
@@ -186,14 +185,16 @@ router.post('/get-comments', authSession, async (req, res) => {
 /* Pemilik video: hapus / reject / markSpam langsung lewat YouTube API*/
 /* Bukan pemilik: simpan report lokal                                 */
 /* ------------------------------------------------------------------ */
-router.post('/moderate-comments', authSession, async (req, res) => {
+router.post('/youtube/moderate-comments', authSession, async (req, res) => {
   try {
     const { action, videoId } = req.body;
     let ids = req.body.ids;
-    if (!ids) return res.status(400).json({ success: false, message: 'Tidak ada komentar yang dipilih.' });
+    if (!ids) {
+      return res.status(400).json({ success: false, message: 'Tidak ada komentar yang dipilih.' });
+    }
     if (typeof ids === 'string') ids = [ids];
 
-    /* --- Re-hydrate OAuth --- */
+    /* --- OAuth --- */
     const credentials = loadYoutubeCredentials();
     const oauth2Client = new google.auth.OAuth2(
       credentials.client_id,
@@ -206,13 +207,13 @@ router.post('/moderate-comments', authSession, async (req, res) => {
     });
     const youtube = google.youtube({ version: 'v3', auth: oauth2Client });
 
-    /* --- Dapatkan channel user & pemilik video --- */
+    /* --- Dapatkan channel user & channel video --- */
     const userChannelId = await getUserChannelId(youtube, req);
     const videoChannelId = await getVideoChannelId(youtube, videoId);
     const isOwner = userChannelId && videoChannelId && userChannelId === videoChannelId;
 
     if (!isOwner) {
-      // Tidak punya hak → treat sebagai report
+      // Simpan laporan (non-owner)
       saveReportsLocal(req.user, videoId, ids);
       return res.json({
         success: true,
@@ -221,8 +222,7 @@ router.post('/moderate-comments', authSession, async (req, res) => {
       });
     }
 
-    /* --- Pemilik: aksi moderasi --- */
-    // action: 'delete' (permanen) | 'reject' (moderation reject) | 'spam' (markAsSpam)
+    // Pemilik: eksekusi moderasi
     const promises = [];
     for (const id of ids) {
       if (action === 'delete') {
@@ -235,7 +235,7 @@ router.post('/moderate-comments', authSession, async (req, res) => {
           })
         );
       } else {
-        // default markAsSpam
+        // default: mark as spam
         promises.push(youtube.comments.markAsSpam({ id }));
       }
     }
@@ -287,7 +287,7 @@ async function getVideoChannelId(youtube, videoId) {
   return item?.snippet?.channelId || null;
 }
 
-/* Simpan laporan user (non-owner) ke file log lokal */
+/* Simpan laporan user (non-owner) ke file log */
 function saveReportsLocal(user, videoId, commentIds) {
   try {
     const dir = path.join(__dirname, '../logs');
@@ -296,11 +296,7 @@ function saveReportsLocal(user, videoId, commentIds) {
 
     let existing = [];
     if (fs.existsSync(file)) {
-      try {
-        existing = JSON.parse(fs.readFileSync(file, 'utf8'));
-      } catch {
-        existing = [];
-      }
+      try { existing = JSON.parse(fs.readFileSync(file, 'utf8')); } catch { existing = []; }
     }
 
     existing.push({
