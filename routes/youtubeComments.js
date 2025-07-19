@@ -197,6 +197,8 @@ router.post('/youtube/moderate-comments', authSession, async (req, res) => {
         .json({ success: false, message: 'Tidak ada komentar yang dipilih.' });
     }
     if (typeof ids === 'string') ids = [ids];
+    console.log("[moderate] Action=%s totalIds=%d firstIds=%s", action, ids.length, ids.join(","));
+
 
     const credentials = loadYoutubeCredentials();
     const oauth2Client = new google.auth.OAuth2(
@@ -363,6 +365,33 @@ if (process.env.DEBUG_JUDOL_LOG === '1') {
     }
   });
 }
+
+router.get('/youtube/check-comment/:id', authSession, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const credentials = loadYoutubeCredentials();
+    const oauth2Client = new google.auth.OAuth2(
+      credentials.client_id,
+      credentials.client_secret,
+      isProductionHttps() ? credentials.redirect_uris[1] : credentials.redirect_uris[0]
+    );
+    oauth2Client.setCredentials({
+      access_token: req.user.access_token,
+      refresh_token: req.user.refresh_token,
+    });
+    const youtube = google.youtube({ version: 'v3', auth: oauth2Client });
+
+    // Panggil YouTube API untuk cek comment ID
+    const resp = await youtube.comments.list({
+      part: 'snippet',
+      id,
+    });
+    res.json(resp.data);
+  } catch (err) {
+    console.error('Error check-comment:', err);
+    res.status(500).json({ error: err.message, details: err.errors });
+  }
+});
 
 module.exports = router;
 
