@@ -3,6 +3,7 @@
  * ------------------------------------------------------------
  * Ambil komentar YouTube & filter spam (Manual-only / AI-only).
  * Tentukan apakah user adalah pemilik video → izin hapus / moderasi.
+ * Versi: debug delete enhanced.
  */
 
 const express = require('express');
@@ -106,7 +107,7 @@ router.post('/get-comments', authSession, async (req, res) => {
 
       const commentsBatch = items.map((item) => ({
         text: item.snippet.topLevelComment.snippet.textDisplay,
-        commentId: item.snippet.topLevelComment.id, // ID komentar (bukan thread id)
+        commentId: item.snippet.topLevelComment.id, // penting: ID komentar
         author: item.snippet.topLevelComment.snippet.authorDisplayName,
         publishedAt: item.snippet.topLevelComment.snippet.publishedAt,
       }));
@@ -224,14 +225,13 @@ router.post('/youtube/moderate-comments', authSession, async (req, res) => {
 
     const youtube = google.youtube({ version: 'v3', auth: oauth2Client });
 
-    // Ownership check ulang
+    // Ownership check
     const userChannelId = await getUserChannelId(youtube, req);
     const videoChannelId = await getVideoChannelId(youtube, videoId);
     const isOwner =
       userChannelId && videoChannelId && userChannelId === videoChannelId;
 
     if (!isOwner) {
-      // Hanya boleh REPORT
       if (action !== 'report') {
         return res
           .status(403)
@@ -253,14 +253,14 @@ router.post('/youtube/moderate-comments', authSession, async (req, res) => {
         .json({ success: false, message: 'Action tidak valid.' });
     }
 
-    // (Opsional) verifikasi ID sebelum eksekusi (aktifkan dengan VERIFY_DELETE_ID=1)
-    if (process.env.VERIFY_DELETE_ID === '1') {
-      console.log('[moderate] Verifikasi ID komentar (sample max 10)...');
+    // Optional verify
+    if (process.env.VERIFY_DELETE_ID === '1' && action === 'delete') {
+      console.log('[moderate] Verifikasi sample ID komentar...');
       const sample = ids.slice(0, 10);
       try {
         const verifyResp = await youtube.comments.list({
           part: 'snippet',
-          id: sample.join(','),
+            id: sample.join(','),
           maxResults: sample.length,
         });
         const returned = (verifyResp.data.items || []).map((i) => i.id);
@@ -269,6 +269,8 @@ router.post('/youtube/moderate-comments', authSession, async (req, res) => {
         console.warn('Verifikasi ID gagal:', verErr.message);
       }
     }
+
+    console.log(`[moderate] Action=${action} totalIds=${ids.length} firstIds=${ids.slice(0,5).join(',')}`);
 
     let failedCount = 0;
     const failures = [];
@@ -280,9 +282,9 @@ router.post('/youtube/moderate-comments', authSession, async (req, res) => {
           console.log(`🗑️ Deleted comment: ${id}`);
         } catch (err) {
           failedCount++;
-          const r = extractYouTubeReason(err);
-            console.error(`❌ Delete gagal (${id}):`, r || err.message);
-          failures.push({ id, reason: r || err.message });
+          const info = describeGapiError(err);
+          console.error(`❌ Delete gagal (${id}):`, info.short);
+          failures.push({ id, ...info });
         }
       }
     } else if (action === 'reject') {
@@ -295,9 +297,9 @@ router.post('/youtube/moderate-comments', authSession, async (req, res) => {
           console.log(`🚫 Rejected comment: ${id}`);
         } catch (err) {
           failedCount++;
-          const r = extractYouTubeReason(err);
-          console.error(`❌ Reject gagal (${id}):`, r || err.message);
-          failures.push({ id, reason: r || err.message });
+          const info = describeGapiError(err);
+          console.error(`❌ Reject gagal (${id}):`, info.short);
+          failures.push({ id, ...info });
         }
       }
     } else if (action === 'spam') {
@@ -307,9 +309,9 @@ router.post('/youtube/moderate-comments', authSession, async (req, res) => {
           console.log(`⚑ Marked as spam: ${id}`);
         } catch (err) {
           failedCount++;
-          const r = extractYouTubeReason(err);
-          console.error(`❌ Mark spam gagal (${id}):`, r || err.message);
-          failures.push({ id, reason: r || err.message });
+          const info = describeGapiError(err);
+          console.error(`❌ Mark spam gagal (${id}):`, info.short);
+          failures.push({ id, ...info });
         }
       }
     }
@@ -333,6 +335,34 @@ router.post('/youtube/moderate-comments', authSession, async (req, res) => {
       .json({ success: false, message: 'Gagal memproses komentar.' });
   }
 });
+
+/* ------------------------------------------------------------------ */
+/* OPTIONAL DEBUG: GET /youtube/debug-comment/:id                     */
+/* Aktifkan dengan DEBUG_JUDOL_LOG=1                                   */
+/* ------------------------------------------------------------------ */
+if (process.env.DEBUG_JUDOL_LOG === '1') {
+  router.get('/youtube/debug-comment/:id', authSession, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const videoId = req.query.videoId;
+      const credentials = loadYoutubeCredentials();
+      const oauth2Client = new google.auth.OAuth2(
+        credentials.client_id,
+        credentials.client_secret,
+        isProductionHttps() ? credentials.redirect_uris[1] : credentials.redirect_uris[0]
+      );
+      oauth2Client.setCredentials({
+        access_token: req.user.access_token,
+        refresh_token: req.user.refresh_token,
+      });
+      const youtube = google.youtube({ version: 'v3', auth: oauth2Client });
+      const resp = await youtube.comments.list({ part: 'snippet', id });
+      res.json({ id, items: resp.data.items || [], videoId });
+    } catch (e) {
+      res.status(500).json({ error: e.message });
+    }
+  });
+}
 
 module.exports = router;
 
@@ -412,18 +442,42 @@ function debugLog(data) {
   }
 }
 
-function extractYouTubeReason(err) {
-  try {
-    if (err && err.errors && err.errors[0] && err.errors[0].reason) {
-      return err.errors[0].reason;
+/**
+ * Ekstrak detail error YouTube API (Google API) dengan ringkas.
+ */
+function describeGapiError(err) {
+  let reason = null;
+  let message = err?.message || null;
+  let domain = null;
+  let location = null;
+  let status = err?.code || null;
+
+  // Beberapa library meletakkan detail di err.errors
+  if (Array.isArray(err?.errors) && err.errors.length) {
+    const e0 = err.errors[0];
+    reason = e0.reason || reason;
+    message = e0.message || message;
+    domain = e0.domain || domain;
+    location = e0.location || location;
+  }
+
+  // Format respons axios-like (err.response.data.error)
+  if (err?.response?.data?.error) {
+    const g = err.response.data.error;
+    if (Array.isArray(g.errors) && g.errors.length) {
+      const e0 = g.errors[0];
+      reason = reason || e0.reason;
+      domain = domain || e0.domain;
+      message = message || e0.message;
+      location = location || e0.location;
+    } else {
+      message = message || g.message;
     }
-    if (err && err.response && err.response.data && err.response.data.error) {
-      const errData = err.response.data.error;
-      if (Array.isArray(errData.errors) && errData.errors[0]?.reason) {
-        return errData.errors[0].reason;
-      }
-      return errData.message;
-    }
-  } catch (_) {}
-  return null;
+    status = g.code || status;
+  }
+
+  // Keterangan ringkas
+  const short = `[reason=${reason || 'n/a'} status=${status || 'n/a'}] ${message || 'no-message'}`;
+
+  return { reason, message, status, domain, location, short, rawType: err?.name };
 }

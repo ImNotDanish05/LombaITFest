@@ -1,7 +1,6 @@
 
 const http = require('http');
 const https = require('https');
-//require('dotenv').config({ path: './.env' });
 
 const express = require('express');
 const cors = require('cors');
