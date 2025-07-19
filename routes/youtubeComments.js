@@ -222,31 +222,39 @@ router.post('/youtube/moderate-comments', authSession, async (req, res) => {
       });
     }
 
-    // Pemilik: eksekusi moderasi
-    const promises = [];
-    for (const id of ids) {
-      if (action === 'delete') {
-        promises.push(youtube.comments.delete({ id }));
-      } else if (action === 'reject') {
-        promises.push(
-          youtube.comments.setModerationStatus({
-            id,
-            moderationStatus: 'rejected',
-          })
-        );
-      } else {
-        // default: mark as spam
-        promises.push(youtube.comments.markAsSpam({ id }));
-      }
-    }
-    await Promise.allSettled(promises);
+    /* --- Pemilik: aksi moderasi --- */
+const results = await Promise.allSettled(
+  ids.map(async (id) => {
+    console.log('Menghapus comment ID:', id); // ✅ Log ID komentar
 
-    return res.json({
-      success: true,
-      message: 'Komentar berhasil dimoderasi.',
-      count: ids.length,
-      action: action || 'spam',
-    });
+    if (action === 'delete') {
+      return youtube.comments.delete({ id });
+    } else if (action === 'reject') {
+      return youtube.comments.setModerationStatus({
+        id,
+        moderationStatus: 'rejected',
+      });
+    } else {
+      return youtube.comments.markAsSpam({ id });
+    }
+  })
+);
+
+// Cek jika ada yang gagal
+const failed = results.filter(r => r.status === 'rejected');
+if (failed.length) {
+  console.error('❌ Gagal hapus komentar:', failed);
+}
+
+return res.json({
+  success: failed.length === 0,
+  message: failed.length === 0
+    ? 'Komentar berhasil dimoderasi.'
+    : 'Beberapa komentar gagal dihapus.',
+  count: ids.length,
+  action: action || 'spam',
+});
+
   } catch (err) {
     console.error('Gagal moderasi komentar:', err);
     return res.status(500).json({ success: false, message: 'Gagal memproses komentar.' });
