@@ -93,7 +93,7 @@
                             <div class="d-flex align-items-center">
                                 <img src="<%= user.picture || '/images/default-avatar.png' %>" alt="User" class="rounded-circle me-2" style="width: 40px; height: 40px;">
                                 <div>
-                                    <div class="fw-bold"><%= user.name %></div>
+                                    <div class="fw-bold"><%= user?.username || user?.name || 'guest' %></div>
                                     <small class="text-muted"><%= user.email %></small>
                                 </div>
                             </div>
@@ -333,11 +333,11 @@
 }
 
 .user-name {
-    font-weight: 500;
-    margin-left: 0.5rem;
+    color: #fff !important;      /* putih */
+    /* atau pakai abu-abu: color: #e0e0e0 !important; */
 }
 
-/* Notification Badge */
+ /* Notification Badge */
 .notification-badge {
     font-size: 0.6rem;
     width: 18px;
@@ -377,6 +377,15 @@
     padding: 1rem;
     border: none;
 }
+
+.dropdown-header .fw-bold {
+    color: #fff !important; /* putih untuk username */
+}
+
+.dropdown-header small.text-muted {
+    color: #fff !important; /* putih untuk email */
+}
+
 
 .dropdown-item {
     padding: 0.75rem 1rem;
