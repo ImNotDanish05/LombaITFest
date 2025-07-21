@@ -32,6 +32,8 @@ app.use(session({
   saveUninitialized: true
 }));
 
+
+
 // Routes
 app.use('/', require('./routes/youtube'));
 app.use('/', require('./routes/index'));
@@ -44,6 +46,25 @@ app.use('/', require('./routes/success'));
 app.use('/', require('./routes/auth'));
 app.use('/', require('./routes/youtubeComments'));
 app.use('/uploads', express.static(path.join(__dirname, 'public', 'uploads')));
+
+app.use(async (err, req, res, next) => {
+  console.error(err.stack);
+  let user = null;
+  try {
+    user = req.user || await checkSession(req);
+  } catch (e) {
+    // abaikan; user tetap null
+  }
+  res.status(err.status || 500).render('pages/eror', {
+    title: 'Error',
+    user : user,
+    error: {
+      code: err.status || 500,
+      message: err.message || 'Terjadi kesalahan.'
+    },
+    backUrl: err.backUrl || '/'
+  });
+});
 
 
 // Handle 404 (Route not found)

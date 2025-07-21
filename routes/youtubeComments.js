@@ -36,14 +36,26 @@ const isProductionHttps = require('../utils/isProductionHttps');
 /* ------------------------------------------------------------------ */
 /* POST /youtube/get-comments                                         */
 /* ------------------------------------------------------------------ */
-router.post('/get-comments', authSession, async (req, res) => {
+router.post('/get-comments', authSession, async (req, res, next) => {
   try {
     const useAi = req.body.useAiJudol === '1' || req.body.useAiJudol === true;
     const youtubeUrl = req.body.youtubeUrl?.trim();
-    if (!youtubeUrl) return res.status(400).send('❌ URL YouTube kosong.');
+    const user = req.user
+    if (!youtubeUrl) {
+      const err = new Error('❌ URL YouTube kosong.');
+      err.status = 400;
+      err.backUrl = '/judolremover';  // agar tombol kembali ke form input
+      return next(err);
+    }
 
     const videoId = getVideoIdFromUrl(youtubeUrl);
-    if (!videoId) return res.status(400).send('❌ Link YouTube tidak valid.');
+    console.log (videoId, youtubeUrl);
+    if (!videoId) {
+      const err = new Error('❌ link video youtube tidak valid.');
+      err.status = 400;
+      err.backUrl = '/judolremover';  // agar tombol kembali ke form input
+      return next(err);
+    }
 
     /* --- OAuth --- */
     const credentials = loadYoutubeCredentials();
@@ -61,9 +73,19 @@ router.post('/get-comments', authSession, async (req, res) => {
       await oauth2Client.getAccessToken();
     } catch (refreshError) {
       console.warn('⚠ Refresh token (get-comments) gagal:', refreshError?.message);
+
       if (oauth2Client.credentials.refresh_token) {
-        const tokens = await oauth2Client.refreshAccessToken();
-        oauth2Client.setCredentials(tokens.credentials);
+        try {
+          const tokens = await oauth2Client.refreshAccessToken();
+          oauth2Client.setCredentials(tokens.credentials);
+        } catch (refreshFail) {
+          console.error('❌ Refresh token gagal:', refreshFail.message);
+          // Logout user langsung
+          return res.redirect('/logout');
+        }
+      } else {
+        // Tidak ada refresh token → langsung logout
+        return res.redirect('/logout');
       }
     }
 
@@ -76,16 +98,22 @@ router.post('/get-comments', authSession, async (req, res) => {
     /* --- Channel user (cache) --- */
     let userChannelId = req.session?.userChannelId;
     if (!userChannelId) {
-      const chanResp = await youtube.channels.list({ part: 'id', mine: true });
-      userChannelId = chanResp?.data?.items?.[0]?.id || null;
-      if (req.session) req.session.userChannelId = userChannelId;
+      const chanResp = await youtube.channels.list({ part: 'id', mine: true, auth: oauth2Client });
+      userChannelId = chanResp?.data?.items?.[0]?.id;
+      // if (req.session) req.session.userChannelId = userChannelId;
       console.log('[get-comments] userChannelId:', userChannelId);
     }
 
     /* --- Info video --- */
     const videoResp = await youtube.videos.list({ part: 'snippet', id: videoId });
     const videoItem = videoResp?.data?.items?.[0];
-    if (!videoItem) return res.status(404).send('❌ Video tidak ditemukan.');
+    if (!videoItem) {
+      const err = new Error('❌ tidak menemukan video.');
+      err.status = 400;
+      err.backUrl = '/judolremover';  // agar tombol kembali ke form input
+      return next(err);
+    }
+    
     const videoChannelId = videoItem.snippet.channelId;
 
     const isOwner = userChannelId && videoChannelId && userChannelId === videoChannelId;
@@ -180,7 +208,7 @@ router.post('/get-comments', authSession, async (req, res) => {
     });
   } catch (err) {
     console.error('YouTube API error (get-comments):', err);
-    res.status(500).send('❌ Gagal mengambil komentar.');
+    next(err);
   }
 });
 
