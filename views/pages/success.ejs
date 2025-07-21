@@ -61,49 +61,52 @@
       font-size: 1rem;
     }
 
-    a {
+    .btn-action {
       display: inline-block;
       margin-top: 25px;
       text-decoration: none;
-      color: #7f5af0;
-      font-weight: 500;
-      border-bottom: 1px dotted #7f5af0;
-      transition: all 0.3s ease;
+      color: #fff;
+      background: linear-gradient(135deg, #7CFC00 0%, #2e5e8e 100%);
+      font-weight: 600;
+      border-radius: 8px;
+      padding: 0.5rem 1.2rem;
+      border: none;
+      transition: all 0.3s;
+      box-shadow: 0 2px 10px rgba(44,62,80,0.15);
+      font-size: 1rem;
     }
-
-    a:hover {
-      color: #e94560;
-      border-bottom: 1px solid #e94560;
+    .btn-action:hover {
+      background: linear-gradient(135deg, #2e5e8e 0%, #7CFC00 100%);
+      color: #222;
     }
   </style>
 
   <link rel="icon" type="image/png" href="/images/logo_app_big.svg">
 </head>
 <body>
-  <!-- Include headerlogin di dalam body -->
+  <!-- Include headerlogin di dalam body jika perlu -->
 
   <div class="main-content">
     <div class="glass-card">
-      <div class="success">✅ <%= message %></div>
-
-      <div class="info">
-        <strong>Total komentar diproses:</strong> <%= selectedIds %>
-      </div>
-
-      <% if (isOwner) { %>
+      <% if (success) { %>
+        <div class="success">✅ <%= message %></div>
         <div class="info">
-          <%= permanentDelete ? 'Hapus Permanen (Tidak bisa di-undo)' : 'Sembunyikan (Bisa di-undo)' %>
+          <strong>Total komentar diproses:</strong> <%= selectedIds %>
         </div>
+        <a href="/dashboard" class="btn-action">⬅️ Kembali ke Dashboard</a>
       <% } else { %>
+        <div class="success" style="color:#e94560;">❌ <%= message %></div>
         <div class="info">
-          Kamu bukan pemilik video, komentar hanya dilaporkan sebagai spam ke YouTube.
+          <strong>Total komentar gagal diproses:</strong> <%= selectedIds %>
         </div>
+        <a href="/judolremover" class="btn-action" style="margin-right:1rem;">
+          <i class="bi bi-arrow-left"></i> Kembali ke JudolRemover
+        </a>
+        <a href="/dashboard" class="btn-action" style="margin-left:1rem;background:#444;">Kembali ke Dashboard</a>
       <% } %>
-
-      <a href="/dashboard">⬅️ Kembali ke Dashboard</a>
     </div>
   </div>
 
-  <!-- Footer tetap di bawah -->
+  <!-- Footer tetap di bawah jika perlu -->
 </body>
 </html>
