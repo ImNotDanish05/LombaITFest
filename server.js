@@ -69,7 +69,7 @@ app.use(async (err, req, res, next) => {
       code: err.status || 500,
       message: err.message || 'Terjadi kesalahan.'
     },
-    backUrl: user ? err.backUrl || '/'
+    backUrl: user ? err.backUrl : '/'
   });
 });
 
