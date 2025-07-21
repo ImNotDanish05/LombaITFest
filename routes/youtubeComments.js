@@ -418,6 +418,7 @@ router.post('/youtube/moderate-comments', authSession, async (req, res, next) =>
         ? `Komentar berhasil dimoderasi.`
         : `Beberapa komentar gagal diproses.`,
       isOwner,
+      success,
       permanentDelete,
       selectedIds: ids.length,
       user: user
