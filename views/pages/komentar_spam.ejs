@@ -247,6 +247,57 @@
       margin-left: 6px;
     }
 
+    .my-button {
+      position: relative; /* Penting untuk penempatan tooltip */
+      display: inline-block; /* Agar tombol tidak mengambil lebar penuh */
+      padding: 10px 20px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+      overflow: visible; /* Penting agar tooltip tidak terpotong */
+    }
+
+    .tooltip-text {
+      visibility: hidden; /* Sembunyikan secara default */
+      width: 160px; /* Sesuaikan lebar tooltip */
+      background-color: #150e57; /* Warna latar belakang tooltip */
+      color: #fff; /* Warna teks tooltip */
+      text-align: center;
+      border-radius: 6px;
+      padding: 8px 0;
+      position: absolute;
+      z-index: 1; /* Pastikan di atas elemen lain */
+      bottom: 125%; /* Posisikan di atas tombol */
+      left: 50%;
+      margin-left: -80px; /* Setengah dari lebar untuk menengahkan */
+      opacity: 0; /* Mulai dengan transparan */
+      transition: opacity 0.3s, transform 0.3s; /* Efek transisi */
+      transform: translateY(10px); /* Sedikit bergeser ke bawah saat tersembunyi */
+      box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.2); /* Bayangan untuk efek manis */
+    }
+
+    /* Panah kecil di bawah tooltip */
+    .tooltip-text::after {
+      content: "";
+      position: absolute;
+      top: 100%; /* Di bagian bawah tooltip */
+      left: 50%;
+      margin-left: -5px;
+      border-width: 5px;
+      border-style: solid;
+      border-color: #333 transparent transparent transparent; /* Warna panah */
+    }
+
+    /* Tampilkan tooltip saat tombol di-hover */
+    .my-button:hover .tooltip-text {
+      visibility: visible;
+      opacity: 1;
+      transform: translateY(0); /* Kembali ke posisi semula */
+    }
+
     .filter-method.ai { background: linear-gradient(120deg,#00c6ff,#0072ff); }
     .filter-method.manual { background: linear-gradient(120deg,#ff416c,#ff4b2b); }
   </style>
@@ -343,18 +394,22 @@
 
         <div class="action-bar">
           <% if (isOwner) { %>
-            <button type="submit" name="action" value="delete" class="btn-action" disabled id="btnDelete">
+            <button type="submit" name="action" value="delete" class="btn-action my-button" disabled id="btnDelete">
               Hapus Permanen
+              <span class="tooltip-text">Hapus secara permanen komentar yang terdeteksi mengandung unsur judi online. Tindakan ini tidak dapat dibatalkan.</span>
             </button>
-            <button type="submit" name="action" value="reject" class="btn-action secondary" disabled id="btnReject">
+            <button type="submit" name="action" value="reject" class="btn-action secondary my-button" disabled id="btnReject">
               Sembunyikan
+              <span class="tooltip-text">Sembunyikan komentar ini dari publik. Kamu bisa mengembalikannya kapan saja.</span>
             </button>
-            <button type="submit" name="action" value="spam" class="btn-action spam" disabled id="btnSpam">
-              Report Spam
+            <button type="submit" name="action" value="spam" class="btn-action spam my-button" disabled id="btnSpam">
+              Laporkan ke Youtube
+              <span class="tooltip-text">Laporkan komentar ini ke tim YouTube untuk ditinjau lebih lanjut.</span>
             </button>
           <% } else { %>
-            <button type="submit" name="action" value="report" class="btn-action" disabled id="btnReport">
-              Laporkan ke Pemilik
+            <button type="submit" name="action" value="report" class="btn-action my-button" disabled id="btnReport">
+              Laporkan ke Youtube
+              <span class="tooltip-text">Laporkan komentar ini ke tim YouTube untuk ditinjau lebih lanjut.</span>
             </button>
           <% } %>
         </div>
