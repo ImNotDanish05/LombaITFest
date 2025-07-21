@@ -6,7 +6,6 @@
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
 
 <style>
-  /* 1. Background Animated Gradient */
   body {
     background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460, #2e5e8e);
     background-size: 400% 400%;
@@ -20,24 +19,21 @@
     100% { background-position: 0% 50%; }
   }
 
-  /* 2. Card */
   .glass-card {
-  background: rgba(255, 255, 255, 0.08);
-  backdrop-filter: blur(12px);
-  border-radius: 25px;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  box-shadow: 0 8px 32px 0 rgba(0, 201, 167, 0.4), 0 0 20px rgba(58, 134, 255, 0.3);
-  color: white;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(12px);
+    border-radius: 25px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow: 0 8px 32px rgba(0, 201, 167, 0.4), 0 0 20px rgba(58, 134, 255, 0.3);
+    color: white;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
 
-.glass-card:hover {
-  transform: translateY(-8px);
-  box-shadow: 0 16px 40px rgba(58, 134, 255, 0.5), 0 0 30px rgba(0, 201, 167, 0.4);
-}
+  .glass-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 16px 40px rgba(58, 134, 255, 0.5), 0 0 30px rgba(0, 201, 167, 0.4);
+  }
 
-
-  /* 3. Animation */
   .animate-fade-in {
     animation: fadeInUp 0.8s ease-out forwards;
     opacity: 0;
@@ -50,34 +46,20 @@
     }
   }
 
-  /* 4. Profile Image */
   .profile-img-container {
-  display: inline-block;
-  padding: 5px;
-  border-radius: 50%;
-  margin-bottom: 1.5rem;
-  background: linear-gradient(
-    120deg,
-    #00FF9C,
-    #3a86ff,
-    #00FF9C,
-    #3a86ff,
-    #00FF9C
-  );
-  background-size: 500% 500%;
-  animation: moveGradient 3s linear infinite;
-}
-
-
-@keyframes moveGradient {
-  0% {
-    background-position: 0% 50%;
+    display: inline-block;
+    padding: 5px;
+    border-radius: 50%;
+    margin-bottom: 1.5rem;
+    background: linear-gradient(120deg, #00FF9C, #3a86ff, #00FF9C, #3a86ff, #00FF9C);
+    background-size: 500% 500%;
+    animation: moveGradient 3s linear infinite;
   }
-  100% {
-    background-position: 100% 50%;
+
+  @keyframes moveGradient {
+    0% { background-position: 0% 50%; }
+    100% { background-position: 100% 50%; }
   }
-}
-  
 
   .profile-img {
     width: 100px;
@@ -87,7 +69,6 @@
     border: 3px solid #1a1a2e;
   }
 
-  /* 5. Text Styling */
   .welcome-text {
     font-weight: 600;
     font-size: 2rem;
@@ -124,46 +105,58 @@
     color: #c0c0c0;
   }
 
-  /* 6. Button */
   .btn-custom-action {
-  background: linear-gradient(
-    120deg,
-    #FF1E1E,
-    #9F0000,
-    rgba(0, 0, 0, 0.2),
-    #9F0000,
-    #FF1E1E
-  );
-  background-size: 300% 100%;
-  animation: animate-bg 5s ease infinite;
-  border: none;
-  border-radius: 12px;
-  color: white;
-  font-weight: 500;
-  padding: 12px 25px;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-}
+    background: linear-gradient(120deg, #FF1E1E, #9F0000, rgba(0, 0, 0, 0.2), #9F0000, #FF1E1E);
+    background-size: 300% 100%;
+    animation: animate-bg 5s ease infinite;
+    border: none;
+    border-radius: 12px;
+    color: white;
+    font-weight: 500;
+    padding: 12px 25px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  }
 
-@keyframes animate-bg {
-  0% {
-    background-position: 0% 50%;
+  @keyframes animate-bg {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
   }
-  50% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0% 50%;
-  }
-}
-
 
   .btn-custom-action:hover {
     transform: scale(1.05);
     box-shadow: 0 6px 20px rgba(255, 0, 0, 0.5);
   }
 
-  /* 7. Comments Section */
+  .btn-tutorial {
+    background: linear-gradient(120deg, #7f5af0, #2cb1bc, rgba(0, 0, 0, 0.2), #2cb1bc, #7f5af0);
+    background-size: 300% 100%;
+    animation: animate-tutorial-bg 5s ease infinite;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    color: white;
+    font-weight: 500;
+    padding: 10px 20px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    text-decoration: none;
+    display: inline-block;
+  }
+
+  @keyframes animate-tutorial-bg {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+
+  .btn-tutorial:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 20px rgba(127, 90, 240, 0.5);
+    color: white;
+    text-decoration: none;
+  }
+
   .comments-section {
     width: 100%;
     max-width: 700px;
@@ -177,55 +170,55 @@
   }
 
   @media (max-width: 768px) {
-  .welcome-text {
-    font-size: 1.5rem;
-    text-align: center;
-  }
+    .welcome-text {
+      font-size: 1.5rem;
+      text-align: center;
+    }
 
-  .typing-animation {
-    font-size: 1.2rem;
-    white-space: normal;
-    border-right: none;
-  }
+    .typing-animation {
+      font-size: 1.2rem;
+      white-space: normal;
+      border-right: none;
+    }
 
-  .email-text {
-    flex-direction: column;
-    font-size: 0.85rem;
-    gap: 4px;
-    text-align: center;
-  }
+    .email-text {
+      flex-direction: column;
+      font-size: 0.85rem;
+      gap: 4px;
+      text-align: center;
+    }
 
-  .glass-card {
-    width: 100% !important;
-    padding: 20px !important;
-  }
+    .glass-card {
+      width: 100% !important;
+      padding: 20px !important;
+    }
 
-  .container {
-    padding-left: 1rem;
-    padding-right: 1rem;
-  }
+    .container {
+      padding-left: 1rem;
+      padding-right: 1rem;
+    }
 
-  .btn-custom-action {
-    font-size: 1rem;
-    padding: 10px 20px;
-  }
+    .btn-custom-action {
+      font-size: 1rem;
+      padding: 10px 20px;
+    }
 
-  .profile-img {
-    width: 80px;
-    height: 80px;
-  }
+    .btn-tutorial {
+      font-size: 0.9rem;
+      padding: 8px 16px;
+      margin-top: 10px;
+    }
 
-  .comments-section {
-    padding: 0 10px;
-  }
-}
+    .profile-img {
+      width: 80px;
+      height: 80px;
+    }
 
+    .comments-section {
+      padding: 0 10px;
+    }
+  }
 </style>
-
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
-
 
 <div class="container py-5 d-flex flex-column align-items-center justify-content-center min-vh-100">
   <div class="glass-card text-center animate-fade-in p-4 p-md-5" style="transform: translateY(20px);">
@@ -242,9 +235,13 @@
       <span><%= user.email %></span>
     </p>
 
-    <div class="d-grid">
+    <div class="d-grid gap-3">
       <a href="/judolremover" class="btn btn-custom-action btn-lg shadow-sm">
         <i class="bi bi-youtube me-2"></i>Mulai Menghapus
+      </a>
+      
+      <a href="/tutorial" class="btn btn-tutorial shadow-sm">
+        <i class="bi bi-book me-2"></i>Tutorial Penggunaan
       </a>
     </div>
   </div>
@@ -260,6 +257,5 @@
     </div>
   <% } %>
 </div>
-<!-- Content End -->
 
 <%- include('../partials/footer') %>
