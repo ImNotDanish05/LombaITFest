@@ -50,7 +50,7 @@ app.use('/uploads', express.static(path.join(__dirname, 'public', 'uploads')));
 app.use((req, res, next) => {
   const err = new Error('❌ Halaman tidak ditemukan.');
   err.status = 404;
-  err.backUrl = '/';
+  err.backUrl = '/dashboard';
   next(err);
 });
 
