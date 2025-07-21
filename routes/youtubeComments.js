@@ -243,9 +243,174 @@ router.post('/get-comments', authSession, async (req, res, next) => {
   }
 });
 
+
+
+
 /* ------------------------------------------------------------------ */
 /* POST /youtube/moderate-comments                                    */
 /* ------------------------------------------------------------------ */
+
+router.post('/youtube/moderate-comments', authSession, async (req, res, next) => {
+  try {
+    let permanentDelete = false;
+    const { action, videoId } = req.body;
+    let ids = req.body.ids;
+    let selectedIds = ids;
+    const user = req.user;
+
+    if (!ids) {
+      const err = new Error('❌ Tidak ada Komentar yang dipilih');
+      err.status = 400;
+      err.backUrl = '/judolremover';
+      return next(err);
+    }
+
+    if (typeof ids === 'string') ids = [ids];
+
+    console.log("[moderate] Action=%s totalIds=%d firstIds=%s", action, ids.length, ids.join(","));
+
+    const credentials = loadYoutubeCredentials();
+    const oauth2Client = new google.auth.OAuth2(
+      credentials.client_id,
+      credentials.client_secret,
+      isProductionHttps() ? credentials.redirect_uris[1] : credentials.redirect_uris[0]
+    );
+    oauth2Client.setCredentials({
+      access_token: req.user.access_token,
+      refresh_token: req.user.refresh_token,
+    });
+
+    try {
+      await oauth2Client.getAccessToken();
+    } catch (refreshError) {
+      console.warn('⚠ Refresh token (moderate) gagal:', refreshError?.message);
+      if (oauth2Client.credentials.refresh_token) {
+        const tokens = await oauth2Client.refreshAccessToken();
+        oauth2Client.setCredentials(tokens.credentials);
+      }
+    }
+
+    if (process.env.DEBUG_JUDOL_LOG === '1') {
+      console.log('[moderate] token scopes:', oauth2Client.credentials.scope);
+    }
+
+    const youtube = google.youtube({ version: 'v3', auth: oauth2Client });
+
+    // Ownership check
+    const userChannelId = await getUserChannelId(youtube, req);
+    const videoChannelId = await getVideoChannelId(youtube, videoId);
+    const isOwner = userChannelId && videoChannelId && userChannelId === videoChannelId;
+
+    if (!isOwner) {
+      if (action !== 'report') {
+        const err = new Error('❌ Bukan pemilik video.');
+        err.status = 403;
+        err.backUrl = '/dashboard';
+        return next(err);
+      } else {
+        saveReportsLocal(req.user, videoId, ids);
+        return res.render('pages/success', {
+          message: 'Komentar berhasil dilaporkan ke youtube.',
+          isOwner,
+          permanentDelete,
+          selectedIds: selectedIds.length,
+          user: user
+        });
+      }
+    }
+
+    const allowedOwnerActions = new Set(['delete', 'reject', 'spam']);
+    if (!allowedOwnerActions.has(action)) {
+      const err = new Error('❌ Aksi tidak valid.');
+      err.status = 404;
+      err.backUrl = '/judolremover';
+      return next(err);
+    }
+
+    // Optional verify
+    if (process.env.VERIFY_DELETE_ID === '1' && action === 'delete') {
+      console.log('[moderate] Verifikasi sample ID komentar...');
+      const sample = ids.slice(0, 10);
+      try {
+        const verifyResp = await youtube.comments.list({
+          part: 'snippet',
+          id: sample.join(','),
+          maxResults: sample.length,
+        });
+        const returned = (verifyResp.data.items || []).map((i) => i.id);
+        console.log('[moderate] verify returned:', returned);
+      } catch (verErr) {
+        console.warn('Verifikasi ID gagal:', verErr.message);
+      }
+    }
+
+    console.log(`[moderate] Action=${action} totalIds=${ids.length} firstIds=${ids.slice(0, 5).join(',')}`);
+
+    let failedCount = 0;
+    const failures = [];
+
+    if (action === 'delete') {
+      for (const id of ids) {
+        try {
+          await youtube.comments.delete({ id });
+          permanentDelete = true;
+          console.log(`🗑️ Deleted comment: ${id}`);
+        } catch (err) {
+          failedCount++;
+          const info = describeGapiError(err);
+          console.error(`❌ Delete gagal (${id}):`, info.short);
+          failures.push({ id, ...info });
+        }
+      }
+    } else if (action === 'reject') {
+      for (const id of ids) {
+        try {
+          await youtube.comments.setModerationStatus({
+            id,
+            moderationStatus: 'rejected',
+          });
+          console.log(`🚫 Rejected comment: ${id}`);
+        } catch (err) {
+          failedCount++;
+          const info = describeGapiError(err);
+          console.error(`❌ Reject gagal (${id}):`, info.short);
+          failures.push({ id, ...info });
+        }
+      }
+    } else if (action === 'spam') {
+      for (const id of ids) {
+        try {
+          await youtube.comments.markAsSpam({ id });
+          console.log(`⚑ Marked as spam: ${id}`);
+        } catch (err) {
+          failedCount++;
+          const info = describeGapiError(err);
+          console.error(`❌ Mark spam gagal (${id}):`, info.short);
+          failures.push({ id, ...info });
+        }
+      }
+    }
+
+    const success = failedCount === 0;
+    return res.render('pages/success', {
+      message: success
+        ? `Komentar berhasil dimoderasi.`
+        : `Beberapa komentar gagal diproses.`,
+      isOwner,
+      permanentDelete,
+      selectedIds: selectedIds.length,
+      user: user
+    });
+
+  } catch (err) {
+    console.error('Gagal moderasi komentar (fatal):', err);
+    err.status = 500;
+    err.backUrl = '/judolremover';
+    return next(err);
+  }
+});
+
+/*
 router.post('/youtube/moderate-comments', authSession, async (req, res, next) => {
   try {
     let permanentDelete = false;
@@ -302,26 +467,17 @@ router.post('/youtube/moderate-comments', authSession, async (req, res, next) =>
         err.status = 403;
         err.backUrl = '/dashboard';  // agar tombol kembali ke form input
         return next(err);
-      
-        // return res
-        //   .status(403)
-        //   .json({ success: false, message: 'Bukan pemilik video.' });
       }
-      saveReportsLocal(req.user, videoId, ids);
+      else {
+        saveReportsLocal(req.user, videoId, ids);
         res.render('pages/success', {
         message: 'Komentar berhasil dilaporkan ke youtube.',
         isOwner,
         permanentDelete,
         selectedIds: selectedIds.length,
         user:user
-    })};
-      // return res.json({
-      //   success: true,
-      //   message: 'Komentar dilaporkan. Pemilik channel dapat menindaklanjuti.',
-      //   reported: ids.length,
-      //   action: 'report',
-      //});
-    //}
+      })}
+      };
 
     const allowedOwnerActions = new Set(['delete', 'reject', 'spam']);
     if (!allowedOwnerActions.has(action)) {
@@ -413,6 +569,7 @@ router.post('/youtube/moderate-comments', authSession, async (req, res, next) =>
     return next(err);
   }
 });
+*/
 
 /* ------------------------------------------------------------------ */
 /* OPTIONAL DEBUG: GET /youtube/debug-comment/:id                     */
