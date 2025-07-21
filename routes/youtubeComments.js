@@ -278,7 +278,6 @@ router.post('/youtube/moderate-comments', authSession, async (req, res, next) =>
     let permanentDelete = false;
     const { action, videoId } = req.body;
     let ids = req.body.ids;
-    let selectedIds = ids;
     const user = req.user;
 
     if (!ids) {
@@ -336,7 +335,7 @@ router.post('/youtube/moderate-comments', authSession, async (req, res, next) =>
           message: 'Komentar berhasil dilaporkan ke youtube.',
           isOwner,
           permanentDelete,
-          selectedIds: selectedIds.length,
+          selectedIds: ids.length,
           user: user
         });
       }
@@ -421,7 +420,7 @@ router.post('/youtube/moderate-comments', authSession, async (req, res, next) =>
         : `Beberapa komentar gagal diproses.`,
       isOwner,
       permanentDelete,
-      selectedIds: selectedIds.length,
+      selectedIds: ids.length,
       user: user
     });
 
