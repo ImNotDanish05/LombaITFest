@@ -144,12 +144,7 @@ router.post('/get-comments', authSession, async (req, res, next) => {
       nextPageToken = response.data.nextPageToken;
     } while (nextPageToken);
 
-    /* --- Bersihkan untuk display --- */
-    allComments = allComments.map((c) => ({
-      ...c,
-      text: sanitizeDisplayText(c.text),
-    }));
-
+    
     if (allComments.length === 0) {
       return res.render('pages/komentar_spam', {
         user: safeUser(req.user),
@@ -163,22 +158,58 @@ router.post('/get-comments', authSession, async (req, res, next) => {
     }
 
     /* --- Filtering --- */
-    let spamLabels;
+    // 1. Manual check (selalu dilakukan)
+    const manualLabels = allComments.map((c) => (getJudolComment(c.text) ? 1 : 0));
+
+    // 2. Jalankan AI untuk komentar yang lolos manual
+    const aiLabelsFull = new Array(allComments.length).fill(0); // default 0
     if (useAi) {
-      spamLabels = await getJudolCommentAi(allComments.map((c) => c.text));
-    } else {
-      spamLabels = allComments.map((c) => (getJudolComment(c.text) ? 1 : 0));
+      const textsForAi = [];
+      const indexMap = [];
+
+      manualLabels.forEach((label, idx) => {
+        if (label === 0) { // hanya komentar lolos manual
+          textsForAi.push(allComments[idx].text);
+          indexMap.push(idx);
+        }
+      });
+
+      if (textsForAi.length > 0) {
+        const aiResults = await getJudolCommentAi(textsForAi); // [0/1]
+        aiResults.forEach((res, i) => {
+          aiLabelsFull[indexMap[i]] = res; // tempatkan hasil AI ke posisi aslinya
+        });
+      }
     }
+
+    // 3. Gabungkan ke spamLabels final
+    const spamLabels = allComments.map((_, i) => (manualLabels[i] === 1 || aiLabelsFull[i] === 1) ? 1 : 0);
+
+
+    /* --- Bersihkan untuk display --- */
+    allComments = allComments.map((c) => ({
+    ...c,
+    text: sanitizeDisplayText(c.text),
+    }));
 
     while (spamLabels.length < allComments.length) spamLabels.push(0);
     if (spamLabels.length > allComments.length) spamLabels.length = allComments.length;
 
-    const commentsWithSpam = allComments.map((c, i) => ({
-      ...c,
-      isSpam: spamLabels[i] === 1,
-      flaggedBy: spamLabels[i] === 1 ? (useAi ? 'ai' : 'manual') : null,
-    }));
+    const commentsWithSpam = allComments.map((c, i) => {
+      let flaggedBy = null;
+      if (manualLabels[i] === 1) {
+        flaggedBy = 'manual';
+      } else if (aiLabelsFull[i] === 1) {
+        flaggedBy = 'ai';
+      }
 
+      return {
+        ...c,
+        isSpam: spamLabels[i] === 1,
+        flaggedBy,
+      };
+    });
+    
     const spamOnly = commentsWithSpam.filter((c) => c.isSpam);
     const stats = {
       total: allComments.length,

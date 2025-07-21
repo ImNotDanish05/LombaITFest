@@ -90,6 +90,8 @@ function getJudolComment(text) {
 /* AI Detection (batch 100, anti-mismatch)                            */
 /* ================================================================== */
 async function getJudolCommentAi(comments) {
+  console.log('getJudolCommentAi called with', comments.length, 'comments');
+  console.log(comments);
   if (!Array.isArray(comments) || comments.length === 0) return [];
   if (!GEMINI_API_KEY) {
     console.error('❌ GEMINI_API_KEY kosong. Fallback semua 0.');
@@ -107,7 +109,7 @@ async function getJudolCommentAi(comments) {
   // sinkron panjang global
   while (out.length < comments.length) out.push(0);
   if (out.length > comments.length) out.length = comments.length;
-
+  console.log(out);
   return out;
 }
 
