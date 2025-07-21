@@ -275,6 +275,7 @@ router.post('/get-comments', authSession, async (req, res, next) => {
 
 router.post('/youtube/moderate-comments', authSession, async (req, res, next) => {
   try {
+    let success = false;
     let permanentDelete = false;
     const { action, videoId } = req.body;
     let ids = req.body.ids;
@@ -322,17 +323,33 @@ router.post('/youtube/moderate-comments', authSession, async (req, res, next) =>
     const userChannelId = await getUserChannelId(youtube, req);
     const videoChannelId = await getVideoChannelId(youtube, videoId);
     const isOwner = userChannelId && videoChannelId && userChannelId === videoChannelId;
+    let failedCount = 0;
 
     if (!isOwner) {
-      if (action !== 'report') {
+      if (action !== 'spam') {
         const err = new Error('❌ Bukan pemilik video.');
         err.status = 403;
         err.backUrl = '/dashboard';
         return next(err);
       } else {
+        for (const id of ids) {
+          try {
+            await youtube.comments.markAsSpam({ id });
+            console.log(`⚑ Marked as spam: ${id}`);
+          } catch (err) {
+            failedCount++;
+            const info = describeGapiError(err);
+            console.error(`❌ Mark spam gagal (${id}):`, info.short);
+            failures.push({ id, ...info });
+          }
+        }
+        success = failedCount === 0;
         return res.render('pages/success', {
           message: 'Komentar berhasil dilaporkan ke youtube.',
+          action: 'spam',
           isOwner,
+          success,
+          failedCount,
           permanentDelete,
           selectedIds: ids.length,
           user: user
@@ -367,10 +384,10 @@ router.post('/youtube/moderate-comments', authSession, async (req, res, next) =>
 
     console.log(`[moderate] Action=${action} totalIds=${ids.length} firstIds=${ids.slice(0, 5).join(',')}`);
 
-    let failedCount = 0;
     const failures = [];
-
+    let message = '';
     if (action === 'delete') {
+      message = `Komentar berhasil dihapus secara permanen.`;
       for (const id of ids) {
         try {
           await youtube.comments.delete({ id });
@@ -384,6 +401,7 @@ router.post('/youtube/moderate-comments', authSession, async (req, res, next) =>
         }
       }
     } else if (action === 'reject') {
+      message = `Komentar berhasil disembunyikan.`;
       for (const id of ids) {
         try {
           await youtube.comments.setModerationStatus({
@@ -399,6 +417,7 @@ router.post('/youtube/moderate-comments', authSession, async (req, res, next) =>
         }
       }
     } else if (action === 'spam') {
+      message = `Komentar berhasil direport sebagai spam ke youtube`;
       for (const id of ids) {
         try {
           await youtube.comments.markAsSpam({ id });
@@ -411,14 +430,16 @@ router.post('/youtube/moderate-comments', authSession, async (req, res, next) =>
         }
       }
     }
-
-    const success = failedCount === 0;
+    
+    success = failedCount === 0;
+    
     return res.render('pages/success', {
-      message: success
-        ? `Komentar berhasil dimoderasi.`
-        : `Beberapa komentar gagal diproses.`,
+      message: success ?
+      message : `Beberapa komentar gagal diproses.`,
       isOwner,
       success,
+      action,
+      failedCount,
       permanentDelete,
       selectedIds: ids.length,
       user: user
