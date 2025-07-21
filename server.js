@@ -1,25 +1,23 @@
+const fs            = require('fs');
+const path          = require('path');
+const http          = require('http');
+const https         = require('https');
+const express       = require('express');
+const socketio      = require('socket.io');
+const cors          = require('cors');
+const bodyParser    = require('body-parser');
+const cookieParser  = require('cookie-parser');
+const session       = require('express-session');
+const mongoose      = require('mongoose');
 
-const http = require('http');
-const https = require('https');
-
-const express = require('express');
-const cors = require('cors');
-const bodyParser = require('body-parser');
-const path = require('path');
-const mongoose = require('mongoose');
-const fs = require('fs');
-const session = require('express-session');
-const cookieParser = require('cookie-parser');
-const checkProtocol = require('./middlewares/checkProtocol');
-const { checkSession, authSession } = require('./controllers/authSession');
-const isProductionHttps = require('./utils/isProductionHttps');
-const youtubeCommentsRouter = require('./routes/youtubeComments');
+const checkProtocol       = require('./middlewares/checkProtocol');
+const { checkSession }    = require('./controllers/authSession');
+const isProductionHttps   = require('./utils/isProductionHttps');
 const { loadYoutubeCredentials } = require('./utils/LoadData');
 
-const app = express();
-const credentials = loadYoutubeCredentials();
+const app         = express();
+const ytCreds     = loadYoutubeCredentials();
 
-// Middleware
 app.use(checkProtocol);
 app.use(cors());
 app.use(bodyParser.json());
@@ -29,81 +27,91 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 app.use(session({
-  secret: credentials.client_secret,
+  secret: ytCreds.client_secret,
   resave: false,
   saveUninitialized: true
 }));
 
-
-
-// Routes
-app.use('/', require('./routes/youtube'));
 app.use('/', require('./routes/index'));
 app.use('/', require('./routes/auth'));
 app.use('/', require('./routes/dashboard'));
-app.use('/', require('./routes/youtubeComments'));
+app.use('/', require('./routes/youtube'));
 app.use('/', require('./routes/judol'));
+app.use('/', require('./routes/youtubeComments'));
 app.use('/', require('./routes/home'));
 app.use('/', require('./routes/success'));
-app.use('/', require('./routes/auth'));
-app.use('/', require('./routes/youtubeComments'));
 app.use('/uploads', express.static(path.join(__dirname, 'public', 'uploads')));
 
 app.use((req, res, next) => {
-  const err = new Error('❌ Halaman tidak ditemukan.');
-  err.status = 404;
+  const err   = new Error('❌ Halaman tidak ditemukan.');
+  err.status  = 404;
   err.backUrl = '/dashboard';
   next(err);
 });
 
-app.use(async (err, req, res, next) => {
+app.use(async (err, req, res, _next) => {
   console.error(err.stack);
   let user = null;
-  try {
-    user = req.user || await checkSession(req);
-  } catch (e) {
-    // abaikan
-  }
+  try { user = req.user || await checkSession(req); } catch {}
+
   res.status(err.status || 500).render('pages/eror', {
-    title: 'Error',
-    user: user,
-    error: {
-      code: err.status || 500,
+    title : 'Error',
+    user  : user,
+    error : {
+      code   : err.status || 500,
       message: err.message || 'Terjadi kesalahan.'
     },
     backUrl: user ? err.backUrl : '/'
   });
 });
 
-
-// Fungsi async untuk connect MongoDB dan start server
 const startServer = async () => {
   try {
-    // ✅ MongoDB Connect
-    await mongoose.connect('mongodb+srv://public:DIKpwpcctrx9hIeZ@youtubedata.cqgmi5j.mongodb.net/dbKontenJudol');
+    await mongoose.connect(
+      'mongodb+srv://public:DIKpwpcctrx9hIeZ@youtubedata.cqgmi5j.mongodb.net/dbKontenJudol'
+    );
     console.log('✅ MongoDB Atlas connected');
 
-    // ✅ Start Server (HTTPS atau HTTP)
-    console.log('Https mode:', isProductionHttps());
+    const useHttps = isProductionHttps();
+    console.log('Https mode:', useHttps);
 
-    if (isProductionHttps()) {
-      const privateKey = fs.readFileSync('/etc/letsencrypt/live/novaclean.danish05.my.id/privkey.pem', 'utf8');
-      const certificate = fs.readFileSync('/etc/letsencrypt/live/novaclean.danish05.my.id/fullchain.pem', 'utf8');
-      const credentials = { key: privateKey, cert: certificate };
-
-      https.createServer(credentials, app).listen(443, () => {
-        console.log('🔐 HTTPS Server running on port 443');
-      });
+    /* a. buat server (http atau https) */
+    let server;
+    if (useHttps) {
+      const creds = {
+        key : fs.readFileSync('/etc/letsencrypt/live/novaclean.danish05.my.id/privkey.pem',  'utf8'),
+        cert: fs.readFileSync('/etc/letsencrypt/live/novaclean.danish05.my.id/fullchain.pem','utf8')
+      };
+      server = https.createServer(creds, app);
     } else {
-      const port = process.env.PORT || 3000;
-      http.createServer(app).listen(port, () => {
-        console.log(`🌐 HTTP Server running on http://localhost:${port}`);
-        console.log(`🔐 Login: http://localhost:${port}/login`);
-      });
+      server = http.createServer(app);
     }
-  } catch (error) {
-    console.error('❌ Gagal memulai server:', error);
-    process.exit(1); // keluar dengan error
+
+    /* b. attach Socket.IO sekali saja */
+    const io = socketio(server, {});
+    app.set('io', io);                       // simpan di app untuk dipakai di route
+    global.io = io;                          // opsi global (hindari redeclare)
+
+    io.on('connection', socket => {
+      console.log('🔌 Client connected:', socket.id);
+      socket.on('disconnect', () =>
+        console.log('🔌 Client disconnected:', socket.id)
+      );
+    });
+
+    /* c. hidupkan server */
+    const PORT = process.env.PORT || 3000;
+    server.listen(useHttps ? 443 : PORT, () => {
+      console.log(
+        useHttps
+          ? '🔐 HTTPS Server running on port 443'
+          : `🌐 HTTP Server running on http://localhost:${PORT}\n   🔐 Login: http://localhost:${PORT}/login`
+      );
+    });
+
+  } catch (err) {
+    console.error('❌ Gagal memulai server:', err);
+    process.exit(1);
   }
 };
 
