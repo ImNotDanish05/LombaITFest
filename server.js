@@ -14,8 +14,10 @@ const checkProtocol = require('./middlewares/checkProtocol');
 const { checkSession, authSession } = require('./controllers/authSession');
 const isProductionHttps = require('./utils/isProductionHttps');
 const youtubeCommentsRouter = require('./routes/youtubeComments');
+const { loadYoutubeCredentials } = require('./utils/LoadData');
 
 const app = express();
+const credentials = loadYoutubeCredentials();
 
 // Middleware
 app.use(checkProtocol);
@@ -27,7 +29,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 app.use(session({
-  secret: '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',
+  secret: credentials.client_secret,
   resave: false,
   saveUninitialized: true
 }));
