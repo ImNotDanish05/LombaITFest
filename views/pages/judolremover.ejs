@@ -255,17 +255,45 @@
 </div>
 
 <!-- ✅ SCRIPT -->
+
+
+<!-- SOCKET -->
+<script src="/socket.io/socket.io.js"></script>
 <script>
   const form = document.getElementById('commentForm');
   const overlay = document.getElementById('loadingOverlay');
+  const socket = io();
 
-  form.addEventListener('submit', function () {
+  // Dengerin event dari server buat update teks loading
+  socket.on('progress', function (message) {
+    const loaderText = document.querySelector('.loader-text');
+    if (loaderText) {
+      loaderText.textContent = message;
+    }
+  });
+
+  // Saat form dikirim
+  form.addEventListener('submit', function (event) {
+    // Tambahkan input hidden socketId sebelum submit
+    const socketId = socket.id;
+    let hidden = document.querySelector('input[name="socketId"]');
+    if (!hidden) {
+      hidden = document.createElement('input');
+      hidden.type = 'hidden';
+      hidden.name = 'socketId';
+      form.appendChild(hidden);
+    }
+    hidden.value = socketId;
+
+    // Tampilkan overlay
     overlay.style.display = 'flex';
   });
 
+  // Reset overlay saat kembali ke halaman
   window.addEventListener('pageshow', function () {
     overlay.style.display = 'none';
   });
 </script>
+
 
 <%- include('../partials/footer') %>

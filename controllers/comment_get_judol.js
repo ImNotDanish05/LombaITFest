@@ -12,6 +12,7 @@
 const fs = require('fs');
 const path = require('path');
 require('dotenv').config();
+const socketio      = require('socket.io');
 
 /* ------------------------------------------------------------------ */
 /* Ensure fetch (Node <18)                                            */
@@ -56,6 +57,7 @@ try {
 /* Manual Detection (tetap, sederhana)                                */
 /* ================================================================== */
 function getJudolComment(text) {
+
   if (!text) return false;
 
   const normalizedText = text.normalize('NFKD');

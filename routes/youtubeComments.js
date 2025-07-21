@@ -38,209 +38,232 @@ const isProductionHttps = require('../utils/isProductionHttps');
 /* ------------------------------------------------------------------ */
 router.post('/get-comments', authSession, async (req, res, next) => {
   try {
-    const useAi = req.body.useAiJudol === '1' || req.body.useAiJudol === true;
-    const youtubeUrl = req.body.youtubeUrl?.trim();
-    const user = req.user
-    if (!youtubeUrl) {
-      const err = new Error('❌ URL YouTube kosong.');
-      err.status = 400;
-      err.backUrl = '/judolremover';  // agar tombol kembali ke form input
-      return next(err);
-    }
+      const io = req.app.get('socketio');
+      const socketId = req.body.socketId; // ambil ID socket dari frontend
 
-    const videoId = getVideoIdFromUrl(youtubeUrl);
-    console.log (videoId, youtubeUrl);
-    if (!videoId) {
-      const err = new Error('❌ link video youtube tidak valid.');
-      err.status = 400;
-      err.backUrl = '/judolremover';  // agar tombol kembali ke form input
-      return next(err);
-    }
-
-    /* --- OAuth --- */
-    const credentials = loadYoutubeCredentials();
-    const oauth2Client = new google.auth.OAuth2(
-      credentials.client_id,
-      credentials.client_secret,
-      isProductionHttps() ? credentials.redirect_uris[1] : credentials.redirect_uris[0]
-    );
-    oauth2Client.setCredentials({
-      access_token: req.user.access_token,
-      refresh_token: req.user.refresh_token,
-    });
-
-    try {
-      await oauth2Client.getAccessToken();
-    } catch (refreshError) {
-      console.warn('⚠ Refresh token (get-comments) gagal:', refreshError?.message);
-
-      if (oauth2Client.credentials.refresh_token) {
-        try {
-          const tokens = await oauth2Client.refreshAccessToken();
-          oauth2Client.setCredentials(tokens.credentials);
-        } catch (refreshFail) {
-          console.error('❌ Refresh token gagal:', refreshFail.message);
-          // Logout user langsung
-          return res.redirect('/logout');
+      function emitProgress(msg) {
+        if (socketId && io) {
+          io.to(socketId).emit('progress', msg);
         }
-      } else {
-        // Tidak ada refresh token → langsung logout
-        return res.redirect('/logout');
       }
-    }
+      emitProgress('Memulai proses ambil komentar...');
+      const useAi = req.body.useAiJudol === '1' || req.body.useAiJudol === true;
+      const youtubeUrl = req.body.youtubeUrl?.trim();
+      const user = req.user
 
-    if (process.env.DEBUG_JUDOL_LOG === '1') {
-      console.log('[get-comments] token scopes:', oauth2Client.credentials.scope);
-    }
+      emitProgress('Memeriksa URL YouTube...');
+      if (!youtubeUrl) {
+        const err = new Error('❌ URL YouTube kosong.');
+        err.status = 400;
+        err.backUrl = '/judolremover';  // agar tombol kembali ke form input
+        return next(err);
+      }
 
-    const youtube = google.youtube({ version: 'v3', auth: oauth2Client });
+      emitProgress('Mengekstrak ID video dari URL...');
+      const videoId = getVideoIdFromUrl(youtubeUrl);
+      console.log (videoId, youtubeUrl);
+      if (!videoId) {
+        const err = new Error('❌ link video youtube tidak valid.');
+        err.status = 400;
+        err.backUrl = '/judolremover';  // agar tombol kembali ke form input
+        return next(err);
+      }
 
-    /* --- Channel user (cache) --- */
-    let userChannelId = req.session?.userChannelId;
-    if (!userChannelId) {
-      const chanResp = await youtube.channels.list({ part: 'id', mine: true, auth: oauth2Client });
-      userChannelId = chanResp?.data?.items?.[0]?.id;
-      // if (req.session) req.session.userChannelId = userChannelId;
-      console.log('[get-comments] userChannelId:', userChannelId);
-    }
-
-    /* --- Info video --- */
-    const videoResp = await youtube.videos.list({ part: 'snippet', id: videoId });
-    const videoItem = videoResp?.data?.items?.[0];
-    if (!videoItem) {
-      const err = new Error('❌ Tidak menemukan video.');
-      err.status = 400;
-      err.backUrl = '/judolremover';  // agar tombol kembali ke form input
-      return next(err);
-    }
-    
-    const videoChannelId = videoItem.snippet.channelId;
-
-    const isOwner = userChannelId && videoChannelId && userChannelId === videoChannelId;
-    console.log(`[get-comments] isOwner? ${isOwner} (user: ${userChannelId} vs video: ${videoChannelId})`);
-
-    /* --- Ambil komentar (pagination) --- */
-    let allComments = [];
-    let nextPageToken = null;
-    do {
-      const response = await youtube.commentThreads.list({
-        part: 'snippet',
-        videoId,
-        maxResults: 100,
-        pageToken: nextPageToken || '',
+      /* --- OAuth --- */
+      emitProgress('Mengautentikasi dengan YouTube API...');
+      const credentials = loadYoutubeCredentials();
+      const oauth2Client = new google.auth.OAuth2(
+        credentials.client_id,
+        credentials.client_secret,
+        isProductionHttps() ? credentials.redirect_uris[1] : credentials.redirect_uris[0]
+      );
+      oauth2Client.setCredentials({
+        access_token: req.user.access_token,
+        refresh_token: req.user.refresh_token,
       });
 
-      const items = response?.data?.items;
-      if (!items || !items.length) break;
+      try {
+        await oauth2Client.getAccessToken();
+      } catch (refreshError) {
+        console.warn('⚠ Refresh token (get-comments) gagal:', refreshError?.message);
 
-      const commentsBatch = items.map((item) => ({
-        text: item.snippet.topLevelComment.snippet.textDisplay,
-        commentId: item.snippet.topLevelComment.id, // penting: ID komentar
-        author: item.snippet.topLevelComment.snippet.authorDisplayName,
-        publishedAt: item.snippet.topLevelComment.snippet.publishedAt,
+        if (oauth2Client.credentials.refresh_token) {
+          try {
+            const tokens = await oauth2Client.refreshAccessToken();
+            oauth2Client.setCredentials(tokens.credentials);
+          } catch (refreshFail) {
+            console.error('❌ Refresh token gagal:', refreshFail.message);
+            // Logout user langsung
+            return res.redirect('/logout');
+          }
+        } else {
+          // Tidak ada refresh token → langsung logout
+          return res.redirect('/logout');
+        }
+      }
+
+      if (process.env.DEBUG_JUDOL_LOG === '1') {
+        console.log('[get-comments] token scopes:', oauth2Client.credentials.scope);
+      }
+
+      const youtube = google.youtube({ version: 'v3', auth: oauth2Client });
+
+      emitProgress('Mengecek kepemilikan video...');
+      /* --- Channel user (cache) --- */
+      let userChannelId = req.session?.userChannelId;
+      if (!userChannelId) {
+        const chanResp = await youtube.channels.list({ part: 'id', mine: true, auth: oauth2Client });
+        userChannelId = chanResp?.data?.items?.[0]?.id;
+        // if (req.session) req.session.userChannelId = userChannelId;
+        console.log('[get-comments] userChannelId:', userChannelId);
+      }
+
+      /* --- Info video --- */
+      const videoResp = await youtube.videos.list({ part: 'snippet', id: videoId });
+      const videoItem = videoResp?.data?.items?.[0];
+      if (!videoItem) {
+        const err = new Error('❌ Tidak menemukan video.');
+        err.status = 400;
+        err.backUrl = '/judolremover';  // agar tombol kembali ke form input
+        return next(err);
+      }
+      
+      const videoChannelId = videoItem.snippet.channelId;
+
+      const isOwner = userChannelId && videoChannelId && userChannelId === videoChannelId;
+      console.log(`[get-comments] isOwner? ${isOwner} (user: ${userChannelId} vs video: ${videoChannelId})`);
+
+      /* --- Ambil komentar (pagination) --- */
+      emitProgress('Mengambil komentar dari YouTube...');
+      let allComments = [];
+      let nextPageToken = null;
+      do {
+        emitProgress(`Mengambil batch komentar... (nextPageToken: ${nextPageToken || 'null'})`);
+        const response = await youtube.commentThreads.list({
+          part: 'snippet',
+          videoId,
+          maxResults: 100,
+          pageToken: nextPageToken || '',
+        });
+
+        const items = response?.data?.items;
+        if (!items || !items.length) break;
+
+        const commentsBatch = items.map((item) => ({
+          text: item.snippet.topLevelComment.snippet.textDisplay,
+          commentId: item.snippet.topLevelComment.id, // penting: ID komentar
+          author: item.snippet.topLevelComment.snippet.authorDisplayName,
+          publishedAt: item.snippet.topLevelComment.snippet.publishedAt,
+        }));
+
+        allComments = allComments.concat(commentsBatch);
+        nextPageToken = response.data.nextPageToken;
+      } while (nextPageToken);
+
+      
+      if (allComments.length === 0) {
+        return res.render('pages/komentar_spam', {
+          user: safeUser(req.user),
+          comments: [],
+          stats: { total: 0, spam: 0, ratio: 0 },
+          videoTitle: videoItem.snippet.title,
+          videoId,
+          useAi,
+          isOwner,
+        });
+      }
+
+      /* --- Filtering --- */
+      // 1. Manual check (selalu dilakukan)
+      emitProgress('Memeriksa komentar menggunakan Basic AI...');
+      const manualLabels = allComments.map((c, i) => (getJudolComment(c.text) ? 1 : 0));
+
+      // 2. Jalankan AI untuk komentar yang lolos manual
+      emitProgress('Memeriksa komentar menggunakan Gemini AI...');
+      const aiLabelsFull = new Array(allComments.length).fill(0); // default 0
+      if (useAi) {
+        const textsForAi = [];
+        const indexMap = [];
+
+        manualLabels.forEach((label, idx) => {
+          if (label === 0) { // hanya komentar lolos manual
+            textsForAi.push(allComments[idx].text);
+            indexMap.push(idx);
+          }
+          emitProgress(`Menyiapkan data untuk tahap Gemini AI ${textsForAi.length}/${allComments.length}...`);
+        });
+
+        if (textsForAi.length > 0) {
+          emitProgress('Memeriksa komentar dengan Gemini AI (Tunggu sekitar 2-3 menit)...');
+          const aiResults = await getJudolCommentAi(textsForAi); // [0/1]
+          aiResults.forEach((res, i) => {
+            aiLabelsFull[indexMap[i]] = res; // tempatkan hasil AI ke posisi aslinya
+          });
+        }
+      }
+
+      // 3. Gabungkan ke spamLabels final
+      emitProgress('Menggabungkan hasil manual dan AI...');
+      const spamLabels = allComments.map((_, i) => (manualLabels[i] === 1 || aiLabelsFull[i] === 1) ? 1 : 0);
+
+
+      /* --- Bersihkan untuk display --- */
+      allComments = allComments.map((c) => ({
+      ...c,
+      text: sanitizeDisplayText(c.text),
       }));
 
-      allComments = allComments.concat(commentsBatch);
-      nextPageToken = response.data.nextPageToken;
-    } while (nextPageToken);
+      while (spamLabels.length < allComments.length) spamLabels.push(0);
+      if (spamLabels.length > allComments.length) spamLabels.length = allComments.length;
 
-    
-    if (allComments.length === 0) {
-      return res.render('pages/komentar_spam', {
+      
+      const commentsWithSpam = allComments.map((c, i) => {
+        let flaggedBy = null;
+        emitProgress(`Mempersiapkan data untuk tampilan ${i + 1}/${allComments.length}...`);
+        if (manualLabels[i] === 1) {
+          flaggedBy = 'Basic AI';
+        } else if (aiLabelsFull[i] === 1) {
+          flaggedBy = 'Gemini AI';
+        }
+
+        return {
+          ...c,
+          isSpam: spamLabels[i] === 1,
+          flaggedBy,
+        };
+      });
+
+      const spamOnly = commentsWithSpam.filter((c) => c.isSpam);
+      const stats = {
+        total: allComments.length,
+        spam: spamOnly.length,
+        ratio: allComments.length
+          ? ((spamOnly.length / allComments.length) * 100).toFixed(2)
+          : 0,
+      };
+      emitProgress('Selesai memproses komentar. Tunggu sebentar...');
+      res.render('pages/komentar_spam', {
         user: safeUser(req.user),
-        comments: [],
-        stats: { total: 0, spam: 0, ratio: 0 },
+        comments: spamOnly,
+        stats,
         videoTitle: videoItem.snippet.title,
         videoId,
         useAi,
         isOwner,
       });
-    }
 
-    /* --- Filtering --- */
-    // 1. Manual check (selalu dilakukan)
-    const manualLabels = allComments.map((c) => (getJudolComment(c.text) ? 1 : 0));
-
-    // 2. Jalankan AI untuk komentar yang lolos manual
-    const aiLabelsFull = new Array(allComments.length).fill(0); // default 0
-    if (useAi) {
-      const textsForAi = [];
-      const indexMap = [];
-
-      manualLabels.forEach((label, idx) => {
-        if (label === 0) { // hanya komentar lolos manual
-          textsForAi.push(allComments[idx].text);
-          indexMap.push(idx);
-        }
+      debugLog({
+        videoId,
+        isOwner,
+        useAi,
+        total: allComments.length,
+        spam: spamOnly.length,
+        commentIdsSample: spamOnly.slice(0, 5).map((c) => c.commentId),
       });
-
-      if (textsForAi.length > 0) {
-        const aiResults = await getJudolCommentAi(textsForAi); // [0/1]
-        aiResults.forEach((res, i) => {
-          aiLabelsFull[indexMap[i]] = res; // tempatkan hasil AI ke posisi aslinya
-        });
-      }
+    } catch (err) {
+      console.error('YouTube API error (get-comments):', err);
+      next(err);
     }
-
-    // 3. Gabungkan ke spamLabels final
-    const spamLabels = allComments.map((_, i) => (manualLabels[i] === 1 || aiLabelsFull[i] === 1) ? 1 : 0);
-
-
-    /* --- Bersihkan untuk display --- */
-    allComments = allComments.map((c) => ({
-    ...c,
-    text: sanitizeDisplayText(c.text),
-    }));
-
-    while (spamLabels.length < allComments.length) spamLabels.push(0);
-    if (spamLabels.length > allComments.length) spamLabels.length = allComments.length;
-
-    const commentsWithSpam = allComments.map((c, i) => {
-      let flaggedBy = null;
-      if (manualLabels[i] === 1) {
-        flaggedBy = 'Basic AI';
-      } else if (aiLabelsFull[i] === 1) {
-        flaggedBy = 'Gemini AI';
-      }
-
-      return {
-        ...c,
-        isSpam: spamLabels[i] === 1,
-        flaggedBy,
-      };
-    });
-
-    const spamOnly = commentsWithSpam.filter((c) => c.isSpam);
-    const stats = {
-      total: allComments.length,
-      spam: spamOnly.length,
-      ratio: allComments.length
-        ? ((spamOnly.length / allComments.length) * 100).toFixed(2)
-        : 0,
-    };
-
-    res.render('pages/komentar_spam', {
-      user: safeUser(req.user),
-      comments: spamOnly,
-      stats,
-      videoTitle: videoItem.snippet.title,
-      videoId,
-      useAi,
-      isOwner,
-    });
-
-    debugLog({
-      videoId,
-      isOwner,
-      useAi,
-      total: allComments.length,
-      spam: spamOnly.length,
-      commentIdsSample: spamOnly.slice(0, 5).map((c) => c.commentId),
-    });
-  } catch (err) {
-    console.error('YouTube API error (get-comments):', err);
-    next(err);
-  }
 });
 
 
