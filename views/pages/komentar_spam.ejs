@@ -236,6 +236,18 @@
       font-weight: 500;
       letter-spacing: .5px;
     }
+    .badge-combo {
+      background: linear-gradient(120deg, #ff512f, #00c6ff); /* warna basic + gemini */
+      color: white;
+      padding: 3px 7px 2px;
+      border-radius: 999px;
+      font-size: .55rem;
+      font-weight: 600;
+      letter-spacing: .7px;
+      display: inline-block;
+      margin-left: 6px;
+    }
+
     .filter-method.ai { background: linear-gradient(120deg,#00c6ff,#0072ff); }
     .filter-method.manual { background: linear-gradient(120deg,#ff416c,#ff4b2b); }
   </style>
@@ -249,9 +261,11 @@
       </h1>
       <div class="sub-head">
         Video: <strong><%= videoTitle %></strong>
-        <span class="filter-method <%= useAi ? 'ai' : 'manual' %>">
-          <%= useAi ? 'AI Filter' : 'Manual Filter' %>
-        </span>
+        <% if (useAi) { %>
+          <span class="badge-combo">Basic + Gemini Filter</span>
+        <% } else { %>
+          <span class="filter-method manual">Basic AI Filter</span>
+        <% } %>
       </div>
 
       <div class="stats-grid">
@@ -265,7 +279,7 @@
           <b><%= stats.ratio %>%</b>Rasio Spam
         </div>
         <div class="stat-box">
-          <b><%= useAi ? 'AI' : 'Manual' %></b>Mode
+          <b><%= useAi ? 'Gemini AI' : 'Basic AI' %></b>Mode
         </div>
         <div class="stat-box">
           <b><%= isOwner ? 'Ya' : 'Tidak' %></b>Pemilik Video
@@ -274,7 +288,7 @@
 
       <% if (!isOwner) { %>
         <div class="warning">
-          ⚠️ Kamu bukan pemilik video ini. Kamu hanya bisa mengirim **laporan spam** (tidak langsung menghapus di YouTube).
+          ⚠️ Kamu bukan pemilik video ini. Komentar hanya akan dilaporkan sebagai spam ke <strong>YouTube</strong> (tidak langsung menghapus di YouTube).
         </div>
       <% } else { %>
         <div class="warning" style="background:rgba(79,227,255,0.10);border-color:rgba(79,227,255,0.35);color:#9be6ff;">
