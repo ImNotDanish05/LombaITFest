@@ -47,17 +47,24 @@ app.use('/', require('./routes/auth'));
 app.use('/', require('./routes/youtubeComments'));
 app.use('/uploads', express.static(path.join(__dirname, 'public', 'uploads')));
 
+app.use((req, res, next) => {
+  const err = new Error('❌ Halaman tidak ditemukan.');
+  err.status = 404;
+  err.backUrl = '/';
+  next(err);
+});
+
 app.use(async (err, req, res, next) => {
   console.error(err.stack);
   let user = null;
   try {
     user = req.user || await checkSession(req);
   } catch (e) {
-    // abaikan; user tetap null
+    // abaikan
   }
   res.status(err.status || 500).render('pages/eror', {
     title: 'Error',
-    user : user,
+    user: user,
     error: {
       code: err.status || 500,
       message: err.message || 'Terjadi kesalahan.'
@@ -65,21 +72,6 @@ app.use(async (err, req, res, next) => {
     backUrl: err.backUrl || '/'
   });
 });
-
-
-// Handle 404 (Route not found)
-// app.use(async (req, res) => {
-//   const user = await checkSession(req);
-
-//   res.status(404).render('pages/eror', {
-//     title: '404 - Halaman Tidak Ditemukan',
-//     error: {
-//       code: 404,
-//       message: `Halaman ${req.originalUrl} tidak ditemukan`
-//     },
-//     user:user
-//   });
-// });
 
 
 // Fungsi async untuk connect MongoDB dan start server

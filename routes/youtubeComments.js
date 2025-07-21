@@ -108,7 +108,7 @@ router.post('/get-comments', authSession, async (req, res, next) => {
     const videoResp = await youtube.videos.list({ part: 'snippet', id: videoId });
     const videoItem = videoResp?.data?.items?.[0];
     if (!videoItem) {
-      const err = new Error('❌ tidak menemukan video.');
+      const err = new Error('❌ Tidak menemukan video.');
       err.status = 400;
       err.backUrl = '/judolremover';  // agar tombol kembali ke form input
       return next(err);
@@ -254,7 +254,7 @@ router.post('/youtube/moderate-comments', authSession, async (req, res, next) =>
     let selectedIds = ids;
     const user = req.user;
     if (!ids) {
-      const err = new Error('❌ tidak ada Komentar yang dipilih');
+      const err = new Error('❌ Tidak ada Komentar yang dipilih');
       err.status = 400;
       err.backUrl = '/judolremover';  // agar tombol kembali ke form input
       return next(err);
