@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title><%= title %></title>
+  <title>Error Page</title>
   <style>
     * {
       box-sizing: border-box;
@@ -22,12 +22,171 @@
       justify-content: center;
       padding: 2rem;
       text-align: center;
+      overflow: hidden;
+      position: relative;
     }
 
     @keyframes gradientFlow {
       0% { background-position: 0% 50%; }
       50% { background-position: 100% 50%; }
       100% { background-position: 0% 50%; }
+    }
+
+    /* Particle System */
+    .particles-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      overflow: hidden;
+    }
+
+    .particle {
+      position: absolute;
+      background: #e94560;
+      border-radius: 50%;
+      animation: particleFloat 6s infinite linear;
+      opacity: 0.7;
+    }
+
+    .particle.error {
+      background: #ff6b6b;
+      animation: errorParticle 4s infinite ease-in-out;
+    }
+
+    .particle.glitch {
+      background: #ffd93d;
+      animation: glitchParticle 3s infinite ease-in-out;
+      clip-path: polygon(0 0, 100% 0, 85% 100%, 15% 100%);
+      border-radius: 0;
+    }
+
+    .particle.code {
+      background: #6bcf7f;
+      animation: codeParticle 8s infinite linear;
+      width: 3px !important;
+      height: 15px !important;
+      border-radius: 2px;
+    }
+
+    @keyframes particleFloat {
+      0% {
+        transform: translateY(100vh) rotate(0deg);
+        opacity: 0;
+      }
+      10% {
+        opacity: 0.7;
+      }
+      90% {
+        opacity: 0.7;
+      }
+      100% {
+        transform: translateY(-100px) rotate(360deg);
+        opacity: 0;
+      }
+    }
+
+    @keyframes errorParticle {
+      0%, 100% {
+        transform: translateY(100vh) scale(1) rotate(0deg);
+        opacity: 0;
+      }
+      50% {
+        transform: translateY(50vh) scale(1.5) rotate(180deg);
+        opacity: 1;
+      }
+    }
+
+    @keyframes glitchParticle {
+      0% {
+        transform: translateX(-100px) translateY(100vh) rotate(0deg);
+        opacity: 0;
+      }
+      25% {
+        transform: translateX(50px) translateY(75vh) rotate(90deg);
+        opacity: 1;
+      }
+      50% {
+        transform: translateX(-30px) translateY(50vh) rotate(180deg);
+        opacity: 0.8;
+      }
+      75% {
+        transform: translateX(80px) translateY(25vh) rotate(270deg);
+        opacity: 1;
+      }
+      100% {
+        transform: translateX(-100px) translateY(-50px) rotate(360deg);
+        opacity: 0;
+      }
+    }
+
+    @keyframes codeParticle {
+      0% {
+        transform: translateY(100vh) translateX(0);
+        opacity: 0;
+      }
+      20% {
+        opacity: 1;
+      }
+      80% {
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(-100px) translateX(200px);
+        opacity: 0;
+      }
+    }
+
+    /* Glitch Effect for Background */
+    .glitch-bg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: repeating-linear-gradient(
+        90deg,
+        transparent,
+        transparent 2px,
+        rgba(255, 0, 0, 0.03) 2px,
+        rgba(255, 0, 0, 0.03) 4px
+      );
+      animation: glitchBg 0.3s infinite;
+      pointer-events: none;
+    }
+
+    @keyframes glitchBg {
+      0%, 90%, 100% {
+        transform: translateX(0);
+      }
+      95% {
+        transform: translateX(-2px);
+      }
+    }
+
+    /* Static Noise */
+    .static-noise {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: 
+        radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px);
+      background-size: 10px 10px;
+      animation: staticNoise 0.1s infinite;
+      pointer-events: none;
+      opacity: 0.1;
+    }
+
+    @keyframes staticNoise {
+      0% { transform: translate(0, 0); }
+      25% { transform: translate(-1px, 1px); }
+      50% { transform: translate(1px, -1px); }
+      75% { transform: translate(-1px, -1px); }
+      100% { transform: translate(1px, 1px); }
     }
 
     .error-box {
@@ -39,6 +198,18 @@
       max-width: 600px;
       box-shadow: 0 8px 30px rgba(233, 69, 96, 0.4);
       transition: transform 0.3s ease;
+      position: relative;
+      z-index: 10;
+      animation: errorBoxGlow 2s infinite alternate;
+    }
+
+    @keyframes errorBoxGlow {
+      0% {
+        box-shadow: 0 8px 30px rgba(233, 69, 96, 0.4);
+      }
+      100% {
+        box-shadow: 0 8px 30px rgba(233, 69, 96, 0.6), 0 0 50px rgba(233, 69, 96, 0.2);
+      }
     }
 
     .error-box:hover {
@@ -50,6 +221,19 @@
       font-size: 3rem;
       margin-bottom: 1rem;
       color: #e94560;
+      animation: textGlitch 1s infinite;
+      position: relative;
+    }
+
+    @keyframes textGlitch {
+      0%, 90%, 100% {
+        transform: translateX(0);
+        text-shadow: 2px 2px 0 rgba(233, 69, 96, 0.5);
+      }
+      95% {
+        transform: translateX(-2px);
+        text-shadow: -2px 2px 0 rgba(233, 69, 96, 0.5), 2px -2px 0 rgba(255, 255, 0, 0.5);
+      }
     }
 
     .error-box p {
@@ -63,10 +247,13 @@
       font-weight: bold;
       font-size: 1.1rem;
       transition: color 0.2s;
+      position: relative;
+      z-index: 11;
     }
 
     .error-box a:hover {
       color: #a88ffb;
+      text-shadow: 0 0 10px rgba(127, 90, 240, 0.5);
     }
 
     .error-container {
@@ -74,18 +261,189 @@
       display: inline-block;
     }
 
+    /* Binary Rain Effect */
+    .binary-rain {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      overflow: hidden;
+    }
+
+    .binary-char {
+      position: absolute;
+      color: #00ff00;
+      font-family: 'Courier New', monospace;
+      font-size: 14px;
+      animation: binaryFall 6s infinite linear;
+      opacity: 0.3;
+    }
+
+    @keyframes binaryFall {
+      0% {
+        transform: translateY(-100px);
+        opacity: 0;
+      }
+      10% {
+        opacity: 0.3;
+      }
+      90% {
+        opacity: 0.3;
+      }
+      100% {
+        transform: translateY(100vh);
+        opacity: 0;
+      }
+    }
+
+    /* Floating Error Messages */
+    .floating-error {
+      position: absolute;
+      color: #ff6b6b;
+      font-family: 'Courier New', monospace;
+      font-size: 12px;
+      animation: floatingError 8s infinite ease-in-out;
+      pointer-events: none;
+      opacity: 0.6;
+    }
+
+    @keyframes floatingError {
+      0% {
+        transform: translateY(100vh) translateX(0) rotate(0deg);
+        opacity: 0;
+      }
+      25% {
+        opacity: 0.6;
+      }
+      75% {
+        opacity: 0.6;
+      }
+      100% {
+        transform: translateY(-50px) translateX(100px) rotate(360deg);
+        opacity: 0;
+      }
+    }
   </style>
 </head>
 <body>
-  <div class="error-container">
+  <!-- Particle Effects -->
+  <div class="particles-container" id="particlesContainer"></div>
+  
+  <!-- Glitch Effects -->
+  <div class="glitch-bg"></div>
+  <div class="static-noise"></div>
+  
+  <!-- Binary Rain -->
+  <div class="binary-rain" id="binaryRain"></div>
 
+  <div class="error-container">
     <div class="error-box">
-      <h1>Error <%= error.code %></h1>
-      <p><%= error.message %></p>
-      <a href="<%= user ? '/dashboard' : '/' %>">
-        ← Kembali ke <%= user ? 'Dashboard' : 'Beranda' %>
+      <h1>Error 404</h1>
+      <p>Halaman yang Anda cari tidak ditemukan</p>
+      <a href="/">
+        ← Kembali ke Beranda
       </a>
     </div>
   </div>
+
+  <script>
+    // Create floating particles
+    function createParticle() {
+      const particle = document.createElement('div');
+      particle.classList.add('particle');
+      
+      // Random particle type
+      const types = ['', 'error', 'glitch', 'code'];
+      const type = types[Math.floor(Math.random() * types.length)];
+      if (type) particle.classList.add(type);
+      
+      // Random size
+      const size = Math.random() * 8 + 2;
+      particle.style.width = size + 'px';
+      particle.style.height = size + 'px';
+      
+      // Random position
+      particle.style.left = Math.random() * 100 + 'vw';
+      
+      // Random animation delay
+      particle.style.animationDelay = Math.random() * 4 + 's';
+      
+      document.getElementById('particlesContainer').appendChild(particle);
+      
+      // Remove particle after animation
+      setTimeout(() => {
+        if (particle.parentNode) {
+          particle.parentNode.removeChild(particle);
+        }
+      }, 8000);
+    }
+
+    // Create binary rain
+    function createBinaryChar() {
+      const char = document.createElement('div');
+      char.classList.add('binary-char');
+      char.textContent = Math.random() > 0.5 ? '1' : '0';
+      
+      char.style.left = Math.random() * 100 + 'vw';
+      char.style.animationDelay = Math.random() * 2 + 's';
+      char.style.fontSize = (Math.random() * 6 + 10) + 'px';
+      
+      document.getElementById('binaryRain').appendChild(char);
+      
+      setTimeout(() => {
+        if (char.parentNode) {
+          char.parentNode.removeChild(char);
+        }
+      }, 6000);
+    }
+
+    // Create floating error messages
+    function createFloatingError() {
+      const errors = ['404', 'ERROR', 'NOT FOUND', 'NULL', 'UNDEFINED', '//ERROR', '<!ERROR>', '[ERROR]'];
+      const error = document.createElement('div');
+      error.classList.add('floating-error');
+      error.textContent = errors[Math.floor(Math.random() * errors.length)];
+      
+      error.style.left = Math.random() * 80 + '%';
+      error.style.animationDelay = Math.random() * 3 + 's';
+      
+      document.body.appendChild(error);
+      
+      setTimeout(() => {
+        if (error.parentNode) {
+          error.parentNode.removeChild(error);
+        }
+      }, 8000);
+    }
+
+    // Initialize particle effects
+    function initializeEffects() {
+      // Create particles
+      setInterval(createParticle, 200);
+      
+      // Create binary rain
+      setInterval(createBinaryChar, 150);
+      
+      // Create floating errors
+      setInterval(createFloatingError, 2000);
+    }
+
+    // Start effects when page loads
+    window.addEventListener('load', () => {
+      initializeEffects();
+      
+      // Create initial batch
+      for (let i = 0; i < 10; i++) {
+        setTimeout(createParticle, i * 100);
+        setTimeout(createBinaryChar, i * 80);
+      }
+      
+      for (let i = 0; i < 5; i++) {
+        setTimeout(createFloatingError, i * 400);
+      }
+    });
+  </script>
 </body>
 </html>
