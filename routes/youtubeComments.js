@@ -198,9 +198,9 @@ router.post('/get-comments', authSession, async (req, res, next) => {
     const commentsWithSpam = allComments.map((c, i) => {
       let flaggedBy = null;
       if (manualLabels[i] === 1) {
-        flaggedBy = 'manual';
+        flaggedBy = 'Basic AI';
       } else if (aiLabelsFull[i] === 1) {
-        flaggedBy = 'ai';
+        flaggedBy = 'Gemini AI';
       }
 
       return {

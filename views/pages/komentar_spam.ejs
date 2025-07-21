@@ -323,7 +323,7 @@
                 <div>
                   <span class="author"><%= comment.author || 'Anon' %></span>
                   <% if (comment.flaggedBy) { %>
-                    <span class="badge <%= comment.flaggedBy === 'ai' ? 'badge-ai' : 'badge-manual' %>">
+                    <span class="badge <%= comment.flaggedBy === 'Gemini AI' ? 'badge-ai' : 'badge-manual' %>">
                       <%= comment.flaggedBy %>
                     </span>
                   <% } %>

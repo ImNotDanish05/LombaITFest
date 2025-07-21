@@ -78,7 +78,7 @@ app.use(async (err, req, res, next) => {
 const startServer = async () => {
   try {
     // ✅ MongoDB Connect
-    await mongoose.connect('mongodb+srv://syauqi:RU5Jch8oORT91cnL@youtubedata.cqgmi5j.mongodb.net/dbKontenJudol');
+    await mongoose.connect('mongodb+srv://public:DIKpwpcctrx9hIeZ@youtubedata.cqgmi5j.mongodb.net/dbKontenJudol');
     console.log('✅ MongoDB Atlas connected');
 
     // ✅ Start Server (HTTPS atau HTTP)
