@@ -340,9 +340,9 @@
 
   <div class="error-container">
     <div class="error-box">
-      <h1>Error 404</h1>
-      <p>Halaman yang Anda cari tidak ditemukan</p>
-      <a href="/">
+      <h1><%= title %> <%= error.code %></h1>
+      <p><%= error.message %></p>
+      <a href="<%= backUrl %>">
         ← Kembali ke Beranda
       </a>
     </div>
