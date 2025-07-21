@@ -248,8 +248,11 @@ router.post('/get-comments', authSession, async (req, res, next) => {
 /* ------------------------------------------------------------------ */
 router.post('/youtube/moderate-comments', authSession, async (req, res, next) => {
   try {
+    let permanentDelete = false;
     const { action, videoId } = req.body;
     let ids = req.body.ids;
+    let selectedIds = ids;
+    const user = req.user;
     if (!ids) {
       const err = new Error('❌ tidak ada Komentar yang dipilih');
       err.status = 400;
@@ -349,11 +352,13 @@ router.post('/youtube/moderate-comments', authSession, async (req, res, next) =>
 
     let failedCount = 0;
     const failures = [];
+    
 
     if (action === 'delete') {
       for (const id of ids) {
         try {
           await youtube.comments.delete({ id });
+          permanentDelete = true;
           console.log(`🗑️ Deleted comment: ${id}`);
         } catch (err) {
           failedCount++;

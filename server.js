@@ -68,18 +68,18 @@ app.use(async (err, req, res, next) => {
 
 
 // Handle 404 (Route not found)
-app.use(async (req, res) => {
-  const user = await checkSession(req);
+// app.use(async (req, res) => {
+//   const user = await checkSession(req);
 
-  res.status(404).render('pages/eror', {
-    title: '404 - Halaman Tidak Ditemukan',
-    error: {
-      code: 404,
-      message: `Halaman ${req.originalUrl} tidak ditemukan`
-    },
-    user:user
-  });
-});
+//   res.status(404).render('pages/eror', {
+//     title: '404 - Halaman Tidak Ditemukan',
+//     error: {
+//       code: 404,
+//       message: `Halaman ${req.originalUrl} tidak ditemukan`
+//     },
+//     user:user
+//   });
+// });
 
 
 // Fungsi async untuk connect MongoDB dan start server
