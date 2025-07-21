@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
-  <title>Cara Menggunakan Website</title>
+  <title>Tutorial</title>
   <style>
     * {
       box-sizing: border-box;
@@ -17,9 +17,6 @@
       animation: gradientFlow 15s ease infinite;
       color: #fff;
       min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
       padding: 2rem;
     }
 
@@ -29,22 +26,39 @@
       100% { background-position: 0% 50%; }
     }
 
-    .container {
+    h1.title {
+      text-align: center;
+      color: #e94560;
+      margin-bottom: 2rem;
+      font-size: 2.5rem;
+    }
+
+    .grid-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+    }
+
+    @media (max-width: 768px) {
+      .grid-container {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .video-box {
       background: rgba(255, 255, 255, 0.08);
       backdrop-filter: blur(12px);
       border: 1px solid rgba(255, 255, 255, 0.2);
-      padding: 2rem;
+      padding: 1.5rem;
       border-radius: 20px;
-      max-width: 800px;
-      width: 100%;
       box-shadow: 0 8px 30px rgba(233, 69, 96, 0.4);
-      text-align: center;
     }
 
-    .container h1 {
-      font-size: 2.5rem;
-      margin-bottom: 1.5rem;
-      color: #e94560;
+    .video-box h2 {
+      font-size: 1.5rem;
+      color: #ffffff;
+      margin-bottom: 1rem;
+      text-align: center;
     }
 
     .video-wrapper {
@@ -53,7 +67,7 @@
       height: 0;
       overflow: hidden;
       border-radius: 12px;
-      margin-bottom: 2rem;
+      margin-bottom: 1rem;
     }
 
     .video-wrapper iframe {
@@ -63,62 +77,57 @@
       border: 0;
     }
 
-    .instructions {
-      text-align: left;
-      font-size: 1.1rem;
-      line-height: 1.8;
-    }
-
-    .instructions li {
-      margin-bottom: 1rem;
-    }
-
-    .timeline {
-      text-align: left;
-      font-size: 1rem;
+    .steps {
+      font-size: 0.95rem;
       line-height: 1.6;
-      margin-top: 1.5rem;
       padding-left: 1rem;
     }
-    .timeline li {
-      margin-bottom: 0.5rem;
+
+    .steps li {
+      margin-bottom: 0.6rem;
     }
-
-
   </style>
+  <link rel="icon" type="image/png" href="/images/logo_app_big.svg">
 </head>
 <body>
 
-  <div class="container">
-    <h1>📺 How To Use NovaClean </h1>
+  <h1 class="title">📺 How To Use NovaClean</h1>
 
-    <ul class="instructions">
-      <li>1️⃣ Log in using your Google account to start accessing the features.</li>
-      <li>2️⃣ After logging in, go to the dashboard and enter the YouTube video link you want to analyze.</li>
-      <li>3️⃣ Click the "Detect Spam Comments" button to start the scanning process.</li>
-      <li>4️⃣ Spam comments will be displayed, and you can select and delete them.</li>
-    </ul>
-
-    <div class="video-wrapper">
-      <iframe 
-        src="https://www.youtube.com/embed/XGTEX-GsiGE"
-        title="How To Use NovaClean"
-        allowfullscreen>
-      </iframe>
+  <div class="grid-container">
+    <!-- Bahasa Indonesia -->
+    <div class="video-box">
+      <h2>Panduan Bahasa Indonesia</h2>
+      <div class="video-wrapper">
+        <iframe 
+          src="https://www.youtube.com/embed/VIDIO_ID_INDO"
+          title="Tutorial NovaClean Indonesia"
+          allowfullscreen>
+        </iframe>
+      </div>
+      <ul class="steps">
+        <li>1️⃣ Masuk dengan akun Google Anda.</li>
+        <li>2️⃣ Masukkan link video YouTube ke dashboard.</li>
+        <li>3️⃣ Klik "Deteksi Komentar Spam".</li>
+        <li>4️⃣ Pilih komentar yang ingin dihapus.</li>
+      </ul>
     </div>
 
-    <ul class="timeline">
-      <li>1️⃣ 00:00 Opening.</li>
-      <li>2️⃣ 00:19 Quick Explanation.</li>
-      <li>3️⃣ 00:40 Example "Judol" Comment.</li>
-      <li>4️⃣ 01:21 App Demo - How user login.</li>
-      <li>5️⃣ 04:05 App Demo - Owner's Video.</li>
-      <li>6️⃣ 05:19 App Demo - Not Owner's Video.</li>
-      <li>7️⃣ 13:10 App Demo - Delete Account.</li>
-    </ul>
-
-    
-
+    <!-- English Version -->
+    <div class="video-box">
+      <h2>English Guide</h2>
+      <div class="video-wrapper">
+        <iframe 
+          src="https://www.youtube.com/embed/VIDIO_ID_ENGLISH"
+          title="NovaClean English Tutorial"
+          allowfullscreen>
+        </iframe>
+      </div>
+      <ul class="steps">
+        <li>1️⃣ Log in using your Google account.</li>
+        <li>2️⃣ Paste the YouTube video link on the dashboard.</li>
+        <li>3️⃣ Click "Detect Spam Comments".</li>
+        <li>4️⃣ Select and delete the unwanted comments.</li>
+      </ul>
     </div>
   </div>
 
