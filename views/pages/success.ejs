@@ -92,7 +92,7 @@
 
       <% if (isOwner) { %>
         <div class="info">
-          Mode: <%= permanentDelete ? 'Hapus Permanen (Tidak bisa di-undo)' : 'Sembunyikan (Bisa di-undo)' %>
+          <%= permanentDelete ? ' Komentar berhasil dihapus permanent. Komentar tidak bisa di kembalikan' : ' Sembunyikan ' %>
         </div>
       <% } else { %>
         <div class="info">
