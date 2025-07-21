@@ -330,7 +330,6 @@ router.post('/youtube/moderate-comments', authSession, async (req, res, next) =>
         err.backUrl = '/dashboard';
         return next(err);
       } else {
-        saveReportsLocal(req.user, videoId, ids);
         return res.render('pages/success', {
           message: 'Komentar berhasil dilaporkan ke youtube.',
           isOwner,
