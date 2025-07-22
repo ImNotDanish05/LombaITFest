@@ -29,7 +29,7 @@ router.get('/login', async (req, res) => {
   try {
     const user = await checkSession(req);
     if (user) return res.redirect('/dashboard/');
-
+    console.log('Redirect URI:', isProductionHttps() ? YC.redirect_uris[1] : YC.redirect_uris[0]);
     const url = oauth2Client.generateAuthUrl({
       access_type: 'offline',
       prompt: 'consent',
