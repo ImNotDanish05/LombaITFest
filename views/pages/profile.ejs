@@ -80,6 +80,7 @@
       display: flex;
       flex-direction: column;
       justify-content: flex-start;
+      color : white;
     }
 
     .profile-main-row {
@@ -124,19 +125,20 @@
       color: #fff;
       border: none;
       border-radius: 8px;
-      padding: 0.4rem 0.9rem; /* diperkecil dari 0.6rem 1.5rem */
-      font-size: 1rem;
+      padding: 0.3rem 0.6rem; /* dikurangi agar tombol lebih pendek */
+      font-size: 0.9rem;
       font-weight: 600;
       cursor: pointer;
       box-shadow: 0 4px 12px rgba(44, 62, 80, 0.25);
       transition: all 0.3s ease;
       display: inline-flex;
       align-items: center;
-      gap: 0.5rem;
+      gap: 0.4rem;
       text-decoration: none;
       min-width: 0;
-      width: auto;
+      width: fit-content; /* memastikan hanya selebar konten */
     }
+
 
     .btn-back:hover {
       background: linear-gradient(135deg, #2e5e8e 0%, #7CFC00 100%);
