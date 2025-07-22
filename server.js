@@ -14,9 +14,11 @@ const checkProtocol       = require('./middlewares/checkProtocol');
 const { checkSession }    = require('./controllers/authSession');
 const isProductionHttps   = require('./utils/isProductionHttps');
 const { loadYoutubeCredentials } = require('./utils/LoadData');
+const { setPriority } = require('os');
 
 const app         = express();
 const ytCreds     = loadYoutubeCredentials();
+
 
 app.use(checkProtocol);
 app.use(cors());
@@ -41,6 +43,8 @@ app.use('/', require('./routes/youtubeComments'));
 app.use('/', require('./routes/home'));
 app.use('/', require('./routes/success'));
 app.use('/uploads', express.static(path.join(__dirname, 'public', 'uploads')));
+
+
 
 app.use((req, res, next) => {
   const err   = new Error('❌ Halaman tidak ditemukan.');
@@ -88,7 +92,7 @@ const startServer = async () => {
     }
 
     /* b. attach Socket.IO sekali saja */
-    const io = socketio(server, {});
+    const io = socketio(server);
     app.set('io', io);                       // simpan di app untuk dipakai di route
     global.io = io;                          // opsi global (hindari redeclare)
 

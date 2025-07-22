@@ -38,7 +38,7 @@ const isProductionHttps = require('../utils/isProductionHttps');
 /* ------------------------------------------------------------------ */
 router.post('/get-comments', authSession, async (req, res, next) => {
   try {
-      const io = req.app.get('socketio');
+      const io = req.app.get('io');
       const socketId = req.body.socketId; // ambil ID socket dari frontend
 
       function emitProgress(msg) {
@@ -119,7 +119,7 @@ router.post('/get-comments', authSession, async (req, res, next) => {
       }
 
       /* --- Info video --- */
-      const videoResp = await youtube.videos.list({ part: 'snippet', id: videoId });
+      const videoResp = await youtube.videos.list({ part: 'snippet,statistics', id: videoId });
       const videoItem = videoResp?.data?.items?.[0];
       if (!videoItem) {
         const err = new Error('❌ Tidak menemukan video.');
@@ -138,7 +138,7 @@ router.post('/get-comments', authSession, async (req, res, next) => {
       let allComments = [];
       let nextPageToken = null;
       do {
-        emitProgress(`Mengambil batch komentar... (nextPageToken: ${nextPageToken || 'null'})`);
+        emitProgress(`Mengambil batch komentar... (${allComments.length})`);
         const response = await youtube.commentThreads.list({
           part: 'snippet',
           videoId,
@@ -176,7 +176,10 @@ router.post('/get-comments', authSession, async (req, res, next) => {
       /* --- Filtering --- */
       // 1. Manual check (selalu dilakukan)
       emitProgress('Memeriksa komentar menggunakan Basic AI...');
-      const manualLabels = allComments.map((c, i) => (getJudolComment(c.text) ? 1 : 0));
+      const manualLabels = allComments.map((c, i) => {
+        emitProgress(`🔎 Memeriksa komentar ke-${i + 1} dari ${allComments.length}`);
+        return getJudolComment(c.text) ? 1 : 0;
+      });
 
       // 2. Jalankan AI untuk komentar yang lolos manual
       emitProgress('Memeriksa komentar menggunakan Gemini AI...');
