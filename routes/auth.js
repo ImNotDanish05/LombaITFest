@@ -76,7 +76,11 @@ router.get('/auth/callback', async (req, res) => {
 
   try {
     // 1. Ambil token dari Google
-    const { tokens } = await oauth2Client.getToken(code);
+    const { tokens } = await oauth2Client.getToken({
+      code,
+      redirect_uri: isProductionHttps() ? YC.redirect_uris[1] : YC.redirect_uris[0]
+    });
+    
     oauth2Client.setCredentials(tokens);
 
     // 2. Ambil informasi user
