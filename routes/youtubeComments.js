@@ -138,7 +138,7 @@ router.post('/get-comments', authSession, async (req, res, next) => {
       let allComments = [];
       let nextPageToken = null;
       do {
-        emitProgress(`Mengambil batch komentar... (${allComments.length})`);
+        emitProgress(`Mengambil komentar ke ${allComments.length}...`);
         const response = await youtube.commentThreads.list({
           part: 'snippet',
           videoId,
@@ -292,6 +292,12 @@ router.post('/youtube/moderate-comments', authSession, async (req, res, next) =>
     }
 
     if (typeof ids === 'string') ids = [ids];
+    ids = ids.filter(id => typeof id === 'string' && id.trim() !== '');
+    if (ids.length === 0) {
+      const err = new Error('❌ Daftar komentar kosong.');
+      err.status = 400;
+      return next(err);
+    }
 
     console.log("[moderate] Action=%s totalIds=%d firstIds=%s", action, ids.length, ids.join(","));
 
@@ -327,6 +333,7 @@ router.post('/youtube/moderate-comments', authSession, async (req, res, next) =>
     const videoChannelId = await getVideoChannelId(youtube, videoId);
     const isOwner = userChannelId && videoChannelId && userChannelId === videoChannelId;
     let failedCount = 0;
+    const failures = [];
 
     if (!isOwner) {
       if (action !== 'spam') {
@@ -387,7 +394,7 @@ router.post('/youtube/moderate-comments', authSession, async (req, res, next) =>
 
     console.log(`[moderate] Action=${action} totalIds=${ids.length} firstIds=${ids.slice(0, 5).join(',')}`);
 
-    const failures = [];
+    
     let message = '';
     if (action === 'delete') {
       message = `Komentar berhasil dihapus secara permanen.`;
