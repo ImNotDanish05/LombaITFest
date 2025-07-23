@@ -15,6 +15,8 @@ const { checkSession }    = require('./controllers/authSession');
 const isProductionHttps   = require('./utils/isProductionHttps');
 const { loadYoutubeCredentials } = require('./utils/LoadData');
 const { setPriority } = require('os');
+require('dotenv').config();
+
 
 const app         = express();
 const ytCreds     = loadYoutubeCredentials();
@@ -72,7 +74,7 @@ app.use(async (err, req, res, _next) => {
 const startServer = async () => {
   try {
     await mongoose.connect(
-      'mongodb+srv://public:DIKpwpcctrx9hIeZ@youtubedata.cqgmi5j.mongodb.net/dbKontenJudol'
+      process.env.MONGODB_URI
     );
     console.log('✅ MongoDB Atlas connected');
 
