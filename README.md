@@ -22,7 +22,7 @@
    ```bash
    git clone https://github.com/ImNotDanish05/LombaITFest.git
    cd LombaITFest
-````
+   ```
 
 2. **Install dependensi**:
 
