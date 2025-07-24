@@ -57,7 +57,7 @@ NovaClean/
 ├── routes/
 ├── views/
 ├── .env               # Not included
-├── app.js
+├── server.js
 └── ...
 ```
 
