@@ -1,45 +1,52 @@
+
+---
+
 ````markdown
-# 🌐 NovaClean — AI-Powered YouTube Comment Moderator
+# 🌐 NovaClean — Moderator Komentar YouTube Berbasis AI
 
-NovaClean is a web-based application that leverages artificial intelligence to detect and assist creators in moderating spam comments—especially related to online gambling—on their YouTube videos. This project was developed as part of a youth innovation initiative to counter digital threats with technology.
+**NovaClean** adalah aplikasi berbasis web dibuat oleh tim CodeNova yang memanfaatkan kecerdasan buatan untuk membantu kreator YouTube dalam mendeteksi dan memoderasi komentar spam, khususnya yang berkaitan dengan promosi judi online. Aplikasi ini dikembangkan sebagai bagian dari inisiatif inovasi anak muda untuk menghadirkan solusi nyata terhadap masalah sosial digital.
 
-> **Disclaimer**: This repository is for educational and showcase purposes only. The service may require configuration that is not provided publicly due to security and licensing concerns.
+> ⚠️ **Catatan Penting**: Proyek ini ditampilkan sebagai dokumentasi pengembangan dan _showcase_. Beberapa konfigurasi penting **tidak disediakan secara publik** karena alasan keamanan dan lisensi.
 
-## 🚀 Features
+---
 
-- Automatically detects spam or gambling-related comments using pattern-based AI.
-- Utilizes a secondary AI layer to boost detection accuracy.
-- OAuth2-based Google login with full permission control (comment deletion, hiding, or reporting).
-- Lightweight UI that supports fast usage without installations.
-- Database integration for session handling and user account control.
+## 🚀 Fitur Utama
 
-## 🔧 Installation
+- Deteksi otomatis komentar spam atau promosi judi online.
+- Sistem AI berlapis untuk validasi dan akurasi yang lebih tinggi.
+- Login melalui Google OAuth2 dengan kontrol penuh terhadap aksi komentar (hapus, sembunyikan, lapor).
+- Antarmuka pengguna yang ringan dan mudah digunakan.
+- Integrasi database untuk manajemen sesi dan kontrol akun pengguna.
 
-1. Clone this repository:
+---
+
+## 🔧 Cara Penggunaan
+
+1. **Clone repositori ini** ke perangkat lokal:
    ```bash
-   git clone https://github.com/yourusername/NovaClean.git
+   git clone https://github.com/namapengguna/NovaClean.git
    cd NovaClean
 ````
 
-2. Install dependencies:
+2. **Install dependensi**:
 
    ```bash
    npm install
    ```
 
-3. Create an `.env` file in the root directory.
-   The required environment variables involve API keys and domain settings, but they **won’t be shared in this repository** for obvious reasons.
-   You are expected to already know what to put there based on your system configuration and access level. 😉
+3. **Siapkan file `.env`** di direktori utama proyek.
+   File ini berisi variabel lingkungan penting yang dibutuhkan aplikasi, seperti API Key dan konfigurasi domain.
+   Isi file ini **tidak dibagikan secara publik**, dan pengguna **diasumsikan sudah memahami** apa yang harus diisi berdasarkan sistem dan hak akses masing-masing. 😉
 
-4. Place your Google OAuth credentials in the following path:
+4. **Letakkan kredensial OAuth Google** di path berikut:
 
    ```
    config/credentials_youtube_api.json
    ```
 
-   > ⚠️ This file is required to run any YouTube API-related services. Make sure it's structured properly as expected by Google's OAuth system.
+   > ⚠️ File ini wajib ada agar fitur autentikasi dan akses YouTube API berjalan dengan baik. Pastikan strukturnya sesuai dengan format dari Google Developer Console.
 
-5. Start the application:
+5. **Jalankan aplikasi**:
 
    ```bash
    npm start
@@ -47,46 +54,48 @@ NovaClean is a web-based application that leverages artificial intelligence to d
 
 ---
 
-## 📁 Project Structure
+## 📁 Struktur Direktori
 
 ```
 NovaClean/
 ├── config/
-│   └── credentials_youtube_api.json   # Required for OAuth2
+│   └── credentials_youtube_api.json   # File kredensial OAuth
 ├── public/
 ├── routes/
 ├── views/
-├── .env               # Not included
-├── server.js
+├── .env               # Tidak disertakan
+├── app.js
 └── ...
 ```
 
 ---
 
-## 🧠 How It Works (Conceptually)
+## 🧠 Konsep Kerja
 
-NovaClean performs layered analysis on YouTube comments pulled via the YouTube Data API. The first layer uses classic rule-based matching. If uncertain, the comment is forwarded to a more advanced language model through a secondary API service. The system ensures only verified users can perform moderation on their own content.
-
----
-
-## ⚠️ Warning
-
-> Full functionality of this app depends on API services and credentials not provided in this repository. Unauthorized deployment or replication may result in **non-functioning features or errors**.
-
-This project is protected under personal and academic licensing agreements. Please do not attempt to deploy this application without proper authorization.
+NovaClean mengambil komentar dari video YouTube menggunakan YouTube Data API, lalu menganalisisnya menggunakan sistem AI dua lapis. Lapisan pertama menggunakan pendekatan berbasis pola teks, sedangkan lapisan kedua menggunakan model bahasa untuk memahami konteks. Hanya pengguna terverifikasi (pemilik video) yang dapat melakukan moderasi komentar melalui sistem ini.
 
 ---
 
-## 📝 License
+## ⚠️ Peringatan
 
-This repository is licensed under a custom limited-use license. All rights reserved to the original author. Do not redistribute, repurpose, or publicly deploy without explicit permission.
+> **Beberapa fitur utama tidak dapat berjalan** tanpa konfigurasi API dan kredensial yang **tidak disertakan dalam repositori ini**. Instalasi atau penggunaan tanpa pemahaman teknis mendalam mungkin akan menyebabkan aplikasi tidak dapat dijalankan dengan semestinya.
+
+Proyek ini dilindungi oleh lisensi terbatas dan hak cipta. Segala bentuk distribusi ulang, replikasi, atau penggunaan publik tanpa izin dari pengembang **tidak diperbolehkan**.
 
 ---
 
-## 📬 Contact
+## 📄 Lisensi
 
-For inquiries related to demo access or collaboration, you can reach out via the discussion tab or email listed on the repository owner’s GitHub profile.
+Repositori ini dilisensikan secara terbatas untuk kebutuhan pengembangan dan edukasi pribadi. Semua hak cipta dilindungi oleh pengembang asli.
+
+---
+
+## 📬 Kontak
+
+Untuk pertanyaan terkait akses demo, kerja sama, atau dokumentasi lanjutan, silakan hubungi melalui halaman diskusi atau informasi kontak yang tersedia di profil GitHub pengembang.
 
 ---
 
 ```
+
+---
