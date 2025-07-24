@@ -1,7 +1,3 @@
-
----
-
-````markdown
 # 🌐 NovaClean — Moderator Komentar YouTube Berbasis AI
 
 **NovaClean** adalah aplikasi berbasis web dibuat oleh tim CodeNova yang memanfaatkan kecerdasan buatan untuk membantu kreator YouTube dalam mendeteksi dan memoderasi komentar spam, khususnya yang berkaitan dengan promosi judi online. Aplikasi ini dikembangkan sebagai bagian dari inisiatif inovasi anak muda untuk menghadirkan solusi nyata terhadap masalah sosial digital.
