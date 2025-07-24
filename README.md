@@ -88,10 +88,6 @@ Repositori ini dilisensikan secara terbatas untuk kebutuhan pengembangan dan edu
 
 ## 📬 Kontak
 
-Untuk pertanyaan terkait akses demo, kerja sama, atau dokumentasi lanjutan, silakan hubungi melalui halaman diskusi atau informasi kontak yang tersedia di profil GitHub pengembang.
-
----
-
-```
+Untuk pertanyaan terkait akses demo, kerja sama, atau dokumentasi lanjutan, silakan hubungi melalui imnotdanish05bussiness@gmail.com.
 
 ---
